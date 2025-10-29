@@ -1,0 +1,120 @@
+{
+    "joojs": [
+        {
+            "id": 1,
+            "name": "The Witcher 3: Wild Hunt",
+            "hours_played": 60,
+            "hours_expected": null,
+            "platform": "PC",
+            "genre": "RPG",
+            "is_completed": false,
+            "release_year": 2015,
+            "status": "In Progress",
+            "year_started": 2023,
+            "year_finished": null,
+            "background_image": "https://img-eshop.cdn.nintendo.net/i/3f7ee6aa3482b514bd443e116022b038a9728f017916ed37da3f09f731a7d5f2.jpg"
+        },
+        {
+            "id": 2,
+            "name": "Ys VIII: Lacrimosa of Dana",
+            "hours_played": 65.5,            
+            "hours_expected": 60,
+            "platform": "Switch",
+            "genre": "JRPG",
+            "is_completed": true,
+            "release_year": 2016,
+            "status": "Finalizado",
+            "year_started": "2024",
+            "year_finished": "22/03/2025",
+            "background_image": "https://image.api.playstation.com/cdn/UP1063/CUSA08565_00/mAUZ8KJOfkEnbeYORx9cQqsU3GfuOyD4.png"
+        },
+        {
+            "id": 3,
+            "name": "Gravity Rush",
+            "hours_played": 13.5,            
+            "hours_expected": 15,
+            "platform": "PSVita",
+            "genre": "Ação",
+            "is_completed": true,
+            "release_year": 2012,
+            "status": "Finalizado",
+            "year_started": "2025",
+            "year_finished": "01/08/2025",
+            "background_image": "https://upload.wikimedia.org/wikipedia/pt/d/d6/Gravity_Rush_1_capa.png"
+        },
+        {
+            "id": 4,
+            "name": "God Of War - Chains of Olympus ",
+            "hours_played": 5,            
+            "hours_expected": 7,
+            "platform": "PSP-Emulado",
+            "genre": "Ação",
+            "is_completed": true,
+            "release_year": 2008,
+            "status": "Finalizado",
+            "year_started": "2025",
+            "year_finished": "2025",
+            "background_image": "https://upload.wikimedia.org/wikipedia/pt/d/d0/God_of_War_Chains_of_Olympus_capa.png"
+        },
+        {
+            "id": 5,
+            "name": "Pokemon Y",
+            "hours_played": 4.5,            
+            "hours_expected": 50,
+            "platform": "3DS-Emulado",
+            "genre": "Estratégia",
+            "is_completed": false,
+            "release_year": 2013,
+            "status": "Pausado",
+            "year_started": "2025",
+            "year_finished": null,
+            "background_image": "https://m.media-amazon.com/images/I/81ILHAC3VYL.jpg"
+        },
+        {
+            "id": 6,
+            "name": "Pokemon X",
+            "hours_played": 91,            
+            "hours_expected": 50,
+            "platform": "3DS-Emulado",
+            "genre": "Estratégia",
+            "is_completed": true,
+            "release_year": 2013,
+            "status": "Finalizado",
+            "year_started": "2019",
+            "year_finished": "2021",
+            "background_image": "https://http2.mlstatic.com/D_NQ_NP_722130-MLU79306092563_092024-O.webp"
+        },
+        {
+            "id": 7,
+            "name": "A Hat in Time",
+            "hours_played": 15,            
+            "hours_expected": 15,
+            "platform": "Switch",
+            "genre": "Aventura",
+            "is_completed": true,
+            "release_year": 2017,
+            "status": "Finalizado",
+            "year_started": "2024",
+            "year_finished": "22/03/2025",
+            "background_image": "https://assets.nintendo.com/image/upload/ar_16:9,c_lpad,w_1065/b_white/f_auto/q_auto/store/software/switch/70010000003813/32caf691ee34a12f7ca126f3905fea623a7ac30f5d604f9ac950460f25704ff4"
+        }
+
+    ],
+    "jogar": [
+        {
+            "id": 1,
+            "name": "Bravely Default",
+            "hours_played": 0,            
+            "hours_expected": 60,
+            "platform": "3DS-Emulado",
+            "genre": "JRPG",
+            "is_completed": false,
+            "release_year": 2012,
+            "status": "Not Started",
+            "year_started": null,
+            "year_finished": null,
+            "background_image": "https://upload.wikimedia.org/wikipedia/en/b/be/BDFF_Logo.jpg",
+            "background_image2": "https://howlongtobeat.com/games/14968_Bravely_Default.jpg"
+        }
+    ]
+}
