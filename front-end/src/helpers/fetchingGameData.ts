@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { fetchGames, fetchMyGames } from "../services/gameApiServices.ts"
+import { API } from "../services/gameApiServices.ts"
 
 // type Game = {
 //     id: number,
@@ -9,7 +9,7 @@ import { fetchGames, fetchMyGames } from "../services/gameApiServices.ts"
 export function useGameData() {
     return useQuery({
         queryKey: ['games'],
-        queryFn: fetchGames,
+        queryFn: API.fetchGames,
         refetchOnWindowFocus: false,
         gcTime: 1000 * 60 * 5,
     })
@@ -18,7 +18,7 @@ export function useGameData() {
 export function myGames() {
     return useQuery({
         queryKey: ['meu joojs'],
-        queryFn: fetchMyGames,
+        queryFn: API.fetchMyGames,
         refetchOnWindowFocus: false,
         gcTime: 1000 * 60 * 5,
     })
