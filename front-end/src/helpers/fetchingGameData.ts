@@ -6,10 +6,10 @@ import { API } from "../services/gameApiServices.ts"
 //     name: string
 // }
 
-export function useGameData() {
+export function useExternaGameData() {
     return useQuery({
         queryKey: ['games'],
-        queryFn: API.fetchGames,
+        queryFn: API.fetchApiExternaGames,
         refetchOnWindowFocus: false,
         gcTime: 1000 * 60 * 5,
     })

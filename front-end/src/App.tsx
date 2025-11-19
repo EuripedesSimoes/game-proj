@@ -1,7 +1,7 @@
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import './App.css'
-import { useGameData, myGames } from './helpers/fetchingGameData.ts'
+import { useExternaGameData, myGames } from './helpers/fetchingGameData.ts'
 import type { gameDataInterface, myGamesApiInterface } from './interfaces/gameData.ts'
 import { Spinner } from "@/components/ui/spinner"
 import { Button } from "@/components/ui/button"
@@ -37,7 +37,7 @@ type GamePayload2 = {
 
 // function App({name_Prop, hours_played_Prop, platform_Prop, genre_Prop, is_completed_Prop, release_year_Prop, status_Prop, year_started_Prop, year_finished_Prop, background_image_Prop }: GamePayload2) {
 function App() {
-  // const { data, isError, isFetching } = useGameData()
+  // const { data, isError, isFetching } = useExternaGameData()
   const { data, isError, isFetching } = myGames()
   const [filter, setFilter] = useState('')
   const [btnFilter, setBtnFilter] = useState<number>()
@@ -52,7 +52,7 @@ function App() {
 
   const filteredGames = useMemo(() => {
     const list = (data ?? []) as myGamesApiInterface[]
-    const q = filter.trim().toLowerCase()
+    const q = filter.trim().toLowerCase() // tira os espaços e depois deixa todas as letras em minusculo
 
     return list.filter(game => {
       // 1) filtro de texto no nome (se houver)
@@ -90,6 +90,8 @@ function App() {
     //   setTimeout(() => { }, 1000),
   )
 
+
+  // PASSAR PARA O ARQUIVO formAddGame.tsx 
   const [addjogo, setAddjogo] = useState<string>('')
   const [hours_played, setHours_played] = useState<number>(0)
   const [hours_expected, setHours_expected] = useState<number>(0)
@@ -103,7 +105,7 @@ function App() {
   const [background_image, setBackground_image] = useState<string>('')
 
 
-
+  // PASSAR PARA O ARQUIVO formAddGame.tsx 
   async function enviarJogo(e?: React.MouseEvent<HTMLButtonElement>) {
     e?.preventDefault();
     const payload: GamePayload2 = {
@@ -122,6 +124,11 @@ function App() {
     const saved = await API.salvarJogo(payload)
     return saved
   }
+  
+  async function deletaJooj(id: number) {
+    const deleted = await API.deletarJogo(id)
+    return deleted
+  }
 
   return (
     <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
@@ -134,9 +141,9 @@ function App() {
             <input type="text" name="name" id="name" value={addjogo} onChange={(e) => { setAddjogo(e.target.value) }} />
 
             <label htmlFor='hours_played' >Horas jogadas</label>
-            <input type="number" name="hours_played" id="hours_played" value={hours_played} onChange={ (e) => setHours_played(parseInt(e.target.value)) } />
+            <input type="number" name="hours_played" id="hours_played" value={hours_played} onChange={(e) => setHours_played(parseInt(e.target.value))} />
             <label htmlFor='hours_expected' >Horas Experadas</label>
-            <input type="number" name="hours_expected" id="hours_expected" value={hours_expected} onChange={ (e) => setHours_expected(parseInt(e.target.value)) } />
+            <input type="number" name="hours_expected" id="hours_expected" value={hours_expected} onChange={(e) => setHours_expected(parseInt(e.target.value))} />
 
             <label htmlFor='platform' >Plataforma</label>
             <input type="text" name="platform" id="platform" value={platform} onChange={(e) => { setPlatform(e.target.value) }} />
@@ -144,18 +151,18 @@ function App() {
             <input type="text" name="genre" id="genre" value={genre} onChange={(e) => { setGenre(e.target.value) }} />
             <label htmlFor='status' >Status</label>
             <input type="text" name="status" id="status" value={status} onChange={(e) => { setStatus(e.target.value) }} />
-            
+
             {/* <label htmlFor='is_completed' >Foi finalizado?</label> */}
             {/* <input type="text" name="is_completed" id="is_completed" value={is_completed} onChange={(e) => { setIs_completed(e.target.value) }} /> */}
 
             <label htmlFor='release_year' >Ano Lançamento</label>
-            <input type="number" name="release_year" id="release_year" value={release_year} onChange={ (e) => setRelease_year(parseInt(e.target.value)) } />
+            <input type="number" name="release_year" id="release_year" value={release_year} onChange={(e) => setRelease_year(parseInt(e.target.value))} />
             <label htmlFor='year_started' >Ano Iniciado</label>
-            <input type="number" name="year_started" id="year_started" value={year_started} onChange={ (e) => setYear_started(parseInt(e.target.value)) } />
+            <input type="number" name="year_started" id="year_started" value={year_started} onChange={(e) => setYear_started(parseInt(e.target.value))} />
             <label htmlFor='year_finished' >Ano Finalizado</label>
-            <input type="number" name="year_finished" id="year_finished" value={year_finished} onChange={ (e) => setYear_finished(parseInt(e.target.value)) } />
+            <input type="number" name="year_finished" id="year_finished" value={year_finished} onChange={(e) => setYear_finished(parseInt(e.target.value))} />
 
-            
+
             <label htmlFor='background_image' >background_image</label>
             <input type="text" name="background_image" id="background_image" value={background_image} onChange={(e) => { setBackground_image(e.target.value) }} />
 
@@ -187,7 +194,9 @@ function App() {
               <Card className='w-full h-[500px] gap-2 flex flex-col items-start cursor-pointer border-2 hover:border-4 border-white/50 hover:border-amber-500 transition-all bg-slate-900 shadow-4xl' key={game.id}>
 
                 <button className="absolute bg-black/20 z-10  rounded-lg shadow-lg  hover:bg-gray-600">
-                  <FaEraser className="h-6.5 w-6.5 text-red-600/80" />
+                  <span onClick={() => deletaJooj(game.id!)}>
+                    <FaEraser className="h-6.5 w-6.5 text-red-600/80" />
+                  </span>
                   <FaPencilAlt className="h-6.5 w-6.5 text-white/80" />
                 </button>
 

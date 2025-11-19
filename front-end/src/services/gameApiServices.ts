@@ -30,7 +30,7 @@ const URL = `https://api.rawg.io/api/games?key=${TOKEN}`
 const URL_DB = "http://localhost:3000/joojs"
 
 export const API = {
-    async fetchGames(): Promise<any> {
+    async fetchApiExternaGames(): Promise<any> {
         const res = await axios.get<any>(URL)
         return res?.data.results
     },
@@ -43,7 +43,11 @@ export const API = {
     async salvarJogo(payload: any) {
         const res = await axios.post<any>(`${URL_DB}`, payload)
         return res.data
-        
+    },
+
+    async deletarJogo(id: number) {
+        const res = await axios.delete<any>(`${URL_DB}/${id}`)
+        return res.data
     }
 
     // async salvarjogo(payload: GamePayload): Promise<GameResponse | null> {
