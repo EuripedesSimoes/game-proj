@@ -17,6 +17,7 @@ type GamePayload = {
     year_started_Prop: number;
     year_finished_Prop: number | null;
     background_image_Prop: string;
+    // add filtro de (esqueci)
 };
 
 

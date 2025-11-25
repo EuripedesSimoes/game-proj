@@ -48,6 +48,11 @@ export const API = {
     async deletarJogo(id: number) {
         const res = await axios.delete<any>(`${URL_DB}/${id}`)
         return res.data
+    },
+
+    async attJogo(id: number) {
+        const res = await axios.patch<any>(`${URL_DB}/${id}`)
+        return res.data
     }
 
     // async salvarjogo(payload: GamePayload): Promise<GameResponse | null> {

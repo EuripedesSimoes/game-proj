@@ -41,7 +41,8 @@
   }
 }
 label {
-  background-color: blue;
+  /* background-color: blue; */
+  color: lightblue;
   margin: 6px;
 }
 input {

@@ -111,6 +111,19 @@
       "year_started": 2024,
       "year_finished": null,
       "background_image": "https://upload.wikimedia.org/wikipedia/en/3/34/Octopath_Traveler.jpg"
+    },
+    {
+      "id": "0c44",
+      "name": "Caarlos el topo qu gira",
+      "hours_played": 80,
+      "hours_expected": 80,
+      "platform": "3DS-Emulado",
+      "genre": "Metroidvania",
+      "release_year": 2024,
+      "status": "Pausado",
+      "year_started": 2024,
+      "year_finished": 2024,
+      "background_image": ""
     }
   ],
   "jogar": [

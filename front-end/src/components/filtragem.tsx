@@ -24,7 +24,7 @@ type Props = {
 //  'Plataforma', 'Gênero', 'Status', 'Prioridade
 
 // Plataforma: 'PC', 'Switch', 'Ps Vita', '3ds-Emulado', 'PSP-Emulado'
-// Gênero: 'Ação', 'Aventura', 'RPG', 'JRPG', 'Estratégia', 'Esportes', 'Puzzle', 'FPS', 'Soulslike', 'Corrida', 'Simulação'
+// Gênero: 'Ação', 'Aventura', 'RPG', 'JRPG', 'Estratégia', 'Metroidvania', 'Plataforma', 'Esportes', 'Puzzle', 'FPS', 'Soulslike', 'Corrida', 'Simulação'
 // Ano de Lançamento dá pra deixar pra depois
 // Status: 'Finalizado', 'Em Andamento', 'Pausado', 'Abandonado'
 // Prioridade: '1ª Prioridade - Goats','2ª Prioridade - Alta', '3ª Prioridade - Média', '4ª Prioridade - Baixa, talvez algum dia', '5ª Prioridade - pelo nome, talvez'
@@ -38,9 +38,7 @@ const filtrosSelect =
         { categoria: 'Prioridade', opcoes: ['Alta', 'Média', 'Baixa'] },
     ];
 
-
-    
-    export default function FilterComponent({ classnameFilter, value, onChange, className, onFiltersChange }: Props) {
+export default function FilterComponent({ classnameFilter, value, onChange, className, onFiltersChange }: Props) {
     // estado separado por categoria -> controlado
     const [selecionados, setSelecionados] = useState<Record<string, string>>(() => {
         const init: Record<string, string> = {};
@@ -57,10 +55,10 @@ const filtrosSelect =
         } else {
             console.log('Nenhuma opção selecionada');
         }
-        
+
         // avisa o pai sobre as seleções ativas
         if (onFiltersChange) onFiltersChange(Object.fromEntries(preenchidos));
-    
+
     }, [selecionados, onFiltersChange]);
 
     function handleSelectChange(categoria: string, valor: string) {
