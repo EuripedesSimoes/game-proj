@@ -17,10 +17,9 @@ import FilterComponent from './components/filtragem.tsx'
 import { useMemo, useState } from 'react'
 import AddGame from './components/formAddGame.tsx'
 import API from './services/gameApiServices.ts'
-import Modal from '@mui/material/Modal';
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem } from '@mui/material';
-import TextField from '@mui/material/TextField';
+// import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem } from '@mui/material';
+// import TextField from '@mui/material/TextField';
 import { Spinner } from "@/components/ui/spinner"
 import { useQueryClient } from '@tanstack/react-query';
 import AddGameModal from './components/modalAddJogo.tsx';
@@ -46,8 +45,8 @@ function App() {
   const { data, isError, isFetching } = myGames()
   const queryClient = useQueryClient() // <--- novo
   const [filter, setFilter] = useState('')
-  const [btnFilter, setBtnFilter] = useState<number>()
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({}) // estado com filtros por categoria
+  const [btnFilter, setBtnFilter] = useState<number>()
   const [nomeOuHora, setNomeOuHora] = useState<string>('Nome')
 
   const categoryToField: Record<string, string> = {

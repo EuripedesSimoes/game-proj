@@ -20,7 +20,6 @@ export function myGames() {
         queryKey: ['meu joojs'],
         queryFn: API.fetchMyGames,
         refetchOnWindowFocus: false,
-        gcTime: 1000 * 60 * 5,
     })
 }
 

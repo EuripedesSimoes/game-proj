@@ -1,12 +1,10 @@
 import { useState } from 'react'
-import Modal from '@mui/material/Modal';
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { useQueryClient } from '@tanstack/react-query';
 import API from '@/services/gameApiServices';
-import { Bold } from 'lucide-react';
-import { FaRegWindowClose } from 'react-icons/fa';
+// import { FaRegWindowClose } from 'react-icons/fa';
 import { RiCloseCircleLine } from "react-icons/ri";
 
 
@@ -63,23 +61,15 @@ const AddGameModal = () => {
             label: 'Pausado'
         },
         {
-            value: 'Não Iniciado',
-            label: 'Não Iniciado'
-        },
-        {
             value: 'Abandonado', // add um icone de caveirinha
             label: 'Abandonado'
+        },
+        {
+            value: 'Não Iniciado',
+            label: 'Não Iniciado'
         }
     ]
     const allGenres = [
-        {
-            value: 'JRPG',
-            label: 'JRPG'
-        },
-        {
-            value: 'RPG',
-            label: 'RPG'
-        },
         {
             value: 'Ação',
             label: 'Ação'
@@ -89,53 +79,64 @@ const AddGameModal = () => {
             label: 'Aventura'
         },
         {
-            value: 'Metroidvania',
-            label: 'Metroidvania'
+            value: 'RPG',
+            label: 'RPG'
         },
         {
-            value: 'Plataforma',
-            label: 'Plataforma'
+            value: 'JRPG',
+            label: 'JRPG'
+        },
+        {
+            value: 'Estratégia',
+            label: 'Estratégia'
+        },
+        {
+            value: 'Esportes/Corrida',
+            label: 'Esportes/Corrida'
+        },
+        {
+            value: 'FPS',
+            label: 'FPS'
         },
         {
             value: 'Soulslike',
             label: 'Soulslike'
         },
         {
-            value: 'FPS',
-            label: 'FPS'
-        },
-
+            value: 'Metroidvania/Plataforma',
+            label: 'Metroidvania/Plataforma'
+        }
     ]
-
 
     const queryClient = useQueryClient() // <--- novo
 
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
     const [addjogo, setAddjogo] = useState<string>('')
-    const [hours_played, setHours_played] = useState<number>(0)
-    const [hours_expected, setHours_expected] = useState<number>(0)
+    const [hours_played, setHours_played] = useState<number>()
+    const [hours_expected, setHours_expected] = useState<number>()
     const [platform, setPlatform] = useState<string>('')
     const [genre, setGenre] = useState<string>('')
     // const [is_completed, setIs_completed] = useState<boolean>(false)
     const [status, setStatus] = useState<string>('')
-    const [release_year, setRelease_year] = useState<number>(0)
-    const [year_started, setYear_started] = useState<number>(0)
-    const [year_finished, setYear_finished] = useState<number>(0)
+    const [release_year, setRelease_year] = useState<number>()
+    const [year_started, setYear_started] = useState<number>()
+    const [year_finished, setYear_finished] = useState<number>()
     const [background_image, setBackground_image] = useState<string>('')
 
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
     async function enviarJogo(e?: React.MouseEvent<HTMLButtonElement>) {
+        e?.preventDefault();
         const payload: GamePayload2 = {
             name: addjogo, //'Octopath Traveler',
-            hours_played: hours_played, //86
-            hours_expected: hours_expected, //60,
+            hours_played: hours_played || 0, //86
+            hours_expected: hours_expected || 0, //60,
             platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
             genre: genre, // 'JPRG',   SELECT AQUI COM VÁRIAS OPÇÕES
             //is_completed: is_completed , //false,
-            release_year: release_year, // 2017,
+            release_year: release_year || 0, // 2017,
             status: status, //'In Progress',
-            year_started: year_started, //2024,
-            year_finished: year_finished, //null,
+            year_started: year_started || 0, //2024,
+            year_finished: year_finished || 0, //null,
             background_image: background_image, //''
         }
         const jogoSalvo = await API.salvarJogo(payload)
@@ -174,12 +175,12 @@ const AddGameModal = () => {
 
     return (
         <div className='w-full h-full flex flex-col justify-center items-center'>
-            <h3 className='text-4lx p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
+            <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
             <Button onClick={handleClickOpen}>Adicionar Jogo</Button>
 
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle sx={{ m: 0, p: 1.5, fontWeight: "bold" }} >
-                    <div className='flex justify-between items-center content-center'>
+                    <div className='flex justify-between items-centerr'>
                         Adicionar Jogo
                         <span onClick={handleClose} className='bg-none hover:cursor-pointer'>
                             <RiCloseCircleLine className='h-8 w-8  hover:size-10' />
@@ -252,7 +253,6 @@ const AddGameModal = () => {
                         </div>
 
                         <div className='grid grid-cols-3 gap-4 my-1'>
-
                             <TextField
                                 className='shadow-lg col-span-2'
                                 // className='shadow-lg '
@@ -294,7 +294,6 @@ const AddGameModal = () => {
                                 )
                                 )}
                             </TextField>
-
                         </div>
 
                         <div className='grid grid-cols-3 gap-4'>
@@ -313,7 +312,6 @@ const AddGameModal = () => {
                             <TextField
                                 className='shadow-lg'
                                 // autoFocus
-                                required
                                 margin="dense"
                                 id="year_started"
                                 name="year_started"
@@ -325,7 +323,6 @@ const AddGameModal = () => {
                             <TextField
                                 className='shadow-lg'
                                 // autoFocus
-                                required
                                 margin="dense"
                                 id="year_finished"
                                 name="year_finished"
@@ -335,6 +332,7 @@ const AddGameModal = () => {
                                 value={year_finished} onChange={(e) => { setYear_finished(parseInt(e.target.value)) }}
                             />
                         </div>
+
                         <TextField
                             className='shadow-lg'
                             margin="dense"

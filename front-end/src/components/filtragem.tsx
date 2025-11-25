@@ -33,7 +33,7 @@ const filtros = ['Nome', 'Quant. Horas',]
 const filtrosSelect =
     [
         { categoria: 'Plataforma', opcoes: ['PC', 'Switch', 'PsVita', '3DS-Emulado', 'PSP-Emulado'] },
-        { categoria: 'Gênero', opcoes: ['Ação', 'Aventura', 'RPG', 'JRPG', 'Estratégia', 'Esportes', 'Puzzle', 'FPS', 'Soulslike', 'Corrida', 'Simulação'] },
+        { categoria: 'Gênero', opcoes: ['Ação', 'Aventura', 'RPG', 'JRPG', 'Estratégia', 'Esportes/Corrida', 'FPS', 'Soulslike', 'Metroidvania/Plataforma'] },
         { categoria: 'Status', opcoes: ['Finalizado', 'Jogando', 'Pausado', 'Abandonado', 'Não iniciado'] },
         { categoria: 'Prioridade', opcoes: ['Alta', 'Média', 'Baixa'] },
     ];
