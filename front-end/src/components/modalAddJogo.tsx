@@ -1,11 +1,20 @@
-import { useState } from 'react'
+import { useState, type SetStateAction } from 'react'
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { useQueryClient } from '@tanstack/react-query';
 import API from '@/services/gameApiServices';
 // import { FaRegWindowClose } from 'react-icons/fa';
 import { RiCloseCircleLine } from "react-icons/ri";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 
 type GamePayload2 = {
@@ -178,19 +187,34 @@ const AddGameModal = () => {
             <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
             <Button onClick={handleClickOpen}>Adicionar Jogo</Button>
 
-            <Dialog open={open} onClose={handleClose}>
+            <Dialog open={open} onClose={handleClose} className=''
+                sx={{
+                    input: { color: '#f1f5f9' },
+                    label: { color: '#3c3c3c' }
+                }}
+            >
                 <DialogTitle sx={{ m: 0, p: 1.5, fontWeight: "bold" }} >
-                    <div className='flex justify-between items-centerr'>
+                    <div className='flex justify-between items-center'>
                         Adicionar Jogo
-                        <span onClick={handleClose} className='bg-none hover:cursor-pointer'>
+                        <span onClick={handleClose} className='hover:cursor-pointer'>
                             <RiCloseCircleLine className='h-8 w-8  hover:size-10' />
                         </span>
                     </div>
                 </DialogTitle>
-                <DialogContent className='bg-slate-300/60'>
+                <DialogContent className='bg-[#f1f2f9]'>
                     <form action="" onSubmit={handleSubmit} id="subscription-form" className=''>
+
                         <TextField
                             className='shadow-lg my-1'
+                            sx={{
+                                backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
+                                input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
+                                '& .MuiOutlinedInput-root': {
+                                    // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                    '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                    '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                },
+                            }}
                             // autoFocus
                             required
                             fullWidth
@@ -203,10 +227,14 @@ const AddGameModal = () => {
                             value={addjogo}
                             onChange={(e) => { setAddjogo(e.target.value) }}
                         />
-
                         <div className='grid grid-cols-3 gap-4 my-1'>
                             <TextField
                                 className='shadow-lg'
+                                sx={{
+                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+
+                                }}
                                 // autoFocus
                                 required
                                 margin="dense"
@@ -220,6 +248,11 @@ const AddGameModal = () => {
                             />
                             <TextField
                                 className='shadow-lg'
+                                sx={{
+                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+
+                                }}
                                 // autoFocus
                                 required
                                 margin="dense"
@@ -231,45 +264,79 @@ const AddGameModal = () => {
                                 value={hours_expected}
                                 onChange={(e) => { setHours_expected(parseInt(e.target.value)) }}
                             />
+                        </div>
+
+                        <div className='grid grid-cols-3 gap-4 my-1'>
                             <TextField
-                                className='shadow-lg'
-                                // autoFocus
+                                className='shadow-lg  placeholder:text-white'
+                                sx={{
+                                    backgroundColor: '#f1f5f9',
+                                    '& .MuiInputBase-input': {
+                                        color: '#3c3c3c', // texto do input
+                                    },
+                                    p: 1,
+                                }}
                                 required
                                 select
                                 id="platform"
                                 name="platform"
                                 label="Plataforma"
                                 margin="dense"
-                                variant="standard"
+                                variant="outlined"
                                 value={platform} onChange={(e) => { setPlatform(e.target.value) }}
                             >
                                 {allPlatforms.map((plats) => (
-                                    <MenuItem key={plats.value} value={plats.value}>
+                                    <MenuItem key={plats.value} value={plats.value}
+                                        sx={{
+                                            color: 'black',
+                                            '&:hover': {
+                                                backgroundColor: '#f1f5f9',
+                                            },
+                                        }}
+                                    >
                                         {plats.label}
                                     </MenuItem>
                                 )
                                 )}
                             </TextField>
-                        </div>
-
-                        <div className='grid grid-cols-3 gap-4 my-1'>
                             <TextField
-                                className='shadow-lg col-span-2'
-                                // className='shadow-lg '
-                                // autoFocus
+                                className='shadow-lg'
+                                sx={{
+                                    backgroundColor: '#f1f5f9',
+                                    //input: { color: '#3c3c3c' }, // text-slate-100
+                                    p: 1
+                                }}
+                                SelectProps={{
+                                    MenuProps: {
+                                        PaperProps: {
+                                            sx: {
+                                                backgroundColor: '#1c1c1c', // fundo do container
+                                                borderRadius: '4px',
+                                                padding: '2px',
+                                                margin: '1px'
+                                            },
+                                        },
+                                    },
+                                }}
                                 required
                                 select
                                 margin="dense"
-                                id="ganre"
+                                id="genre"
                                 name="genre"
                                 label="Gênero"
                                 type="text"
-                                variant="standard"
+                                variant="outlined"
                                 value={genre} onChange={(e) => { setGenre(e.target.value) }}
                             >
                                 {
                                     allGenres.map((genre) => (
-                                        <MenuItem key={genre.value} value={genre.value}>
+                                        <MenuItem key={genre.value} value={genre.value} sx={{
+                                            backgroundColor: '#1c1c1c',
+                                            color: '#f1f5f9',
+                                            '&:hover': {
+                                                backgroundColor: '#2b2b2b',
+                                            },
+                                        }}>
                                             {genre.label}
                                         </MenuItem>
                                     ))
@@ -277,6 +344,11 @@ const AddGameModal = () => {
                             </TextField>
                             <TextField
                                 className='shadow-lg'
+                                sx={{
+                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                    input: { color: '#3c3c3c' }, // text-slate-100
+                                    p: 1
+                                }}
                                 // autoFocus
                                 required
                                 select
@@ -284,7 +356,7 @@ const AddGameModal = () => {
                                 id="status"
                                 name="status"
                                 label="Status"
-                                variant="standard"
+                                variant="outlined"
                                 value={status} onChange={(e) => { setStatus(e.target.value) }}
                             >
                                 {allStatus.map((status) => (
@@ -296,9 +368,14 @@ const AddGameModal = () => {
                             </TextField>
                         </div>
 
-                        <div className='grid grid-cols-3 gap-4'>
+                        <div className='grid grid-cols-3 gap-4 my-1'>
                             <TextField
                                 className='shadow-lg'
+                                sx={{
+                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+
+                                }}
                                 // autoFocus
                                 required
                                 margin="dense"
@@ -311,6 +388,11 @@ const AddGameModal = () => {
                             />
                             <TextField
                                 className='shadow-lg'
+                                sx={{
+                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+
+                                }}
                                 // autoFocus
                                 margin="dense"
                                 id="year_started"
@@ -322,6 +404,11 @@ const AddGameModal = () => {
                             />
                             <TextField
                                 className='shadow-lg'
+                                sx={{
+                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+
+                                }}
                                 // autoFocus
                                 margin="dense"
                                 id="year_finished"
@@ -335,6 +422,15 @@ const AddGameModal = () => {
 
                         <TextField
                             className='shadow-lg'
+                            sx={{
+                                backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                    '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                    '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                },
+                            }}
                             margin="dense"
                             fullWidth
                             id="background_image"

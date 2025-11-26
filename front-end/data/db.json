@@ -124,6 +124,19 @@
       "year_started": 2024,
       "year_finished": 2024,
       "background_image": ""
+    },
+    {
+      "id": "4eae",
+      "name": "Carlos,el topo qie rira",
+      "hours_played": 1231,
+      "hours_expected": 21312,
+      "platform": "PC",
+      "genre": "Aventura",
+      "release_year": 2010,
+      "status": "Finalizado",
+      "year_started": 2021,
+      "year_finished": 2022,
+      "background_image": ""
     }
   ],
   "jogar": [
