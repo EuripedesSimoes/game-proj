@@ -1,5 +1,5 @@
 export interface gameDataInterface {
-    id: number,
+    id: string,
     title?: string,
     name: string
     released: string
@@ -7,7 +7,7 @@ export interface gameDataInterface {
 }
 
 export interface myGamesApiInterface {
-    id: number,
+    id: string,
     name: string,
     hours_played: number,
     hours_expected: number | null,

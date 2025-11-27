@@ -4,6 +4,7 @@ import './App.css'
 import { useExternaGameData, myGames } from './helpers/fetchingGameData.ts'
 import type { gameDataInterface, myGamesApiInterface } from './interfaces/gameData.ts'
 import { FaPencilAlt, FaEraser } from "react-icons/fa";
+
 import {
   Card,
   // CardAction,
@@ -23,6 +24,7 @@ import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { useQueryClient } from '@tanstack/react-query';
 import AddGameModal from './components/modalAddJogo.tsx';
+import AttGameModal from './components/modalAttJogo.tsx';
 
 type GamePayload2 = {
   name: string;
@@ -95,8 +97,7 @@ function App() {
     //   || game.released.substring(0, 4).toLowerCase().includes(filter.toLowerCase()),
     //   setTimeout(() => { }, 1000),
   )
-
-  async function deletaJooj(id: number) {
+  async function deletaJooj(id: string) {
     const deleted = await API.deletarJogo(id)
 
     // <--- invalida a query e força refetch automático
@@ -105,14 +106,6 @@ function App() {
     return deleted
   }
 
-  async function AttJooj(id: number) {
-    const atualizar = await API.attJogo(id)
-
-    // <--- invalida a query e força refetch automático (se precisar atualizar a lista)
-    // queryClient.invalidateQueries({ queryKey: ['meu joojs'] })
-
-    return atualizar
-  }
 
   return (
     <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
@@ -145,12 +138,8 @@ function App() {
                       <FaEraser className="h-6.5 w-6.5 text-red-600/80" />
                     </span>
                   </Button>
-
-                  <Button className='bg-slate-500/60 m-2' onClick={() => AttJooj(game.id!)}>
-                    <span>
-                      <FaPencilAlt className="h-6.5 w-6.5 text-white/80" />
-                    </span>
-                  </Button>
+                  {/* COLOCAR AQUI A FUNÇÃO DE ABRIR O MODAL */}
+                  <AttGameModal gameId={game.id} data={game} />
                 </div>
 
                 <img
@@ -182,7 +171,7 @@ function App() {
                       </p>
                     </CardDescription>
 
-                    {/* Aqui era baseado no is_complete, foi mudado para o valor do status */}
+                    {/* Aqui era baseado no "is_complete", foi mudado para o valor do status */}
                     {/* <CardDescription className={`text-white text-[14px] md:text-base font-bold border-b-2 flex justify-center items-end w-full
                          ${game.is_completed === true ? 'text-green-400'
                         : 'text-red-300'}`}>

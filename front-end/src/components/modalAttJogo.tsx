@@ -5,12 +5,31 @@ import TextField from '@mui/material/TextField';
 import { useQueryClient } from '@tanstack/react-query';
 import API from '@/services/gameApiServices';
 // import { FaRegWindowClose } from 'react-icons/fa';
+
+import { FaPencilAlt, FaEraser } from "react-icons/fa";
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
-import { SelectDemo } from './selects';
 
+
+type AttProps = {
+    gameId: any;
+    data: {
+        id: string,
+        name: string,
+        hours_played: number,
+        hours_expected: number | null,
+        platform: string,
+        genre: string,
+        is_completed?: boolean,
+        release_year: number,
+        status: string,
+        year_started?: number,
+        year_finished?: number | null,
+        background_image?: string
+    };
+}
 // passar pra algum helper ou coisa assim
-type GamePayload2 = {
+type GamePayload3 = {
     name: string;
     hours_played: number;
     hours_expected: number;
@@ -20,14 +39,11 @@ type GamePayload2 = {
     release_year: number;
     status: string;
     year_started: number;
-    year_finished: number | null;
+    year_finished: number;
     background_image?: string;
 };
 
-
-const AddGameModal = () => {
-
-
+const AttGameModal = ({ gameId, data }: AttProps) => {
     // passar essas listas pra algum helper ou coisa assim
     const allPlatforms = [
         {
@@ -111,58 +127,7 @@ const AddGameModal = () => {
             label: 'Metroidvania/Plataforma'
         }
     ]
-
     const queryClient = useQueryClient() // <--- novo
-
-    // PASSAR PARA O ARQUIVO formAddGame.tsx 
-    const [addjogo, setAddjogo] = useState<string>('')
-    const [hours_played, setHours_played] = useState<number>()
-    const [hours_expected, setHours_expected] = useState<number>()
-    const [platform, setPlatform] = useState<string>('')
-    const [genre, setGenre] = useState<string>('')
-    // const [is_completed, setIs_completed] = useState<boolean>(false)
-    const [status, setStatus] = useState<string>('')
-    const [release_year, setRelease_year] = useState<number>()
-    const [year_started, setYear_started] = useState<number>()
-    const [year_finished, setYear_finished] = useState<number>()
-    const [background_image, setBackground_image] = useState<string>('')
-
-    // PASSAR PARA O ARQUIVO formAddGame.tsx 
-    async function enviarJogo(e?: React.MouseEvent<HTMLButtonElement>) {
-        e?.preventDefault();
-        const payload: GamePayload2 = {
-            name: addjogo, //'Octopath Traveler',
-            hours_played: hours_played || 0, //86
-            hours_expected: hours_expected || 0, //60,
-            platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
-            genre: genre, // 'JPRG',   SELECT AQUI COM VÁRIAS OPÇÕES
-            //is_completed: is_completed , //false,
-            release_year: release_year || 0, // 2017,
-            status: status, //'In Progress',
-            year_started: year_started || 0, //2024,
-            year_finished: year_finished || 0, //null,
-            background_image: background_image, //''
-        }
-        const jogoSalvo = await API.salvarJogo(payload)
-
-        // <--- invalida a query e força refetch automático
-        queryClient.invalidateQueries({ queryKey: ['meu joojs'] })
-
-        // limpar os inputs (opcional)
-        setAddjogo('')
-        setHours_played(0)
-        setHours_expected(0)
-        setPlatform('')
-        setGenre('')
-        setStatus('')
-        setRelease_year(0)
-        setYear_started(0)
-        setYear_finished(0)
-        setBackground_image('')
-        handleClose() // fecha o dialog
-
-        return jogoSalvo
-    }
 
     const [open, setOpen] = useState(false);
     const handleClickOpen = () => setOpen(true)
@@ -176,21 +141,72 @@ const AddGameModal = () => {
         handleClose();
     };
 
+    // PASSAR PARA O ARQUIVO formAddGame.tsx 
+        const [nome_jogo, setNome_jogo] = useState<string>(data?.name || '')
+    const [hours_played, setHours_played] = useState<number>(data?.hours_played || 0)
+    const [hours_expected, setHours_expected] = useState<number>(data?.hours_expected || 0)
+    const [platform, setPlatform] = useState<string>(data?.platform || '')
+    const [genre, setGenre] = useState<string>(data?.genre || '')
+    const [is_completed, setIs_completed] = useState<boolean>(false)
+    const [status, setStatus] = useState<string>(data?.status || '')
+    const [release_year, setRelease_year] = useState<number>(data?.release_year || 0)
+    const [year_started, setYear_started] = useState<number>(data?.year_started || 0)
+    const [year_finished, setYear_finished] = useState<number | null>(data?.year_finished || null)
+    const [background_image, setBackground_image] = useState<string>(data?.background_image || '')
+
+
+    console.log('data att: ', data)
+
+
+    async function AtualizarJogo(e?: React.MouseEvent<HTMLButtonElement>) {
+        e?.preventDefault();
+        const payload: GamePayload3 = {
+            name: nome_jogo, //'Octopath Traveler',
+            hours_played: hours_played || 0, //86
+            hours_expected: hours_expected || 0, //60,
+            platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
+            genre: genre, // 'JPRG',   SELECT AQUI COM VÁRIAS OPÇÕES
+            //is_completed: is_completed , //false,
+            release_year: release_year || 0, // 2017,
+            status: status, //'In Progress',
+            year_started: year_started || 0, //2024,
+            year_finished: year_finished || 0, //null,
+            background_image: background_image, //''
+        }
+        const jogoAtualizado = await API.attJogo(gameId, payload)
+
+        // <--- invalida a query e força refetch automático
+        queryClient.invalidateQueries({ queryKey: ['meu joojs'] })
+
+        // limpar os inputs (opcional)
+        // setNome_jogo('')
+        // setHours_played(0)
+        // setHours_expected(0)
+        // setPlatform('')
+        // setGenre('')
+        // setStatus('')
+        // setRelease_year(0)
+        // setYear_started(0)
+        // setYear_finished(0)
+        // setBackground_image('')
+        handleClose() // fecha o dialog
+
+        return jogoAtualizado
+    }
 
     return (
-        <div className='w-full h-full flex flex-col justify-center items-center'>
-            <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
-            <Button onClick={handleClickOpen}>Adicionar Jogo</Button>
+        <>
 
-            <Dialog open={open} onClose={handleClose} className='bg-slate-700'
-                sx={{
-                    input: { color: '#f1f5f9' },
-                    label: { color: '#3c3c3c' }
-                }}
-            >
+            {/* na vdd aqui tem que clicar para abrir o modal pleo handleOpen, e no fim do modal chamadr o AttJooj(game.id!) */}
+            <Button className='bg-slate-500/60 m-2' onClick={handleClickOpen}>
+                <span>
+                    <FaPencilAlt className="h-6.5 w-6.5 text-white/80" />
+                </span>
+            </Button>
+            <Dialog open={open} onClose={handleClose} className='bg-slate-500/95'>
                 <DialogTitle sx={{ m: 0, p: 1.5, fontWeight: "bold" }} >
                     <div className='flex justify-between items-center'>
-                        Adicionar Jogo
+                        Atualizar Jogo
                         <span onClick={handleClose} className='hover:cursor-pointer'>
                             <RiCloseCircleLine className='h-8 w-8  hover:size-10' />
                         </span>
@@ -219,8 +235,8 @@ const AddGameModal = () => {
                             label="Nome do Jogo"
                             type="text"
                             variant="standard"
-                            value={addjogo}
-                            onChange={(e) => { setAddjogo(e.target.value) }}
+                            value={nome_jogo}
+                            onChange={(e) => { setNome_jogo(e.target.value) }}
                         />
                         <div className='grid grid-cols-3 gap-4 my-1'>
                             <TextField
@@ -280,6 +296,8 @@ const AddGameModal = () => {
                                     name="platform"
                                     variant="outlined"
                                     required
+                                    value={platform}
+                                    onChange={(e) => { setPlatform(e.target.value) }}
                                     // className={`bg-yellow-200`}
                                     sx={{
                                         // label:{ color: 'violet'},
@@ -491,52 +509,17 @@ const AddGameModal = () => {
                         />
 
                         <DialogActions>
-                            <Button className='' type="submit" onClick={enviarJogo}>+ ADD Jooj</Button>
+                            <Button className='' type="submit" onClick={AtualizarJogo}>+ ATT Jooj</Button>
                             {/* <Button onClick={handleClose}>Close</Button> */}
                         </DialogActions>
 
                     </form>
                 </DialogContent>
             </Dialog>
-
-            {/* Colocar tudo isso em um novo componente depois */}
-            {/* <div className='bg-gray-300 w-full h-full'>
-                <form action="" className='gap-8 '>
-                    <label htmlFor='name' >Nome do jogo</label>
-                    <input type="text" name="name" id="name" value={addjogo} onChange={(e) => { setAddjogo(e.target.value) }} />
-
-                    <label htmlFor='hours_played' >Horas jogadas</label>
-                    <input type="number" name="hours_played" id="hours_played" value={hours_played} onChange={(e) => setHours_played(parseInt(e.target.value))} />
-                    <label htmlFor='hours_expected' >Horas esperadas</label>
-                    <input type="number" name="hours_expected" id="hours_expected" value={hours_expected} onChange={(e) => setHours_expected(parseInt(e.target.value))} />
-
-                    <label htmlFor='platform' >Plataforma</label>
-                    <input type="text" name="platform" id="platform" value={platform} onChange={(e) => { setPlatform(e.target.value) }} />
-                    <label htmlFor='genre' >Gênero</label>
-                    <input type="text" name="genre" id="genre" value={genre} onChange={(e) => { setGenre(e.target.value) }} />
-                    <label htmlFor='status' >Status</label>
-                    <input type="text" name="status" id="status" value={status} onChange={(e) => { setStatus(e.target.value) }} /> */}
-
-            {/* <label htmlFor='is_completed' >Foi finalizado?</label> */}
-            {/* <input type="text" name="is_completed" id="is_completed" value={is_completed} onChange={(e) => { setIs_completed(e.target.value) }} /> */}
-
-            {/* <label htmlFor='release_year' >Ano Lançamento</label>
-                    <input type="number" name="release_year" id="release_year" value={release_year} onChange={(e) => setRelease_year(parseInt(e.target.value))} />
-                    <label htmlFor='year_started' >Ano Iniciado</label>
-                    <input type="number" name="year_started" id="year_started" value={year_started} onChange={(e) => setYear_started(parseInt(e.target.value))} />
-                    <label htmlFor='year_finished' >Ano Finalizado</label>
-                    <input type="number" name="year_finished" id="year_finished" value={year_finished} onChange={(e) => setYear_finished(parseInt(e.target.value))} />
-
-
-                    <label htmlFor='background_image' >background_image</label>
-                    <input type="text" name="background_image" id="background_image" value={background_image} onChange={(e) => { setBackground_image(e.target.value) }} />
-
-                    <input type="text" value='a' />
-                    <Button type="submit" onClick={enviarJogo}>+ ADD Jooj</Button>
-                </form>
-            </div> */}
-        </div>
+        </>
     )
 }
 
-export default AddGameModal;
+
+
+export default AttGameModal;

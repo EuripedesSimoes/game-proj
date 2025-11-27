@@ -15,11 +15,25 @@ type GamePayload = {
     is_completed_Prop: boolean,
     release_year_Prop: number,
     status_Prop: string,
-    year_started_Prop?: number |  null,
+    year_started_Prop?: number | null,
     year_finished_Prop?: number | null,
     background_image_Prop: string
     // adicione outros campos que seu db.json espera
 }
+// passar pra algum helper ou coisa assim
+type GamePayload3 = {
+    name: string;
+    hours_played: number;
+    hours_expected: number;
+    platform: string;
+    genre: string;
+    is_completed?: boolean;
+    release_year: number;
+    status: string;
+    year_started: number;
+    year_finished: number;
+    background_image?: string;
+};
 
 
 type GameResponse = GamePayload & { id?: number }
@@ -45,14 +59,20 @@ export const API = {
         return res.data
     },
 
-    async deletarJogo(id: number) {
+    async deletarJogo(id: string) {
         const res = await axios.delete<any>(`${URL_DB}/${id}`)
         return res.data
     },
 
-    async attJogo(id: number) {
-        const res = await axios.patch<any>(`${URL_DB}/${id}`)
+    async attJogo(id: string, payload: GamePayload3) {
+        const res = await axios.put<any>(`${URL_DB}/${id}`, payload)
         return res.data
+    //     const response = await fetch(`${URL_DB}/${id}`, {
+    //     method: 'PUT',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify(payload),
+    // })
+    // return response.json()
     }
 
     // async salvarjogo(payload: GamePayload): Promise<GameResponse | null> {
