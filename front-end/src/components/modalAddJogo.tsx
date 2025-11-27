@@ -6,15 +6,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import API from '@/services/gameApiServices';
 // import { FaRegWindowClose } from 'react-icons/fa';
 import { RiCloseCircleLine } from "react-icons/ri";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+import Select from '@mui/material/Select';
+import { SelectDemo } from './selects';
 
 
 type GamePayload2 = {
@@ -187,7 +180,7 @@ const AddGameModal = () => {
             <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
             <Button onClick={handleClickOpen}>Adicionar Jogo</Button>
 
-            <Dialog open={open} onClose={handleClose} className=''
+            <Dialog open={open} onClose={handleClose} className='bg-slate-700'
                 sx={{
                     input: { color: '#f1f5f9' },
                     label: { color: '#3c3c3c' }
@@ -266,45 +259,86 @@ const AddGameModal = () => {
                             />
                         </div>
 
-                        <div className='grid grid-cols-3 gap-4 my-1'>
-                            <TextField
-                                className='shadow-lg  placeholder:text-white'
-                                sx={{
-                                    backgroundColor: '#f1f5f9',
-                                    '& .MuiInputBase-input': {
-                                        color: '#3c3c3c', // texto do input
-                                    },
-                                    p: 1,
-                                }}
-                                required
-                                select
-                                id="platform"
-                                name="platform"
-                                label="Plataforma"
-                                margin="dense"
-                                variant="outlined"
-                                value={platform} onChange={(e) => { setPlatform(e.target.value) }}
-                            >
-                                {allPlatforms.map((plats) => (
-                                    <MenuItem key={plats.value} value={plats.value}
-                                        sx={{
-                                            color: 'black',
-                                            '&:hover': {
-                                                backgroundColor: '#f1f5f9',
+
+                        <div className='grid grid-cols-3 gap-4 mt-4 mb-2'>
+                            <FormControl fullWidth variant="outlined" className='shadow-lg' >
+                                <InputLabel
+                                    id="plataforma-label"
+                                    sx={{
+                                        '&.MuiInputLabel-shrink': {
+                                            transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                        },
+                                    }}
+                                >
+                                    Plataforma
+                                </InputLabel>
+                                <Select
+                                    label="Plataforma"
+                                    id="platform"
+                                    name="platform"
+                                    variant="outlined"
+                                    required
+                                    // className={`bg-yellow-200`}
+                                    sx={{
+                                        // label:{ color: 'violet'},
+                                        "& .MuiSelect-icon": {
+                                            color: "black",
+                                        }
+                                    }}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            sx: {
+                                                backgroundColor: "#1c1c1c",
+                                                // color: "red",  //muda nada
+                                                "& .MuiMenuItem-root": {
+                                                        opacity: '75%',
+                                                        //color: "white",  // já é branco por padrão
+                                                    "&.Mui-selected": {
+                                                        backgroundColor: "#2e2e3e", // background do option selecionado
+                                                        color: "white", //cor do texto do option selecionado
+                                                        fontWeight: 'bold',
+                                                        opacity: '100%',
+                                                    },
+                                                    "&:hover": {
+                                                        // transform: "translateY(4px) time(0.9s)",  //muda nada
+                                                        backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                        //color: "red", //cor do texto do option ao passar mouse por cima
+                                                        fontWeight: 'bold',
+                                                        // opacity: '100%',
+                                                    },
+                                                },
                                             },
-                                        }}
-                                    >
-                                        {plats.label}
-                                    </MenuItem>
-                                )
-                                )}
-                            </TextField>
+                                        },
+                                    }}
+                                >
+                                    {allPlatforms.map((plats) => (
+                                        <MenuItem key={plats.value} value={plats.value} sx={{
+                                            backgroundColor: '#1c1c1c',
+                                            color: '#f1f5f9',
+                                            '&:hover': {
+                                                backgroundColor: '#2b2b2b',
+                                            },
+                                        }}>
+                                            {plats.label}
+                                        </MenuItem>
+                                    )
+                                    )}
+                                </Select>
+                            </FormControl>
                             <TextField
                                 className='shadow-lg'
                                 sx={{
                                     backgroundColor: '#f1f5f9',
+                                    // p: 0.5,
                                     //input: { color: '#3c3c3c' }, // text-slate-100
-                                    p: 1
+                                    '& .MuiInputLabel-root': {
+                                        // color: '#2563eb',
+                                    },
+                                    '& .MuiInputLabel-shrink': {
+                                        transform: 'translate(10px, -12px) scale(0.75)', // ajusta posição
+                                        //backgroundColor: '#fef08a', // mesma cor do fundo para não "cortar"
+                                        //padding: '0 4px', // cria espaço para a label não sobrepor a borda
+                                    },
                                 }}
                                 SelectProps={{
                                     MenuProps: {
@@ -313,14 +347,30 @@ const AddGameModal = () => {
                                                 backgroundColor: '#1c1c1c', // fundo do container
                                                 borderRadius: '4px',
                                                 padding: '2px',
-                                                margin: '1px'
+                                                margin: '1px',
+                                                "& .MuiMenuItem-root": {
+                                                        opacity: '75%',
+                                                        //color: "white",  // já é branco por padrão
+                                                    "&.Mui-selected": {
+                                                        backgroundColor: "#2e2e3e", // background do option selecionado
+                                                        color: "white", //cor do texto do option selecionado
+                                                        fontWeight: 'bold',
+                                                        opacity: '100%',
+                                                    },
+                                                    "&:hover": {
+                                                        // transform: "translateY(4px) time(0.9s)",  //muda nada
+                                                        backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                        //color: "red", //cor do texto do option ao passar mouse por cima
+                                                        fontWeight: 'bold',
+                                                        // opacity: '100%',
+                                                    },
+                                                },
                                             },
                                         },
                                     },
                                 }}
                                 required
                                 select
-                                margin="dense"
                                 id="genre"
                                 name="genre"
                                 label="Gênero"
@@ -347,12 +397,10 @@ const AddGameModal = () => {
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
                                     input: { color: '#3c3c3c' }, // text-slate-100
-                                    p: 1
                                 }}
                                 // autoFocus
                                 required
                                 select
-                                margin="dense"
                                 id="status"
                                 name="status"
                                 label="Status"
@@ -367,7 +415,6 @@ const AddGameModal = () => {
                                 )}
                             </TextField>
                         </div>
-
                         <div className='grid grid-cols-3 gap-4 my-1'>
                             <TextField
                                 className='shadow-lg'
