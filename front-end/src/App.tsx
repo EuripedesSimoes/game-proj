@@ -2,7 +2,7 @@
 // import viteLogo from '/vite.svg'
 import './App.css'
 import { useExternaGameData, myGames } from './helpers/fetchingGameData.ts'
-import type { gameDataInterface, myGamesApiInterface } from './interfaces/gameData.ts'
+import type { gameDataInterface, myGamesApiInterface } from './interfaces/gameDataTypes.ts'
 import { FaPencilAlt, FaEraser } from "react-icons/fa";
 
 import {
@@ -165,8 +165,8 @@ function App() {
                               ${game.platform === 'Switch' ? 'text-red-600'
                             : game.platform === 'PC' ? 'text-blue-400'
                               : game.platform === 'PSVita' ? 'text-blue-600'
-                                : game.platform === '3DS-Emulado'
-                                || game.platform === 'PSP-Emulado' && 'text-purple-800'}`}>
+                                : game.platform === '3DS-Emulado' ? 'text-red-400'
+                                : game.platform === 'PSP-Emulado' && 'text-purple-800'}`}>
                         {game.platform}
                       </p>
                     </CardDescription>

@@ -9,6 +9,8 @@ import API from '@/services/gameApiServices';
 import { FaPencilAlt, FaEraser } from "react-icons/fa";
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
+import { allPlatforms, allStatus, allGenres } from '@/services/listasParaFiltro';
+import type { GamePayload3 } from '@/interfaces/gameDataTypes';
 
 
 type AttProps = {
@@ -16,117 +18,26 @@ type AttProps = {
     data: {
         id: string,
         name: string,
-        hours_played: number,
-        hours_expected: number | null,
+        hours_played: number | string,
+        hours_expected: number | string,
         platform: string,
         genre: string,
         is_completed?: boolean,
-        release_year: number,
+        release_year: number | string,
         status: string,
-        year_started?: number,
-        year_finished?: number | null,
+        year_started?: number | string,
+        year_finished?: number | string,
         background_image?: string
     };
 }
-// passar pra algum helper ou coisa assim
-type GamePayload3 = {
-    name: string;
-    hours_played: number;
-    hours_expected: number;
-    platform: string;
-    genre: string;
-    is_completed?: boolean;
-    release_year: number;
-    status: string;
-    year_started: number;
-    year_finished: number;
-    background_image?: string;
-};
+// OK-passar pra algum helper ou coisa assim
+// type GamePayload3 = {name: string; etc...};
 
 const AttGameModal = ({ gameId, data }: AttProps) => {
-    // passar essas listas pra algum helper ou coisa assim
-    const allPlatforms = [
-        {
-            value: 'PC',
-            label: 'PC'
-        },
-        {
-            value: 'Switch',
-            label: 'Switch'
-        },
-        {
-            value: 'PSVita',
-            label: 'PSVita'
-        },
-        {
-            value: '3DS-Emulado',
-            label: '3DS-Emulado'
-        },
-        {
-            value: 'PSP-Emulado',
-            label: 'PSP-Emulado'
-        }
-    ]
-    const allStatus = [
-        {
-            value: 'Finalizado',
-            label: 'Finalizado'
-        },
-        {
-            value: 'Jogando', // add um icone de reloginho
-            label: 'Jogando'
-        },
-        {
-            value: 'Pausado',
-            label: 'Pausado'
-        },
-        {
-            value: 'Abandonado', // add um icone de caveirinha
-            label: 'Abandonado'
-        },
-        {
-            value: 'Não Iniciado',
-            label: 'Não Iniciado'
-        }
-    ]
-    const allGenres = [
-        {
-            value: 'Ação',
-            label: 'Ação'
-        },
-        {
-            value: 'Aventura',
-            label: 'Aventura'
-        },
-        {
-            value: 'RPG',
-            label: 'RPG'
-        },
-        {
-            value: 'JRPG',
-            label: 'JRPG'
-        },
-        {
-            value: 'Estratégia',
-            label: 'Estratégia'
-        },
-        {
-            value: 'Esportes/Corrida',
-            label: 'Esportes/Corrida'
-        },
-        {
-            value: 'FPS',
-            label: 'FPS'
-        },
-        {
-            value: 'Soulslike',
-            label: 'Soulslike'
-        },
-        {
-            value: 'Metroidvania/Plataforma',
-            label: 'Metroidvania/Plataforma'
-        }
-    ]
+
+    // OK-passar essas listas pra algum helper ou coisa assim
+    // const allPlatforms,etc
+
     const queryClient = useQueryClient() // <--- novo
 
     const [open, setOpen] = useState(false);
@@ -142,53 +53,41 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
     };
 
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
-        const [nome_jogo, setNome_jogo] = useState<string>(data?.name || '')
-    const [hours_played, setHours_played] = useState<number>(data?.hours_played || 0)
-    const [hours_expected, setHours_expected] = useState<number>(data?.hours_expected || 0)
+    const [nome_jogo, setNome_jogo] = useState<string>(data?.name || '')
+    const [hours_played, setHours_played] = useState<number | string>(data?.hours_played || '')
+    const [hours_expected, setHours_expected] = useState<number | string>(data?.hours_expected || '')
     const [platform, setPlatform] = useState<string>(data?.platform || '')
     const [genre, setGenre] = useState<string>(data?.genre || '')
-    const [is_completed, setIs_completed] = useState<boolean>(false)
+    // const [is_completed, setIs_completed] = useState<boolean>(false)
     const [status, setStatus] = useState<string>(data?.status || '')
-    const [release_year, setRelease_year] = useState<number>(data?.release_year || 0)
-    const [year_started, setYear_started] = useState<number>(data?.year_started || 0)
-    const [year_finished, setYear_finished] = useState<number | null>(data?.year_finished || null)
+    const [release_year, setRelease_year] = useState<number | string>(data?.release_year || '')
+    const [year_started, setYear_started] = useState<number | string>(data?.year_started || '')
+    const [year_finished, setYear_finished] = useState<number | string>(data?.year_finished || '')
     const [background_image, setBackground_image] = useState<string>(data?.background_image || '')
 
 
-    console.log('data att: ', data)
+    // console.log('data att: ', data)
 
 
     async function AtualizarJogo(e?: React.MouseEvent<HTMLButtonElement>) {
         e?.preventDefault();
         const payload: GamePayload3 = {
             name: nome_jogo, //'Octopath Traveler',
-            hours_played: hours_played || 0, //86
-            hours_expected: hours_expected || 0, //60,
+            hours_played: hours_played || '', //86
+            hours_expected: hours_expected || '', //60,
             platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
             genre: genre, // 'JPRG',   SELECT AQUI COM VÁRIAS OPÇÕES
             //is_completed: is_completed , //false,
-            release_year: release_year || 0, // 2017,
+            release_year: release_year || '', // 2017,
             status: status, //'In Progress',
-            year_started: year_started || 0, //2024,
-            year_finished: year_finished || 0, //null,
+            year_started: year_started || '', //2024,
+            year_finished: year_finished || '', //null,
             background_image: background_image, //''
         }
         const jogoAtualizado = await API.attJogo(gameId, payload)
 
         // <--- invalida a query e força refetch automático
         queryClient.invalidateQueries({ queryKey: ['meu joojs'] })
-
-        // limpar os inputs (opcional)
-        // setNome_jogo('')
-        // setHours_played(0)
-        // setHours_expected(0)
-        // setPlatform('')
-        // setGenre('')
-        // setStatus('')
-        // setRelease_year(0)
-        // setYear_started(0)
-        // setYear_finished(0)
-        // setBackground_image('')
         handleClose() // fecha o dialog
 
         return jogoAtualizado

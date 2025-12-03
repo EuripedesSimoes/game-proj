@@ -16,7 +16,7 @@ type Props = {
 // const filtros = ['Action', 'Adventure', 'RPG', 'Strategy', 'Sports', 'Puzzle']
 
 //Principais filtros que não precisam de mais de 1 filtro / Serão apenas ordenações do que está renderizado: 
-// 'Nome', 'Quant. Horas', Esses aqui um tem que desativar o outro
+// 'Nome', 'Quant. Horas', 'Prioridade' Esses aqui um tem que desativar o outro
 // 'PC', 'Portátil', Esses aqui um tem que desativar o outro, está para fazer depois
 //PC ou Portátil só pode 1 só, se 1 estiver ativo o outro desativa, pois PC é PC e portatil pode ser 
 
@@ -40,34 +40,40 @@ const filtrosSelect =
 
 export default function FilterComponent({ classnameFilter, value, onChange, className, onFiltersChange }: Props) {
     // estado separado por categoria -> controlado
-    const [selecionados, setSelecionados] = useState<Record<string, string>>(() => {
-        const init: Record<string, string> = {};
-        filtrosSelect.forEach(f => init[f.categoria] = '');
-        return init;
-    });
+    const [selecionados, setSelecionados] = useState<Record<string, string>>(
+        () => Object.fromEntries(filtrosSelect.map(filter => [filter.categoria, '']))
+    );
+    //<Record<string, string>> define que é um objeto com chaves string e valores string EX: {Plataforma(string): 'PC')(string), Gênero(string): 'Ação'(string)}
+    // no caso o objeto inicial é criado com Object.fromEntries, que transforma um array de arrays em objeto
+    // o array de arrays é criado com map, que para cada filtro cria um array [categoria, ''] (inicialmente vazio)
+    // no caso o objeto inicial é o selecionados = {Plataforma: '', Gênero: '', Status: '', Prioridade: ''}
+    // Alternativas equivalentes: type Selecionados = { [categoria: string]: string }; mas Record<string, string> é mais conciso e idiomático.
+    // .map cria um array de pares: [ [categoria, ''], [categoria, ''], ... ]
+    // Object.fromEntries converte esses pares para objeto.(EX:2)
+
+    console.log('1-selecionados: ', selecionados)
 
     // log formatado quando houver mudanças (mostra apenas categorias com valor)
     useEffect(() => {
+        //Object.entries converte um objeto{} em um array[], no caso o 'selecionados'{} em 'preenchidos'[]
         const preenchidos = Object.entries(selecionados).filter(([, v]) => v);
-        if (preenchidos.length > 0) {
-            const obj = Object.fromEntries(preenchidos);
-            console.log(obj); // ex: { Plataforma: 'PC', Gênero: 'Ação', ... }
-        } else {
-            console.log('Nenhuma opção selecionada');
-        }
+        const ativos = Object.fromEntries(preenchidos)
+        console.log('2-preenchidos: ', preenchidos)
+        console.log('3-ativos: ', ativos)
 
         // avisa o pai sobre as seleções ativas
-        if (onFiltersChange) onFiltersChange(Object.fromEntries(preenchidos));
+        if (onFiltersChange) onFiltersChange(ativos);
 
     }, [selecionados, onFiltersChange]);
 
+    //cada select vai ter essa função para mudar seu "value"
     function handleSelectChange(categoria: string, valor: string) {
         setSelecionados(prev => ({ ...prev, [categoria]: valor }));
     }
 
     function handleReset() {
         const cleared: Record<string, string> = {};
-        filtrosSelect.forEach(f => cleared[f.categoria] = '');
+        filtrosSelect.forEach(filter => cleared[filter.categoria] = '');
         setSelecionados(cleared);
         onChange(''); // opcional: limpa também o input de busca
     }

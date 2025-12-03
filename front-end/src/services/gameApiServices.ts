@@ -20,18 +20,31 @@ type GamePayload = {
     background_image_Prop: string
     // adicione outros campos que seu db.json espera
 }
-// passar pra algum helper ou coisa assim
-type GamePayload3 = {
+export type GamePayload2 = {
     name: string;
-    hours_played: number;
-    hours_expected: number;
+    hours_played: number | string;
+    hours_expected: number | string;
     platform: string;
     genre: string;
     is_completed?: boolean;
-    release_year: number;
+    release_year: number | string;
     status: string;
-    year_started: number;
-    year_finished: number;
+    year_started: number | string;
+    year_finished: number | string;
+    background_image?: string;
+};
+// passar pra algum helper ou coisa assim
+type GamePayload3 = {
+    name: string;
+    hours_played: number | string;
+    hours_expected: number | string;
+    platform: string;
+    genre: string;
+    is_completed?: boolean;
+    release_year: number | string;
+    status: string;
+    year_started: number | string;
+    year_finished: number | string;
     background_image?: string;
 };
 
@@ -54,7 +67,7 @@ export const API = {
         return res?.data
     },
 
-    async salvarJogo(payload: any) {
+    async salvarJogo(payload: GamePayload2) {
         const res = await axios.post<any>(`${URL_DB}`, payload)
         return res.data
     },
@@ -67,12 +80,12 @@ export const API = {
     async attJogo(id: string, payload: GamePayload3) {
         const res = await axios.put<any>(`${URL_DB}/${id}`, payload)
         return res.data
-    //     const response = await fetch(`${URL_DB}/${id}`, {
-    //     method: 'PUT',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(payload),
-    // })
-    // return response.json()
+        //     const response = await fetch(`${URL_DB}/${id}`, {
+        //     method: 'PUT',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify(payload),
+        // })
+        // return response.json()
     }
 
     // async salvarjogo(payload: GamePayload): Promise<GameResponse | null> {

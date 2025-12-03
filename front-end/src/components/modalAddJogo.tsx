@@ -1,4 +1,4 @@
-import { useState, type SetStateAction } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
 import TextField from '@mui/material/TextField';
@@ -7,124 +7,30 @@ import API from '@/services/gameApiServices';
 // import { FaRegWindowClose } from 'react-icons/fa';
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
-import { SelectDemo } from './selects';
+import { allPlatforms, allStatus, allGenres } from '@/services/listasParaFiltro';
+import type { GamePayload2 } from '@/interfaces/gameDataTypes';
 
-// passar pra algum helper ou coisa assim
-type GamePayload2 = {
-    name: string;
-    hours_played: number;
-    hours_expected: number;
-    platform: string;
-    genre: string;
-    is_completed?: boolean;
-    release_year: number;
-    status: string;
-    year_started: number;
-    year_finished: number | null;
-    background_image?: string;
-};
-
+// OK-passar pra algum helper ou coisa assim
+// type GamePayload2 = { name: string; etc...}
 
 const AddGameModal = () => {
 
-
-    // passar essas listas pra algum helper ou coisa assim
-    const allPlatforms = [
-        {
-            value: 'PC',
-            label: 'PC'
-        },
-        {
-            value: 'Switch',
-            label: 'Switch'
-        },
-        {
-            value: 'PSVita',
-            label: 'PSVita'
-        },
-        {
-            value: '3DS-Emulado',
-            label: '3DS-Emulado'
-        },
-        {
-            value: 'PSP-Emulado',
-            label: 'PSP-Emulado'
-        }
-    ]
-    const allStatus = [
-        {
-            value: 'Finalizado',
-            label: 'Finalizado'
-        },
-        {
-            value: 'Jogando', // add um icone de reloginho
-            label: 'Jogando'
-        },
-        {
-            value: 'Pausado',
-            label: 'Pausado'
-        },
-        {
-            value: 'Abandonado', // add um icone de caveirinha
-            label: 'Abandonado'
-        },
-        {
-            value: 'Não Iniciado',
-            label: 'Não Iniciado'
-        }
-    ]
-    const allGenres = [
-        {
-            value: 'Ação',
-            label: 'Ação'
-        },
-        {
-            value: 'Aventura',
-            label: 'Aventura'
-        },
-        {
-            value: 'RPG',
-            label: 'RPG'
-        },
-        {
-            value: 'JRPG',
-            label: 'JRPG'
-        },
-        {
-            value: 'Estratégia',
-            label: 'Estratégia'
-        },
-        {
-            value: 'Esportes/Corrida',
-            label: 'Esportes/Corrida'
-        },
-        {
-            value: 'FPS',
-            label: 'FPS'
-        },
-        {
-            value: 'Soulslike',
-            label: 'Soulslike'
-        },
-        {
-            value: 'Metroidvania/Plataforma',
-            label: 'Metroidvania/Plataforma'
-        }
-    ]
+    // OK-passar essas listas pra algum helper ou coisa assim
+    // const allPlatforms
 
     const queryClient = useQueryClient() // <--- novo
 
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
     const [addjogo, setAddjogo] = useState<string>('')
-    const [hours_played, setHours_played] = useState<number>()
-    const [hours_expected, setHours_expected] = useState<number>()
+    const [hours_played, setHours_played] = useState<number | string>('')
+    const [hours_expected, setHours_expected] = useState<number | string>('')
     const [platform, setPlatform] = useState<string>('')
     const [genre, setGenre] = useState<string>('')
     // const [is_completed, setIs_completed] = useState<boolean>(false)
     const [status, setStatus] = useState<string>('')
-    const [release_year, setRelease_year] = useState<number>()
-    const [year_started, setYear_started] = useState<number>()
-    const [year_finished, setYear_finished] = useState<number>()
+    const [release_year, setRelease_year] = useState<number | string>('')
+    const [year_started, setYear_started] = useState<number | string>('')
+    const [year_finished, setYear_finished] = useState<number | string>('')
     const [background_image, setBackground_image] = useState<string>('')
 
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
@@ -132,15 +38,15 @@ const AddGameModal = () => {
         e?.preventDefault();
         const payload: GamePayload2 = {
             name: addjogo, //'Octopath Traveler',
-            hours_played: hours_played || 0, //86
-            hours_expected: hours_expected || 0, //60,
+            hours_played: hours_played || '', //86
+            hours_expected: hours_expected || '', //60,
             platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
             genre: genre, // 'JPRG',   SELECT AQUI COM VÁRIAS OPÇÕES
             //is_completed: is_completed , //false,
-            release_year: release_year || 0, // 2017,
+            release_year: release_year || '', // 2017,
             status: status, //'In Progress',
-            year_started: year_started || 0, //2024,
-            year_finished: year_finished || 0, //null,
+            year_started: year_started || '', //2024,
+            year_finished: year_finished || '', //null,
             background_image: background_image, //''
         }
         const jogoSalvo = await API.salvarJogo(payload)
@@ -498,43 +404,6 @@ const AddGameModal = () => {
                     </form>
                 </DialogContent>
             </Dialog>
-
-            {/* Colocar tudo isso em um novo componente depois */}
-            {/* <div className='bg-gray-300 w-full h-full'>
-                <form action="" className='gap-8 '>
-                    <label htmlFor='name' >Nome do jogo</label>
-                    <input type="text" name="name" id="name" value={addjogo} onChange={(e) => { setAddjogo(e.target.value) }} />
-
-                    <label htmlFor='hours_played' >Horas jogadas</label>
-                    <input type="number" name="hours_played" id="hours_played" value={hours_played} onChange={(e) => setHours_played(parseInt(e.target.value))} />
-                    <label htmlFor='hours_expected' >Horas esperadas</label>
-                    <input type="number" name="hours_expected" id="hours_expected" value={hours_expected} onChange={(e) => setHours_expected(parseInt(e.target.value))} />
-
-                    <label htmlFor='platform' >Plataforma</label>
-                    <input type="text" name="platform" id="platform" value={platform} onChange={(e) => { setPlatform(e.target.value) }} />
-                    <label htmlFor='genre' >Gênero</label>
-                    <input type="text" name="genre" id="genre" value={genre} onChange={(e) => { setGenre(e.target.value) }} />
-                    <label htmlFor='status' >Status</label>
-                    <input type="text" name="status" id="status" value={status} onChange={(e) => { setStatus(e.target.value) }} /> */}
-
-            {/* <label htmlFor='is_completed' >Foi finalizado?</label> */}
-            {/* <input type="text" name="is_completed" id="is_completed" value={is_completed} onChange={(e) => { setIs_completed(e.target.value) }} /> */}
-
-            {/* <label htmlFor='release_year' >Ano Lançamento</label>
-                    <input type="number" name="release_year" id="release_year" value={release_year} onChange={(e) => setRelease_year(parseInt(e.target.value))} />
-                    <label htmlFor='year_started' >Ano Iniciado</label>
-                    <input type="number" name="year_started" id="year_started" value={year_started} onChange={(e) => setYear_started(parseInt(e.target.value))} />
-                    <label htmlFor='year_finished' >Ano Finalizado</label>
-                    <input type="number" name="year_finished" id="year_finished" value={year_finished} onChange={(e) => setYear_finished(parseInt(e.target.value))} />
-
-
-                    <label htmlFor='background_image' >background_image</label>
-                    <input type="text" name="background_image" id="background_image" value={background_image} onChange={(e) => { setBackground_image(e.target.value) }} />
-
-                    <input type="text" value='a' />
-                    <Button type="submit" onClick={enviarJogo}>+ ADD Jooj</Button>
-                </form>
-            </div> */}
         </div>
     )
 }
