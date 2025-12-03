@@ -1,18 +1,17 @@
 {
   "joojs": [
     {
-      "id": "1",
       "name": "The Witcher 3: Wild Hunt",
-      "hours_played": 60,
-      "hours_expected": null,
+      "hours_played": 74,
+      "hours_expected": 120,
       "platform": "PC",
       "genre": "RPG",
-      "is_completed": false,
       "release_year": 2015,
-      "status": "In Progress",
+      "status": "Pausado",
       "year_started": 2023,
-      "year_finished": null,
-      "background_image": "https://img-eshop.cdn.nintendo.net/i/3f7ee6aa3482b514bd443e116022b038a9728f017916ed37da3f09f731a7d5f2.jpg"
+      "year_finished": "",
+      "background_image": "https://img-eshop.cdn.nintendo.net/i/3f7ee6aa3482b514bd443e116022b038a9728f017916ed37da3f09f731a7d5f2.jpg",
+      "id": "1"
     },
     {
       "id": "2",
@@ -112,7 +111,7 @@
       "id": "3068"
     },
     {
-      "name": "Bahrlos,el topo yag11",
+      "name": "1Bahrlos,el topo yag11",
       "hours_played": 1,
       "hours_expected": 2,
       "platform": "3DS-Emulado",
@@ -125,7 +124,7 @@
       "id": "0498"
     },
     {
-      "name": "Bahrlos,el topo yag22",
+      "name": "2Bahrlos,el topo yag22",
       "hours_played": 12,
       "hours_expected": 21,
       "platform": "PC",
@@ -138,7 +137,7 @@
       "id": "0499"
     },
     {
-      "name": "Bahrlos,el topo yag33",
+      "name": "3Bahrlos,el topo yag33",
       "hours_played": 2,
       "hours_expected": 2,
       "platform": "PSP-Emulado",
@@ -151,7 +150,7 @@
       "id": "0500"
     },
     {
-      "name": "Bahrlos,el topo yag44",
+      "name": "4Bahrlos,el topo yag44",
       "hours_played": 25,
       "hours_expected": 3,
       "platform": "Switch",

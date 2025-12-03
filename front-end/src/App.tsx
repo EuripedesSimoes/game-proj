@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/card"
 import FilterComponent from './components/filtragem.tsx'
 import { useMemo, useState } from 'react'
-import AddGame from './components/formAddGame.tsx'
 import API from './services/gameApiServices.ts'
 import { Button } from "@/components/ui/button"
 // import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem } from '@mui/material';
@@ -50,6 +49,8 @@ function App() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({}) // estado com filtros por categoria
   const [btnFilter, setBtnFilter] = useState<number>()
   const [nomeOuHora, setNomeOuHora] = useState<string>('Nome')
+  const [sortBy, setSortBy] = useState<'name' | 'hours_played'>('name') // novo estado
+
 
   const categoryToField: Record<string, string> = {
     'Plataforma': 'platform',   // ajuste se no seu db.json o campo for outro
@@ -57,6 +58,7 @@ function App() {
     'Status': 'status',
     'Prioridade': 'priority',
   }
+
 
   const filteredGames = useMemo(() => {
     const list = (data ?? []) as myGamesApiInterface[]
@@ -106,12 +108,22 @@ function App() {
     return deleted
   }
 
+  // Ordena os jogos filtrados conforme sortBy
+  const sortedGames = useMemo(() => {
+    const arr = [...filteredGames]
+    if (sortBy === 'name') {
+      arr.sort((a, b) => a.name.localeCompare(b.name))
+    } else if (sortBy === 'hours_played') {
+      arr.sort((a, b) => Number(b.hours_played) - Number(a.hours_played))
+    }
+    return arr
+  }, [filteredGames, sortBy])
 
   return (
     <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
 
       <AddGameModal />
-      <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} />
+      <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} />
       {/* <FilterComponent value={filter} onChange={setFilter} /> */}
 
       {/* <div className='w-4/5 h-full flex justify-center items-center bg-blue-100'> */}
@@ -128,7 +140,7 @@ function App() {
           {/* <div className='flex flex-col justify-start min-h-screen w-full'> */}
 
           <div className='grid grid-cols-4 gap-8 py-6 px-4 w-11/12 min-h-screen'>
-            {filteredGames.map((game: myGamesApiInterface) => (
+            {sortedGames.map((game: myGamesApiInterface) => (
 
               <Card className='w-full h-[500px] gap-2 flex flex-col items-start cursor-pointer border-2 hover:border-4 border-white/50 hover:border-amber-500 transition-all bg-slate-900 shadow-4xl' key={game.id}>
 
@@ -166,7 +178,7 @@ function App() {
                             : game.platform === 'PC' ? 'text-blue-400'
                               : game.platform === 'PSVita' ? 'text-blue-600'
                                 : game.platform === '3DS-Emulado' ? 'text-red-400'
-                                : game.platform === 'PSP-Emulado' && 'text-purple-800'}`}>
+                                  : game.platform === 'PSP-Emulado' && 'text-purple-800'}`}>
                         {game.platform}
                       </p>
                     </CardDescription>

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { FaSearch, FaTrashAlt, FaTrashRestoreAlt, FaTrashRestore, FaTrash } from "react-icons/fa";
 import { useState } from 'react'
 import { myGames } from '@/helpers/fetchingGameData';
+import TextField from '@mui/material/TextField';
 // import '../App.css'
 
 //Props da API do RAWG
@@ -11,6 +12,7 @@ type Props = {
     onChange: (v: string) => void,
     className?: string,
     onFiltersChange?: (f: Record<string, string>) => void, // <--- novo prop opcional
+    onSortChange?: (v: 'name' | 'hours_played') => void
 }
 
 // const filtros = ['Action', 'Adventure', 'RPG', 'Strategy', 'Sports', 'Puzzle']
@@ -38,7 +40,7 @@ const filtrosSelect =
         { categoria: 'Prioridade', opcoes: ['Alta', 'Média', 'Baixa'] },
     ];
 
-export default function FilterComponent({ classnameFilter, value, onChange, className, onFiltersChange }: Props) {
+export default function FilterComponent({ classnameFilter, value, onChange, className, onFiltersChange, onSortChange }: Props) {
     // estado separado por categoria -> controlado
     const [selecionados, setSelecionados] = useState<Record<string, string>>(
         () => Object.fromEntries(filtrosSelect.map(filter => [filter.categoria, '']))
@@ -83,9 +85,18 @@ export default function FilterComponent({ classnameFilter, value, onChange, clas
             <div className={` flex justify-end p-2 w-full h-full ${classnameFilter} bg-black`}>
                 <div className={` grid grid-cols-7 justify-end gap-3 p-2 mr-2 w-full h-full border-white border-2 text-sm rounded-xl`}>
 
-                    {filtros.map((filtro) => (
-                        <button key={filtro} onClick={() => onChange(filtro)} className=' bg-[#1a1a1a] text-white rounded-xl hover:bg-gray-700/60 transition-colors'>{filtro}</button>
-                    ))}
+                    <button
+                        onClick={() => onSortChange && onSortChange('name')}
+                        className='bg-[#1a1a1a] text-white rounded-xl hover:bg-gray-700/60 transition-colors'
+                    >
+                        Nome
+                    </button>
+                    <button
+                        onClick={() => onSortChange && onSortChange('hours_played')}
+                        className='bg-[#1a1a1a] text-white rounded-xl hover:bg-gray-700/60 transition-colors'
+                    >
+                        Quant. Horas
+                    </button>
 
                     {filtrosSelect.map(({ categoria, opcoes }) => (
                         <div key={categoria}>
@@ -112,13 +123,13 @@ export default function FilterComponent({ classnameFilter, value, onChange, clas
 
                 <div className='w-72 flex items-center border-2 border-white rounded-2xl'>
                     <label htmlFor="searchGame" className='pr-1 pl-3 flex items-center'>
-                        <FaSearch className='fill-white' />
+                        <FaSearch className='fill-white h-5 w-5' />
                     </label>
                     <input type="search"
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
                         id='searchGame' placeholder='Pesquisar'
-                        className='px-2 py-2 w-full half-border-bottom outline-0 text-white placeholder-white/50' />
+                        className='bg-black px-2 py-2 w-full half-border-bottom outline-0 text-black rounded-r-lg rounded-l-sm placeholder-white/50 text-lg font-semibold' />
                 </div>
             </div>
         </>
