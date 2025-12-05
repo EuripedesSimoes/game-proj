@@ -122,6 +122,7 @@ function App() {
   return (
     <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
 
+      <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
       <AddGameModal />
       <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} />
       {/* <FilterComponent value={filter} onChange={setFilter} /> */}
@@ -164,13 +165,13 @@ function App() {
 
                   <CardTitle className='text-white text-[14px] md:text-base border-b-2 w-full'>{game.name}</CardTitle>
                   <div className='flex w-full gap-x-2'>
-                    <CardDescription className='text-white text-[14px] md:text-base border-b-2 w-40 flex justify-center items-end'>{game.hours_played} horas</CardDescription>
+                    <CardDescription className='text-white text-[14px] md:text-base border-b-2 w-40 flex justify-center items-end'>{game.hours_played}{Number(game.hours_played) <= 1 ? ' hora' : ' horas'} </CardDescription>
                     <CardDescription className='text-white text-[14px] md:text-base border-b-2 w-full flex justify-center items-end '>Gênero: {game.genre}</CardDescription>
                   </div>
 
-                  <div className='flex flex-col 2xl:flex-row w-full  gap-3'>
+                  <div className='flex flex-col 2xl:flex-row w-full gap-3'>
 
-                    <CardDescription className={`text-white text-[14px] md:text-base border-b-2 flex flex-row} justify-center  2xl:justify-start items-end `}>
+                    <CardDescription className={`text-white text-[14px] md:text-base border-b-2 flex flex-row} justify-center 2xl:justify-start items-end `}>
                       Plataforma:
                       <p
                         className={`px-2 font-bold 
@@ -194,10 +195,17 @@ function App() {
                         : game.status === 'Pausado' ? 'text-red-300'
                           : game.status === 'Jogando' ? 'text-yellow-300'
                             : game.status === 'Não Iniciado' && 'text-white'}`}>
-                      Status: {game.status}
+                      Status: {game.status === 'Finalizado' ? `✅ ${game.status}  (${game.year_finished})` : game.status === 'Pausado' ? `${game.status} ⏸️` : game.status === 'Jogando' ? `${game.status} 🎮` : `${game.status}`}
                     </CardDescription>
 
                   </div>
+
+                  <CardDescription className={`text-white text-[14px] md:text-base border-b-2 flex flex-row justify-center  2xl:justify-start items-end `}>
+                    Prioridade:
+                    <span className={`font-bold ${game.priority === '1- Principal' ? 'text-red-600' : game.priority === '2- Secundário' && 'text-yellow-600'}`}>
+                      {game.priority}
+                    </span>
+                  </CardDescription>
                 </CardContent>
               </Card>
 

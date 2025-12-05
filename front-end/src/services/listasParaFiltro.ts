@@ -1,4 +1,26 @@
     // passar essas listas pra algum helper ou coisa assim
+    const allPriorities = [
+         {
+            value: '1ª Prioridade',
+            label: '1ª Prioridade'
+        },
+        {
+            value: '2ª Prioridade',
+            label: '2ª Prioridade'
+        },
+        {
+            value: '3ª Prioridade ',
+            label: '3ª Prioridade '
+        },
+        {
+            value: '4ª - Talvez algum dia',
+            label: '4ª - Talvez algum dia'
+        },
+        {
+            value: '5ª - Talvez pelo nome',
+            label: '5ª - Talvez pelo nome'
+        }
+    ]
     const allPlatforms = [
         {
             value: 'PC',
@@ -83,7 +105,7 @@
     ]
 
 
-    export { allPlatforms, allStatus, allGenres }
+    export { allPriorities, allPlatforms, allStatus, allGenres }
 
 
     // ANTIGO SELECT DA MODAL_ADD_JOGO.tsx

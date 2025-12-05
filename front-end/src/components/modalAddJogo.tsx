@@ -7,7 +7,7 @@ import API from '@/services/gameApiServices';
 // import { FaRegWindowClose } from 'react-icons/fa';
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
-import { allPlatforms, allStatus, allGenres } from '@/services/listasParaFiltro';
+import { allPriorities, allPlatforms, allStatus, allGenres } from '@/services/listasParaFiltro';
 import type { GamePayload2 } from '@/interfaces/gameDataTypes';
 
 // OK-passar pra algum helper ou coisa assim
@@ -24,6 +24,7 @@ const AddGameModal = () => {
     const [addjogo, setAddjogo] = useState<string>('')
     const [hours_played, setHours_played] = useState<number | string>('')
     const [hours_expected, setHours_expected] = useState<number | string>('')
+    const [priority, setPriority] = useState<string>('')
     const [platform, setPlatform] = useState<string>('')
     const [genre, setGenre] = useState<string>('')
     // const [is_completed, setIs_completed] = useState<boolean>(false)
@@ -33,6 +34,22 @@ const AddGameModal = () => {
     const [year_finished, setYear_finished] = useState<number | string>('')
     const [background_image, setBackground_image] = useState<string>('')
 
+    function resetarForm() {
+        // limpar os inputs (opcional)
+        setAddjogo('')
+        setHours_played('')
+        setHours_expected('')
+        setPriority('')
+        setPlatform('')
+        setGenre('')
+        setStatus('')
+        setRelease_year('')
+        setYear_started('')
+        setYear_finished('')
+        setBackground_image('')
+        //handleClose() // fecha o dialog
+    }
+
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
     async function enviarJogo(e?: React.MouseEvent<HTMLButtonElement>) {
         e?.preventDefault();
@@ -40,6 +57,7 @@ const AddGameModal = () => {
             name: addjogo, //'Octopath Traveler',
             hours_played: hours_played || '', //86
             hours_expected: hours_expected || '', //60,
+            priority: priority,
             platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
             genre: genre, // 'JPRG',   SELECT AQUI COM VÁRIAS OPÇÕES
             //is_completed: is_completed , //false,
@@ -54,18 +72,8 @@ const AddGameModal = () => {
         // <--- invalida a query e força refetch automático
         queryClient.invalidateQueries({ queryKey: ['meu joojs'] })
 
-        // limpar os inputs (opcional)
-        setAddjogo('')
-        setHours_played(0)
-        setHours_expected(0)
-        setPlatform('')
-        setGenre('')
-        setStatus('')
-        setRelease_year(0)
-        setYear_started(0)
-        setYear_finished(0)
-        setBackground_image('')
-        handleClose() // fecha o dialog
+        resetarForm()
+        handleClose()
 
         return jogoSalvo
     }
@@ -85,7 +93,6 @@ const AddGameModal = () => {
 
     return (
         <div className='w-full h-full flex flex-col justify-center items-center'>
-            <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
             <Button onClick={handleClickOpen}>Adicionar Jogo</Button>
 
             <Dialog open={open} onClose={handleClose} className='bg-slate-700'
@@ -128,7 +135,7 @@ const AddGameModal = () => {
                             value={addjogo}
                             onChange={(e) => { setAddjogo(e.target.value) }}
                         />
-                        <div className='grid grid-cols-3 gap-4 my-1'>
+                        <div className='grid grid-cols-3 gap-4 mt-4 mb-2'>
                             <TextField
                                 className='shadow-lg'
                                 sx={{
@@ -165,8 +172,67 @@ const AddGameModal = () => {
                                 value={hours_expected}
                                 onChange={(e) => { setHours_expected(parseInt(e.target.value)) }}
                             />
+                            <FormControl fullWidth variant="outlined" className='shadow-lg ' >
+                                <InputLabel
+                                    id="priority-label"
+                                    sx={{
+                                        '&.MuiInputLabel-shrink': {
+                                            transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                        },
+                                    }}
+                                >
+                                    Prioridade
+                                </InputLabel>
+                                <Select
+                                    label="Prioridade"
+                                    id="priority"
+                                    name="priority"
+                                    variant="outlined"
+                                    required
+                                    value={priority}
+                                    onChange={(e) => { setPriority(e.target.value) }}
+                                    sx={{
+                                        p: 0.2,
+                                        "& .MuiSelect-icon": {
+                                            color: "black",
+                                        }
+                                    }}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            sx: {
+                                                backgroundColor: "#1c1c1c",
+                                                "& .MuiMenuItem-root": {
+                                                    opacity: '75%',
+                                                    "&.Mui-selected": {
+                                                        backgroundColor: "#2e2e3e", // background do option selecionado
+                                                        color: "white", //cor do texto do option selecionado
+                                                        fontWeight: 'bold',
+                                                        opacity: '100%',
+                                                    },
+                                                    "&:hover": {
+                                                        backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                        fontWeight: 'bold',
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    }}
+                                >
+                                    {allPriorities.map((prios) => (
+                                        <MenuItem key={prios.value} value={prios.value} sx={{
+                                            backgroundColor: '#1c1c1c',
+                                            color: '#f1f5f9',
+                                            '&:hover': {
+                                                backgroundColor: '#2b2b2b',
+                                            },
+                                        }}>
+                                            {prios.label}
+                                        </MenuItem>
+                                    )
+                                    )}
+                                </Select>
+                            </FormControl>
                         </div>
-
 
                         <div className='grid grid-cols-3 gap-4 mt-4 mb-2'>
                             <FormControl fullWidth variant="outlined" className='shadow-lg' >
@@ -186,7 +252,9 @@ const AddGameModal = () => {
                                     name="platform"
                                     variant="outlined"
                                     required
-                                    // className={`bg-yellow-200`}
+                                    // className={`bg-yellow-200`}                                    
+                                    value={platform}
+                                    onChange={(e) => { setPlatform(e.target.value) }}
                                     sx={{
                                         // label:{ color: 'violet'},
                                         "& .MuiSelect-icon": {
@@ -397,8 +465,8 @@ const AddGameModal = () => {
                         />
 
                         <DialogActions>
+                            <Button onClick={resetarForm}>Resetar</Button>
                             <Button className='' type="submit" onClick={enviarJogo}>+ ADD Jooj</Button>
-                            {/* <Button onClick={handleClose}>Close</Button> */}
                         </DialogActions>
 
                     </form>

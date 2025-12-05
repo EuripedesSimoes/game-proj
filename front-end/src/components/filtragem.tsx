@@ -37,7 +37,7 @@ const filtrosSelect =
         { categoria: 'Plataforma', opcoes: ['PC', 'Switch', 'PsVita', '3DS-Emulado', 'PSP-Emulado'] },
         { categoria: 'Gênero', opcoes: ['Ação', 'Aventura', 'RPG', 'JRPG', 'Estratégia', 'Esportes/Corrida', 'FPS', 'Soulslike', 'Metroidvania/Plataforma'] },
         { categoria: 'Status', opcoes: ['Finalizado', 'Jogando', 'Pausado', 'Abandonado', 'Não iniciado'] },
-        { categoria: 'Prioridade', opcoes: ['Alta', 'Média', 'Baixa'] },
+        { categoria: 'Prioridade', opcoes: ['1ª Prioridade', '2ª Prioridade', '3ª Prioridade', '4ª - Talvez algum dia', '5ª - Talvez pelo nome'] },
     ];
 
 export default function FilterComponent({ classnameFilter, value, onChange, className, onFiltersChange, onSortChange }: Props) {

@@ -24,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', backgroundColor: 'black' }}>
 
+        {/* <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3> */}
         <Tabs.Root defaultValue='Jogos p/ jogar'>
           <Tabs.List className='flex flex-row gap-2 justify-center items-center p-2'>
             <Tabs.Trigger value='Jogos jogados' className='bg-amber-400 border-2 border-amber-900 text-black font-semibold rounded-lg'>
@@ -38,6 +39,7 @@ createRoot(document.getElementById('root')!).render(
           </Tabs.List>
 
           <Tabs.Content value='Jogos jogados'>
+
             <App />
           </Tabs.Content>
 

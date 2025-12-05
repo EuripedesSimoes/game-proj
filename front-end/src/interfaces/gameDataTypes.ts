@@ -11,6 +11,7 @@ export interface myGamesApiInterface {
     name: string;
     hours_played: number | string;
     hours_expected: number | string;
+    priority: string;
     platform: string;
     genre: string;
     is_completed?: boolean;
@@ -26,6 +27,7 @@ export type GamePayload2 = {
     name: string;
     hours_played: number | string;
     hours_expected: number | string;
+    priority: string;
     platform: string;
     genre: string;
     is_completed?: boolean;
@@ -41,6 +43,7 @@ export type GamePayload3 = {
     name: string;
     hours_played: number | string;
     hours_expected: number | string;
+    priority: string;
     platform: string;
     genre: string;
     is_completed?: boolean;

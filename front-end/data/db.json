@@ -25,7 +25,7 @@
       "status": "Finalizado",
       "year_started": "2024",
       "year_finished": "22/03/2025",
-      "background_image": "https://image.api.playstation.com/cdn/UP1063/CUSA08565_00/mAUZ8KJOfkEnbeYORx9cQqsU3GfuOyD4.png"
+      "background_image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFUVFJGsbHeTIHEu0k-oX8uigm2BTMXJfEaqMWpuO2PW_t1Wi9FSjfMlau7XCH9HNpdgcMtpDO74t9a-2VW_MoKA9SB6Mke76fOegMEeQ&s=10"
     },
     {
       "id": "3",
@@ -108,12 +108,13 @@
       "year_started": 2024,
       "year_finished": 2025,
       "background_image": "https://upload.wikimedia.org/wikipedia/en/3/34/Octopath_Traveler.jpg",
-      "id": "3068"
+      "id": "8"
     },
     {
       "name": "1Bahrlos,el topo yag11",
       "hours_played": 1,
       "hours_expected": 2,
+      "priority": "1ª Prioridade",
       "platform": "3DS-Emulado",
       "genre": "Aventura",
       "release_year": 2010,
@@ -121,7 +122,7 @@
       "year_started": 2010,
       "year_finished": 2022,
       "background_image": "",
-      "id": "0498"
+      "id": "9"
     },
     {
       "name": "2Bahrlos,el topo yag22",
@@ -134,12 +135,13 @@
       "year_started": 2019,
       "year_finished": 2022,
       "background_image": "",
-      "id": "0499"
+      "id": "10"
     },
     {
       "name": "3Bahrlos,el topo yag33",
       "hours_played": 2,
       "hours_expected": 2,
+      "priority": "",
       "platform": "PSP-Emulado",
       "genre": "JRPG",
       "release_year": 2010,
@@ -147,12 +149,13 @@
       "year_started": 2010,
       "year_finished": 2022,
       "background_image": "",
-      "id": "0500"
+      "id": "11"
     },
     {
       "name": "4Bahrlos,el topo yag44",
       "hours_played": 25,
       "hours_expected": 3,
+      "priority": "4ª - Talvez algum dia",
       "platform": "Switch",
       "genre": "Estratégia",
       "release_year": 2010,
@@ -160,7 +163,35 @@
       "year_started": 2010,
       "year_finished": 2022,
       "background_image": "",
-      "id": "0501"
+      "id": "12"
+    },
+    {
+      "id": "13",
+      "name": "Ys Seven",
+      "hours_played": 32,
+      "hours_expected": 35,
+      "platform": "PSP-Emulado",
+      "genre": "JRPG",
+      "is_completed": true,
+      "release_year": 2009,
+      "status": "Finalizado",
+      "year_started": "2024",
+      "year_finished": "2024",
+      "background_image": "https://upload.wikimedia.org/wikipedia/en/a/a5/Ys_Seven_Cover.jpg"
+    },
+    {
+      "id": "14",
+      "name": "1--Bahrlos,el topo yag33",
+      "hours_played": "",
+      "hours_expected": "",
+      "priority": "",
+      "platform": "",
+      "genre": "",
+      "release_year": "",
+      "status": "",
+      "year_started": "",
+      "year_finished": "",
+      "background_image": ""
     }
   ],
   "jogar": [

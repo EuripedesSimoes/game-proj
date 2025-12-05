@@ -9,7 +9,7 @@ import API from '@/services/gameApiServices';
 import { FaPencilAlt, FaEraser } from "react-icons/fa";
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
-import { allPlatforms, allStatus, allGenres } from '@/services/listasParaFiltro';
+import { allPlatforms, allStatus, allGenres, allPriorities } from '@/services/listasParaFiltro';
 import type { GamePayload3 } from '@/interfaces/gameDataTypes';
 
 
@@ -20,6 +20,7 @@ type AttProps = {
         name: string,
         hours_played: number | string,
         hours_expected: number | string,
+        priority: string,
         platform: string,
         genre: string,
         is_completed?: boolean,
@@ -56,6 +57,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
     const [nome_jogo, setNome_jogo] = useState<string>(data?.name || '')
     const [hours_played, setHours_played] = useState<number | string>(data?.hours_played || '')
     const [hours_expected, setHours_expected] = useState<number | string>(data?.hours_expected || '')
+    const [priority, setPriority] = useState(data?.priority || '')
     const [platform, setPlatform] = useState<string>(data?.platform || '')
     const [genre, setGenre] = useState<string>(data?.genre || '')
     // const [is_completed, setIs_completed] = useState<boolean>(false)
@@ -75,6 +77,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
             name: nome_jogo, //'Octopath Traveler',
             hours_played: hours_played || '', //86
             hours_expected: hours_expected || '', //60,
+            priority: priority,
             platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
             genre: genre, // 'JPRG',   SELECT AQUI COM VÁRIAS OPÇÕES
             //is_completed: is_completed , //false,
@@ -174,6 +177,66 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                 value={hours_expected}
                                 onChange={(e) => { setHours_expected(parseInt(e.target.value)) }}
                             />
+                            <FormControl fullWidth variant="outlined" className='shadow-lg ' >
+                                <InputLabel
+                                    id="priority-label"
+                                    sx={{
+                                        '&.MuiInputLabel-shrink': {
+                                            transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                        },
+                                    }}
+                                >
+                                    Prioridade
+                                </InputLabel>
+                                <Select
+                                    label="Prioridade"
+                                    id="priority"
+                                    name="priority"
+                                    variant="outlined"
+                                    required
+                                    value={priority}
+                                    onChange={(e) => { setPriority(e.target.value) }}
+                                    sx={{
+                                        p: 0.2,
+                                        "& .MuiSelect-icon": {
+                                            color: "black",
+                                        }
+                                    }}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            sx: {
+                                                backgroundColor: "#1c1c1c",
+                                                "& .MuiMenuItem-root": {
+                                                    opacity: '75%',
+                                                    "&.Mui-selected": {
+                                                        backgroundColor: "#2e2e3e", // background do option selecionado
+                                                        color: "white", //cor do texto do option selecionado
+                                                        fontWeight: 'bold',
+                                                        opacity: '100%',
+                                                    },
+                                                    "&:hover": {
+                                                        backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                        fontWeight: 'bold',
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    }}
+                                >
+                                    {allPriorities.map((prios) => (
+                                        <MenuItem key={prios.value} value={prios.value} sx={{
+                                            backgroundColor: '#1c1c1c',
+                                            color: '#f1f5f9',
+                                            '&:hover': {
+                                                backgroundColor: '#2b2b2b',
+                                            },
+                                        }}>
+                                            {prios.label}
+                                        </MenuItem>
+                                    )
+                                    )}
+                                </Select>
+                            </FormControl>
                         </div>
 
 

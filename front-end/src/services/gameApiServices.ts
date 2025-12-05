@@ -68,8 +68,18 @@ export const API = {
     },
 
     async salvarJogo(payload: GamePayload2) {
-        const res = await axios.post<any>(`${URL_DB}`, payload)
-        return res.data
+        // Gera um ID sequencial baseado nos IDs existentes
+        const res = await apiClient.get('/joojs')
+        const maxId = Math.max(...res.data.map((j: any) => parseInt(j.id) || 0), 0)
+        const novoId = maxId + 1
+
+        const payloadComId = {
+            ...payload,
+            id: novoId.toString(), // convert para string se necessário
+        }
+
+        const response = await apiClient.post('/joojs', payloadComId)
+        return response.data
     },
 
     async deletarJogo(id: string) {
