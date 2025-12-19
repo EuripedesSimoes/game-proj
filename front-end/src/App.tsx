@@ -4,7 +4,6 @@ import './App.css'
 import { useExternaGameData, myGames } from './helpers/fetchingGameData.ts'
 import type { gameDataInterface, myGamesApiInterface } from './interfaces/gameDataTypes.ts'
 import { FaPencilAlt, FaEraser } from "react-icons/fa";
-
 import {
   Card,
   // CardAction,
@@ -14,8 +13,9 @@ import {
   // CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+
 import FilterComponent from './components/filtragem.tsx'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import API from './services/gameApiServices.ts'
 import { Button } from "@/components/ui/button"
 // import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem } from '@mui/material';
@@ -24,6 +24,22 @@ import { Spinner } from "@/components/ui/spinner"
 import { useQueryClient } from '@tanstack/react-query';
 import AddGameModal from './components/modalAddJogo.tsx';
 import AttGameModal from './components/modalAttJogo.tsx';
+
+// import { dbFirebase } from '../firebaseConfig.ts';
+
+
+// import { initializeApp } from "firebase/app";
+// import { getFirestore } from 'firebase/firestore';
+
+// import { getDocs } from "firebase-admin/firestore";
+// import { dbFirebase } from '../firebaseConfig.ts';
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+//getFirestore: olha a aplicação, olhas as chaves secretas do firebaseCoonfig e repassa pro Firestore se tem permissão de admin para acessar o banco de dados
+import { getFirestore, getDocs, collection, addDoc, deleteDoc, doc } from 'firebase/firestore';
+import CardComponent from './components/cardComponent.tsx';
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
 type GamePayload2 = {
   name: string;
@@ -40,17 +56,75 @@ type GamePayload2 = {
 };
 
 
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
+  authDomain: "my-game-list-6fd0f.firebaseapp.com",
+  projectId: "my-game-list-6fd0f",
+  // storageBucket: "my-game-list-6fd0f.firebasestorage.app",
+  // messagingSenderId: "982341506588",
+  // appId: "1:982341506588:web:ac89acb8295ac1c78531d9"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+
+// const dbFirebase = getFirestore(firebaseApp);
+
+// Initialize Firebase
+// const app = initializeApp(firebaseConfig);
+
 // function App({name_Prop, hours_played_Prop, platform_Prop, genre_Prop, is_completed_Prop, release_year_Prop, status_Prop, year_started_Prop, year_finished_Prop, background_image_Prop }: GamePayload2) {
-function App() {
+export default function App() {
   // const { data, isError, isFetching } = useExternaGameData()
   const { data, isError, isFetching } = myGames()
   const queryClient = useQueryClient() // <--- novo
   const [filter, setFilter] = useState('')
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({}) // estado com filtros por categoria
-  const [btnFilter, setBtnFilter] = useState<number>()
-  const [nomeOuHora, setNomeOuHora] = useState<string>('Nome')
   const [sortBy, setSortBy] = useState<'name' | 'hours_played'>('name') // novo estado
 
+  const db = getFirestore(firebaseApp)
+  const joojsColeRef = collection(db, 'joojs')
+  const [users, setUsers] = useState<Array<Record<string, any> & { id: string }>>([])
+
+  async function fbAddjooj() {
+    const fbNovoJooj: GamePayload2 = {
+      name: 'Novo Jooj Firebase',
+      hours_played: 20,
+      hours_expected: 30,
+      platform: 'Switch',
+      genre: 'Ação',
+      release_year: 2025,
+      status: 'Em Andamento',
+      year_started: 2025,
+      year_finished: 2025,
+    };
+    await addDoc(joojsColeRef, fbNovoJooj);
+  }
+  async function fbDeletajooj(id: string) {
+    await deleteDoc(doc(db, 'joojs', id))
+  }
+
+  useEffect(() => {
+    const todosjogos = async () => {
+      const data = await getDocs(joojsColeRef)
+      console.log('1- Jogos do Firebase:', data.docs.map(doc => doc.data()));
+      console.log('2- Jogos do Firebase2:', data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      console.log('Jogos do Firebase DATA:', data);
+      setUsers(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    };
+    todosjogos()
+  }, [])
+
+  // const joojsCollection = dbFirebase.collection('meu joojs');
+  // useEffect(() => {
+  //   const getJoojsFirebase = async () => {
+  //     const data = await joojsCollection.get()
+  //     const jogos = data.docs.map(doc => doc.data())
+  //     // setJoojs(jogos)
+  //     console.log('Jogos do Firebase:', jogos);
+  //   }
+  //   getJoojsFirebase()
+  // }, [])
 
   const categoryToField: Record<string, string> = {
     'Plataforma': 'platform',   // ajuste se no seu db.json o campo for outro
@@ -121,7 +195,24 @@ function App() {
 
   return (
     <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
-
+      <div className='grid grid-cols-4 gap-8 py-6 px-4 w-11/12 min-h-screen'>
+        {users.map(user => {
+          return (
+            <CardComponent id={user.id}
+              name={user.name}
+              hours_played={user.hours_played != null ? Number(user.hours_played) : null}
+              platform={user.platform}
+              genre={user.genre}
+              status={user.status}
+              year_started={user.year_started != null ? Number(user.year_started) : null}
+              year_finished={user.year_finished != null ? Number(user.year_finished) : null}
+              background_image={user.background_image}
+              deletajooj={deletaJooj}
+            />
+          )
+        })}
+      </div>
+      <button onClick={fbAddjooj}>Adicionar no Firebase</button>
       <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
       <AddGameModal />
       <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} />
@@ -142,72 +233,21 @@ function App() {
 
           <div className='grid grid-cols-4 gap-8 py-6 px-4 w-11/12 min-h-screen'>
             {sortedGames.map((game: myGamesApiInterface) => (
+              <>
+                <CardComponent
+                  id={game.id}
+                  name={game.name}
+                  hours_played={game.hours_played != null ? Number(game.hours_played) : null}
+                  platform={game.platform}
+                  genre={game.genre}
+                  status={game.status}
+                  year_started={game.year_started != null ? Number(game.year_started) : null}
+                  year_finished={game.year_finished != null ? Number(game.year_finished) : null}
+                  background_image={game.background_image}
+                  deletajooj={deletaJooj}
 
-              <Card className='w-full h-[500px] gap-2 flex flex-col items-start cursor-pointer border-2 hover:border-4 border-white/50 hover:border-amber-500 transition-all bg-slate-900 shadow-4xl' key={game.id}>
-
-                <div className="absolute bg-black/20 z-10  rounded-lg shadow-lg  hover:bg-gray-600">
-                  <Button className='bg-white/60 m-2' onClick={() => deletaJooj(game.id!)}>
-                    <span>
-                      <FaEraser className="h-6.5 w-6.5 text-red-600/80" />
-                    </span>
-                  </Button>
-                  {/* COLOCAR AQUI A FUNÇÃO DE ABRIR O MODAL */}
-                  <AttGameModal gameId={game.id} data={game} />
-                </div>
-
-                <img
-                  src={game.background_image}
-                  alt={game.name}
-                  className='w-full h-[60%] object-cover object-center rounded-t-lg border-b-3 border-emerald-800 hover:border-amber-500'
                 />
-
-                <CardContent className='h-[40%] w-full p-2 flex flex-col justify-start items-start overflow-auto gap-3'>
-
-                  <CardTitle className='text-white text-[14px] md:text-base border-b-2 w-full'>{game.name}</CardTitle>
-                  <div className='flex w-full gap-x-2'>
-                    <CardDescription className='text-white text-[14px] md:text-base border-b-2 w-40 flex justify-center items-end'>{game.hours_played}{Number(game.hours_played) <= 1 ? ' hora' : ' horas'} </CardDescription>
-                    <CardDescription className='text-white text-[14px] md:text-base border-b-2 w-full flex justify-center items-end '>Gênero: {game.genre}</CardDescription>
-                  </div>
-
-                  <div className='flex flex-col 2xl:flex-row w-full gap-3'>
-
-                    <CardDescription className={`text-white text-[14px] md:text-base border-b-2 flex flex-row} justify-center 2xl:justify-start items-end `}>
-                      Plataforma:
-                      <p
-                        className={`px-2 font-bold 
-                              ${game.platform === 'Switch' ? 'text-red-600'
-                            : game.platform === 'PC' ? 'text-blue-400'
-                              : game.platform === 'PSVita' ? 'text-blue-600'
-                                : game.platform === '3DS-Emulado' ? 'text-red-400'
-                                  : game.platform === 'PSP-Emulado' && 'text-purple-800'}`}>
-                        {game.platform}
-                      </p>
-                    </CardDescription>
-
-                    {/* Aqui era baseado no "is_complete", foi mudado para o valor do status */}
-                    {/* <CardDescription className={`text-white text-[14px] md:text-base font-bold border-b-2 flex justify-center items-end w-full
-                         ${game.is_completed === true ? 'text-green-400'
-                        : 'text-red-300'}`}>
-                      Status: {game.status}
-                    </CardDescription> */}
-                    <CardDescription className={`text-white text-[14px] md:text-base font-bold border-b-2 flex justify-center items-end w-full
-                         ${game.status === 'Finalizado' ? 'text-green-400'
-                        : game.status === 'Pausado' ? 'text-red-300'
-                          : game.status === 'Jogando' ? 'text-yellow-300'
-                            : game.status === 'Não Iniciado' && 'text-white'}`}>
-                      Status: {game.status === 'Finalizado' ? `✅ ${game.status}  (${game.year_finished})` : game.status === 'Pausado' ? `${game.status} ⏸️` : game.status === 'Jogando' ? `${game.status} 🎮` : `${game.status}`}
-                    </CardDescription>
-
-                  </div>
-
-                  <CardDescription className={`text-white text-[14px] md:text-base border-b-2 flex flex-row justify-center  2xl:justify-start items-end `}>
-                    Prioridade:
-                    <span className={`font-bold ${game.priority === '1- Principal' ? 'text-red-600' : game.priority === '2- Secundário' && 'text-yellow-600'}`}>
-                      {game.priority}
-                    </span>
-                  </CardDescription>
-                </CardContent>
-              </Card>
+              </>
 
             ))}
           </div>
@@ -221,4 +261,3 @@ function App() {
   )
 }
 
-export default App
