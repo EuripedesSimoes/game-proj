@@ -16,19 +16,19 @@ import type { GamePayload3 } from '@/interfaces/gameDataTypes';
 type AttProps = {
     gameId: any;
     data: {
-        id: string,
-        name: string,
-        hours_played: number | string,
-        hours_expected: number | string,
-        priority: string,
-        platform: string,
-        genre: string,
-        is_completed?: boolean,
-        release_year: number | string,
-        status: string,
-        year_started?: number | string,
-        year_finished?: number | string,
-        background_image?: string
+        id: string
+        name: string;
+        hours_played: number | null;
+        hours_expected?: number;
+        platform: string;
+        genre: string;
+        is_completed?: boolean;
+        release_year?: number;
+        status: string;
+        priority?: string
+        year_started: number | null;
+        year_finished: number | null;
+        background_image?: string;
     };
 }
 // OK-passar pra algum helper ou coisa assim
