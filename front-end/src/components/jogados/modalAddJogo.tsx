@@ -10,6 +10,9 @@ import Select from '@mui/material/Select';
 import { allPriorities, allPlatforms, allStatus, allGenres } from '@/services/listasParaFiltro';
 import type { GamePayload2 } from '@/interfaces/gameDataTypes';
 
+// OK-passar pra algum helper ou coisa assim
+// type GamePayload2 = { name: string; etc...}
+
 const AddGameModal = () => {
 
     // OK-passar essas listas pra algum helper ou coisa assim
@@ -52,16 +55,16 @@ const AddGameModal = () => {
         e?.preventDefault();
         const payload: GamePayload2 = {
             name: addjogo, //'Octopath Traveler',
-            hours_played: hours_played !== '' ? hours_played : '0', //86
-            hours_expected: hours_expected !== '' ? hours_expected : '0', //60,
+            hours_played: hours_played || '', //86
+            hours_expected: hours_expected || '', //60,
             priority: priority,
             platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
             genre: genre, // 'JPRG',   SELECT AQUI COM VÁRIAS OPÇÕES
             //is_completed: is_completed , //false,
             release_year: release_year || '', // 2017,
             status: status, //'In Progress',
-            year_started: year_started !== '' ? year_started : '0', //2024,
-            year_finished: year_finished !== '' ? year_finished : '0', //null,
+            year_started: year_started || '', //2024,
+            year_finished: year_finished || '', //null,
             background_image: background_image, //''
         }
         const jogoSalvo = await API.salvarJogo(payload)

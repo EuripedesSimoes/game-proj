@@ -10,7 +10,7 @@ import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
 import { allPlatforms, allStatus, allGenres, allPriorities } from '@/services/listasParaFiltro';
 import type { GamePayload2, GamePayload3 } from '@/interfaces/gameDataTypes';
-import { addDoc, collection, doc, getFirestore, updateDoc } from 'firebase/firestore';
+import { collection, doc, getFirestore, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 
 type AttProps = {
@@ -34,7 +34,7 @@ type AttProps = {
 // OK-passar pra algum helper ou coisa assim
 // type GamePayload3 = {name: string; etc...};
 
-const AttGameModal = ({ gameId, data }: AttProps) => {
+const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
 
     // OK-passar essas listas pra algum helper ou coisa assim
     // const allPlatforms,etc
@@ -42,48 +42,47 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
     // const queryClient = useQueryClient() // <--- novo
 
     const [open, setOpen] = useState(false);
-    const handleClickOpen = () => setOpen(true)
-    const handleClose = () => setOpen(false)
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const FBhandleClickOpen = () => {
+        setOpen(true),
+        console.log('gameidddd', gameId)
+    }
+    const FBhandleClose = () => setOpen(false)
+    const FBhandleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         const formJson = Object.fromEntries((formData as any).entries());
         const email = formJson.email;
         console.log(email);
-        handleClose();
+        FBhandleClose();
     };
 
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
-    const [attjogo, setAttjogo] = useState<string>('')
-    const [hours_expected, setHours_expected] = useState<number | string>('')
-    const [priority, setPriority] = useState<string>('')
-    const [platform, setPlatform] = useState<string>('')
-    const [genre, setGenre] = useState<string>('')
+    const [nome_jogo, setNome_jogo] = useState<string>(data?.name || '')
+    const [hours_expected, setHours_expected] = useState<number | string>(data?.hours_expected || '')
+    const [priority, setPriority] = useState(data?.priority || '')
+    const [platform, setPlatform] = useState<string>(data?.platform || '')
+    const [genre, setGenre] = useState<string>(data?.genre || '')
     // const [is_completed, setIs_completed] = useState<boolean>(false)
-    const [status, setStatus] = useState<string>('')
-    const [release_year, setRelease_year] = useState<number | string>('')
-    const [background_image, setBackground_image] = useState<string>('')
+    const [status, setStatus] = useState<string>(data?.status || '')
+    const [release_year, setRelease_year] = useState<number | string>(data?.release_year || '')
+    const [background_image, setBackground_image] = useState<string>(data?.background_image || '')
 
 
     const firebaseConfig = {
         apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
         authDomain: "my-game-list-6fd0f.firebaseapp.com",
         projectId: "my-game-list-6fd0f",
-        // storageBucket: "my-game-list-6fd0f.firebasestorage.app",
-        // messagingSenderId: "982341506588",
-        // appId: "1:982341506588:web:ac89acb8295ac1c78531d9"
     };
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp)
     const jogosParaJogarColeRef = collection(db, 'jogos-para-jogar') // referência à coleção 'jogos-para-jogar' no Firestore
 
-    // console.log('data att: ', data)
+    async function fbAtualizarJogo(e?: React.MouseEvent<HTMLButtonElement>) {
+        e?.preventDefault();
 
-
-    async function fbAtualizarJogo(id: string, dadosAtualizados: Partial<GamePayload2>) {
         const payload: GamePayload3 = {
-            name: attjogo, //'Octopath Traveler',
+            name: nome_jogo, //'Octopath Traveler',
             hours_expected: hours_expected !== '' ? hours_expected : '0', //60,
             priority: priority,
             platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
@@ -93,37 +92,32 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
             status: status, //'In Progress',
             background_image: background_image, //''
         }
-        const joojDoc = doc(db, 'jogos-para-jogar', id)
+        const joojDoc = doc(jogosParaJogarColeRef, gameId)
         await updateDoc(joojDoc, payload)
 
-        // <--- invalida a query e força refetch automático
-        // queryClient.invalidateQueries({ queryKey: ['meu joojs'] })
-
-        handleClose() // fecha o dialog
-
-        // return jogoAtualizado
+        FBhandleClose() // fecha o dialog
     }
 
     return (
         <>
 
             {/* na vdd aqui tem que clicar para abrir o modal pleo handleOpen, e no fim do modal chamadr o AttJooj(game.id!) */}
-            <Button className='bg-slate-500/60 m-2' onClick={handleClickOpen}>
+            <Button className='bg-slate-500/60 m-2' onClick={FBhandleClickOpen}>
                 <span>
                     <FaPencilAlt className="h-6.5 w-6.5 text-white/80" />
                 </span>
             </Button>
-            <Dialog open={open} onClose={handleClose} className='bg-slate-500/95'>
+            <Dialog open={open} onClose={FBhandleClose} className='bg-slate-500/95'>
                 <DialogTitle sx={{ m: 0, p: 1.5, fontWeight: "bold" }} >
                     <div className='flex justify-between items-center'>
-                        Atualizar Jogo
-                        <span onClick={handleClose} className='hover:cursor-pointer'>
+                        Atualizar Jogo Para Jogar
+                        <span onClick={FBhandleClose} className='hover:cursor-pointer'>
                             <RiCloseCircleLine className='h-8 w-8  hover:size-10' />
                         </span>
                     </div>
                 </DialogTitle>
                 <DialogContent className='bg-[#f1f2f9]'>
-                    <form action="" onSubmit={handleSubmit} id="subscription-form" className=''>
+                    <form action="" onSubmit={FBhandleSubmit} id="subscription-form" className=''>
                         <div className='flex gap-4 mt-4 mb-2'>
                             <TextField
                                 className='shadow-lg my-1'
@@ -145,8 +139,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                 label="Nome do Jogo"
                                 type="text"
                                 variant="standard"
-                                value={attjogo}
-                                onChange={(e) => { setAttjogo(e.target.value) }}
+                                value={nome_jogo}
+                                onChange={(e) => { setNome_jogo(e.target.value) }}
                             />
                             <TextField
                                 className='shadow-lg my-1'
@@ -430,7 +424,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                         />
 
                         <DialogActions>
-                            <Button className='' type="submit" onClick={() => fbAtualizarJogo}>+ ATT Jooj</Button>
+                            <Button className='' type="submit" onClick={fbAtualizarJogo}>+ ATT Jooj P/ jogar</Button>
                             {/* <Button className='' type="submit" onClick={addJogo}>+ ADD Jooj</Button> */}
                         </DialogActions>
 
@@ -443,4 +437,4 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
 
 
-export default AttGameModal;
+export default AttGameModalParaJogar;

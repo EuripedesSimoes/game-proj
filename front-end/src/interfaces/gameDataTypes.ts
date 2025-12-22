@@ -25,31 +25,31 @@ export interface myGamesApiInterface {
 // ADD JOGO - OK - // passar pra algum helper ou coisa assim
 export type GamePayload2 = {
     name: string;
-    hours_played: number | string;
-    hours_expected: number | string;
+    hours_played?: number | string;
+    hours_expected?: number | string;
     priority: string;
     platform: string;
     genre: string;
+    status: string;
     is_completed?: boolean;
     release_year: number | string;
-    status: string;
-    year_started: number | string;
-    year_finished: number | string;
+    year_started?: number | string;
+    year_finished?: number | string;
     background_image?: string;
 };
 
 // ATT JOGO - OK - // passar pra algum helper ou coisa assim
 export type GamePayload3 = {
     name: string;
-    hours_played: number | string;
-    hours_expected: number | string;
+    hours_played?: number | string;
+    hours_expected?: number | string;
     priority: string;
     platform: string;
     genre: string;
+    status: string;
     is_completed?: boolean;
     release_year: number | string;
-    status: string;
-    year_started: number | string;
-    year_finished: number | string;
+    year_started?: number | string;
+    year_finished?: number | string;
     background_image?: string;
 };

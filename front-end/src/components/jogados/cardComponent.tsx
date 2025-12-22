@@ -15,17 +15,18 @@ import AttGameModal from "./modalAttJogo";
 type dadosJogos = {
     id: string
     name: string;
-    hours_played: number | null;
-    hours_expected?: number;
+    hours_played?: number | string;
+    hours_expected?: number | string;
+    priority: string;
     platform: string;
     genre: string;
-    is_completed?: boolean;
-    release_year?: number;
     status: string;
-    priority?: string
-    year_started: number | null;
-    year_finished: number | null;
+    is_completed?: boolean;
+    release_year: number | string;
+    year_started?: number | string;
+    year_finished?: number | string;
     background_image?: string;
+
     deletajooj: (id: string) => Promise<void>
 }
 

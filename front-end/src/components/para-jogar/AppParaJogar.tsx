@@ -14,12 +14,12 @@ import { getFirestore, getDocs, collection, addDoc, deleteDoc, doc, updateDoc } 
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 import type { GamePayload2, myGamesApiInterface } from '@/interfaces/gameDataTypes';
-import CardComponent from './cardComponent';
-import AddGameModal from './jogados/modalAddJogo';
-import FilterComponent from './filtragem';
+import AddGameModal from '../jogados/modalAddJogo';
+import FilterComponent from '../filtragem';
 import { Button } from "@/components/ui/button"
-import { Spinner } from './ui/spinner';
-import AddGameModalParaJogar from './para-jogar/modalAddJogoParaJogar';
+import { Spinner } from '../ui/spinner';
+import AddGameModalParaJogar from './modalAddJogoParaJogar';
+import CardComponentParaJogar from './cardComponentParaJogar';
 
 
 // Your web app's Firebase configuration
@@ -182,18 +182,15 @@ export default function AppParaJogar() {
                         <div className='grid grid-cols-4 gap-8 py-6 px-4 w-11/12 min-h-screen'>
                             {sortedGames.map((game: myGamesApiInterface) => {
                                 return (
-                                    <CardComponent
+                                    <CardComponentParaJogar
                                         id={game.id}
                                         name={game.name}
-                                        hours_played={game.hours_played !== '' ? game.hours_played : '0'}
                                         hours_expected={game.hours_expected !== '' ? game.hours_expected : '0'}
                                         priority={game.priority}
                                         platform={game.platform}
                                         genre={game.genre}
                                         status={game.status}
                                         release_year={game.release_year}
-                                        year_started={game.year_started !== '' ? game.year_started : '0'}
-                                        year_finished={game.year_finished !== '' ? game.year_finished : '0'}
                                         background_image={game.background_image}
                                         deletajooj={fbDeletajooj}
                                     />

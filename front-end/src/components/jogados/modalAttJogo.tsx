@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField';
 import { useQueryClient } from '@tanstack/react-query';
 import API from '@/services/gameApiServices';
 // import { FaRegWindowClose } from 'react-icons/fa';
+
 import { FaPencilAlt, FaEraser } from "react-icons/fa";
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
@@ -13,7 +14,7 @@ import type { GamePayload3 } from '@/interfaces/gameDataTypes';
 
 
 type AttProps = {
-    gameId: string;
+    gameId: any;
     data: {
         id: string
         name: string;
@@ -52,19 +53,20 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
         handleClose();
     };
 
+    // console.log('dataaaaaaa', data)
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
-    const [attjogo, setAttjogo] = useState<string>('')
-    const [hours_played, setHours_played] = useState<number | string>('')
-    const [hours_expected, setHours_expected] = useState<number | string>('')
-    const [priority, setPriority] = useState<string>('')
-    const [platform, setPlatform] = useState<string>('')
-    const [genre, setGenre] = useState<string>('')
+    const [nome_jogo, setNome_jogo] = useState<string>(data?.name || '')
+    const [hours_played, setHours_played] = useState<number | string>(data?.hours_played || '')
+    const [hours_expected, setHours_expected] = useState<number | string>(data?.hours_expected || '')
+    const [priority, setPriority] = useState(data?.priority || '')
+    const [platform, setPlatform] = useState<string>(data?.platform || '')
+    const [genre, setGenre] = useState<string>(data?.genre || '')
     // const [is_completed, setIs_completed] = useState<boolean>(false)
-    const [status, setStatus] = useState<string>('')
-    const [release_year, setRelease_year] = useState<number | string>('')
-    const [year_started, setYear_started] = useState<number | string>('')
-    const [year_finished, setYear_finished] = useState<number | string>('')
-    const [background_image, setBackground_image] = useState<string>('')
+    const [status, setStatus] = useState<string>(data?.status || '')
+    const [release_year, setRelease_year] = useState<number | string>(data?.release_year || '')
+    const [year_started, setYear_started] = useState<number | string>(data?.year_started || '')
+    const [year_finished, setYear_finished] = useState<number | string>(data?.year_finished || '')
+    const [background_image, setBackground_image] = useState<string>(data?.background_image || '')
 
 
     // console.log('data att: ', data)
@@ -73,17 +75,17 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
     async function AtualizarJogo(e?: React.MouseEvent<HTMLButtonElement>) {
         e?.preventDefault();
         const payload: GamePayload3 = {
-            name: attjogo, //'Octopath Traveler',
-            hours_played: hours_played !== '' ? hours_played : '0', //86
-            hours_expected: hours_expected !== '' ? hours_expected : '0', //60,
+            name: nome_jogo, //'Octopath Traveler',
+            hours_played: hours_played || '', //86
+            hours_expected: hours_expected || '', //60,
             priority: priority,
             platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
             genre: genre, // 'JPRG',   SELECT AQUI COM VÁRIAS OPÇÕES
             //is_completed: is_completed , //false,
             release_year: release_year || '', // 2017,
             status: status, //'In Progress',
-            year_started: year_started !== '' ? year_started : '0', //2024,
-            year_finished: year_finished !== '' ? year_finished : '0', //null,
+            year_started: year_started || '', //2024,
+            year_finished: year_finished || '', //null,
             background_image: background_image, //''
         }
         const jogoAtualizado = await API.attJogo(gameId, payload)
@@ -136,8 +138,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                             label="Nome do Jogo"
                             type="text"
                             variant="standard"
-                            value={attjogo}
-                            onChange={(e) => { setAttjogo(e.target.value) }}
+                            value={nome_jogo}
+                            onChange={(e) => { setNome_jogo(e.target.value) }}
                         />
                         <div className='grid grid-cols-3 gap-4 my-1'>
                             <TextField

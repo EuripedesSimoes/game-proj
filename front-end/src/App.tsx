@@ -22,24 +22,9 @@ import { Button } from "@/components/ui/button"
 // import TextField from '@mui/material/TextField';
 import { Spinner } from "@/components/ui/spinner"
 import { useQueryClient } from '@tanstack/react-query';
-import AddGameModal from './components/modalAddJogo.tsx';
-import AttGameModal from './components/modalAttJogo.tsx';
-
-// import { dbFirebase } from '../firebaseConfig.ts';
-
-
-// import { initializeApp } from "firebase/app";
-// import { getFirestore } from 'firebase/firestore';
-
-// import { getDocs } from "firebase-admin/firestore";
-// import { dbFirebase } from '../firebaseConfig.ts';
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-//getFirestore: olha a aplicação, olhas as chaves secretas do firebaseCoonfig e repassa pro Firestore se tem permissão de admin para acessar o banco de dados
-import { getFirestore, getDocs, collection, addDoc, deleteDoc, doc } from 'firebase/firestore';
-import CardComponent from './components/cardComponent.tsx';
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import AddGameModal from './components/jogados/modalAddJogo.tsx';
+import AttGameModal from './components/jogados/modalAttJogo.tsx';
+import CardComponent from './components/jogados/cardComponent.tsx';
 
 type GamePayload2 = {
   name: string;
@@ -55,24 +40,6 @@ type GamePayload2 = {
   background_image?: string;
 };
 
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
-  authDomain: "my-game-list-6fd0f.firebaseapp.com",
-  projectId: "my-game-list-6fd0f",
-  // storageBucket: "my-game-list-6fd0f.firebasestorage.app",
-  // messagingSenderId: "982341506588",
-  // appId: "1:982341506588:web:ac89acb8295ac1c78531d9"
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-
-// const dbFirebase = getFirestore(firebaseApp);
-
-// Initialize Firebase
-// const app = initializeApp(firebaseConfig);
-
 // function App({name_Prop, hours_played_Prop, platform_Prop, genre_Prop, is_completed_Prop, release_year_Prop, status_Prop, year_started_Prop, year_finished_Prop, background_image_Prop }: GamePayload2) {
 export default function App() {
   // const { data, isError, isFetching } = useExternaGameData()
@@ -82,49 +49,6 @@ export default function App() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({}) // estado com filtros por categoria
   const [sortBy, setSortBy] = useState<'name' | 'hours_played'>('name') // novo estado
 
-  const db = getFirestore(firebaseApp)
-  const joojsColeRef = collection(db, 'joojs')
-  const [users, setUsers] = useState<Array<Record<string, any> & { id: string }>>([])
-
-  async function fbAddjooj() {
-    const fbNovoJooj: GamePayload2 = {
-      name: 'Novo Jooj Firebase',
-      hours_played: 20,
-      hours_expected: 30,
-      platform: 'Switch',
-      genre: 'Ação',
-      release_year: 2025,
-      status: 'Em Andamento',
-      year_started: 2025,
-      year_finished: 2025,
-    };
-    await addDoc(joojsColeRef, fbNovoJooj);
-  }
-  async function fbDeletajooj(id: string) {
-    await deleteDoc(doc(db, 'joojs', id))
-  }
-
-  useEffect(() => {
-    const todosjogos = async () => {
-      const data = await getDocs(joojsColeRef)
-      console.log('1- Jogos do Firebase:', data.docs.map(doc => doc.data()));
-      console.log('2- Jogos do Firebase2:', data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-      console.log('Jogos do Firebase DATA:', data);
-      setUsers(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-    };
-    todosjogos()
-  }, [])
-
-  // const joojsCollection = dbFirebase.collection('meu joojs');
-  // useEffect(() => {
-  //   const getJoojsFirebase = async () => {
-  //     const data = await joojsCollection.get()
-  //     const jogos = data.docs.map(doc => doc.data())
-  //     // setJoojs(jogos)
-  //     console.log('Jogos do Firebase:', jogos);
-  //   }
-  //   getJoojsFirebase()
-  // }, [])
 
   const categoryToField: Record<string, string> = {
     'Plataforma': 'platform',   // ajuste se no seu db.json o campo for outro
@@ -195,24 +119,7 @@ export default function App() {
 
   return (
     <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
-      <div className='grid grid-cols-4 gap-8 py-6 px-4 w-11/12 min-h-screen'>
-        {users.map(user => {
-          return (
-            <CardComponent id={user.id}
-              name={user.name}
-              hours_played={user.hours_played != null ? Number(user.hours_played) : null}
-              platform={user.platform}
-              genre={user.genre}
-              status={user.status}
-              year_started={user.year_started != null ? Number(user.year_started) : null}
-              year_finished={user.year_finished != null ? Number(user.year_finished) : null}
-              background_image={user.background_image}
-              deletajooj={deletaJooj}
-            />
-          )
-        })}
-      </div>
-      <button onClick={fbAddjooj}>Adicionar no Firebase</button>
+
       <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
       <AddGameModal />
       <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} />
@@ -224,7 +131,8 @@ export default function App() {
           <Button disabled size="sm">
             <Spinner />
             Loading...
-          </Button></div>
+          </Button>
+        </div>
       ) : isError ? (
         <p className='text-white'>Serviço não pegou os dados</p>
       ) : (
@@ -237,15 +145,17 @@ export default function App() {
                 <CardComponent
                   id={game.id}
                   name={game.name}
-                  hours_played={game.hours_played != null ? Number(game.hours_played) : null}
+                  hours_played={game.hours_played !== '' ? game.hours_played : '0'}
+                  hours_expected={game.hours_expected !== '' ? game.hours_expected : '0'}
+                  priority={game.priority}
                   platform={game.platform}
                   genre={game.genre}
                   status={game.status}
-                  year_started={game.year_started != null ? Number(game.year_started) : null}
-                  year_finished={game.year_finished != null ? Number(game.year_finished) : null}
+                  release_year={game.release_year}
+                  year_started={game.year_started !== '' ? game.year_started : '0'}
+                  year_finished={game.year_finished !== '' ? game.year_finished : '0'}
                   background_image={game.background_image}
                   deletajooj={deletaJooj}
-
                 />
               </>
 

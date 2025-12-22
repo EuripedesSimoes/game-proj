@@ -28,7 +28,6 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
 
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
     const [addjogo, setAddjogo] = useState<string>('')
-    const [hours_played, setHours_played] = useState<number | string>('')
     const [hours_expected, setHours_expected] = useState<number | string>('')
     const [priority, setPriority] = useState<string>('')
     const [platform, setPlatform] = useState<string>('')
@@ -36,22 +35,17 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
     // const [is_completed, setIs_completed] = useState<boolean>(false)
     const [status, setStatus] = useState<string>('')
     const [release_year, setRelease_year] = useState<number | string>('')
-    const [year_started, setYear_started] = useState<number | string>('')
-    const [year_finished, setYear_finished] = useState<number | string>('')
     const [background_image, setBackground_image] = useState<string>('')
 
     function resetarForm() {
         // limpar os inputs (opcional)
         setAddjogo('')
-        setHours_played('')
         setHours_expected('')
         setPriority('')
         setPlatform('')
         setGenre('')
         setStatus('')
         setRelease_year('')
-        setYear_started('')
-        setYear_finished('')
         setBackground_image('')
         //handleClose() // fecha o dialog
     }
@@ -70,7 +64,6 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
         e?.preventDefault();
         const payload: GamePayload2 = {
             name: addjogo, //'Octopath Traveler',
-            hours_played: hours_played || '', //86
             hours_expected: hours_expected || '', //60,
             priority: priority,
             platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
@@ -78,8 +71,6 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
             //is_completed: is_completed , //false,
             release_year: release_year || '', // 2017,
             status: status, //'In Progress',
-            year_started: year_started || '', //2024,
-            year_finished: year_finished || '', //null,
             background_image: background_image, //''
         }
         await addDoc(jogosParaJogarColeRef, payload);
@@ -110,7 +101,6 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
 
             <Dialog open={open} onClose={handleClose} className='bg-slate-700'
                 sx={{
-                    input: { color: '#f1f5f9' },
                     label: { color: '#3c3c3c' }
                 }}
             >
