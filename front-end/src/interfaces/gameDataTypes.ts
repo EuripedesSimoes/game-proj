@@ -17,6 +17,7 @@ export interface myGamesApiInterface {
     is_completed?: boolean;
     release_year: number | string;
     status: string;
+    replayed: string;
     year_started: number | string;
     year_finished: number | string;
     background_image?: string;
@@ -31,6 +32,7 @@ export type GamePayload2 = {
     platform: string;
     genre: string;
     status: string;
+    replayed?: string;
     is_completed?: boolean;
     release_year: number | string;
     year_started?: number | string;
@@ -47,6 +49,7 @@ export type GamePayload3 = {
     platform: string;
     genre: string;
     status: string;
+    replayed?: string;
     is_completed?: boolean;
     release_year: number | string;
     year_started?: number | string;

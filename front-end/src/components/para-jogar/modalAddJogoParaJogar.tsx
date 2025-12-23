@@ -7,7 +7,7 @@ import API from '@/services/gameApiServices';
 // import { FaRegWindowClose } from 'react-icons/fa';
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
-import { allPriorities, allPlatforms, allStatus, allGenres } from '@/services/listasParaFiltro';
+import { allPriorities, allPlatforms, allGenres, notInicialized } from '@/services/listasParaFiltro';
 import type { GamePayload2 } from '@/interfaces/gameDataTypes';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
@@ -20,11 +20,7 @@ type Props = {
 }
 
 const AddGameModalParaJogar = ({ addJogo }: Props) => {
-
-    // OK-passar essas listas pra algum helper ou coisa assim
-    // const allPlatforms
-
-    // const queryClient = useQueryClient() // <--- novo
+    const queryClient = useQueryClient()
 
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
     const [addjogo, setAddjogo] = useState<string>('')
@@ -74,46 +70,42 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
             background_image: background_image, //''
         }
         await addDoc(jogosParaJogarColeRef, payload);
-
-        // <--- invalida a query e força refetch automático
-        // queryClient.invalidateQueries({ queryKey: ['meu joojs'] })
-
+        
+        // Invalidar a query para forçar um refetch automático
+        queryClient.invalidateQueries({ queryKey: ['jogos-para-jogar'] })
+        
         resetarForm()
-        handleClose()
+        FBhandleClose()
     }
 
     const [open, setOpen] = useState(false);
-    const handleClickOpen = () => setOpen(true)
-    const handleClose = () => setOpen(false)
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const formJson = Object.fromEntries((formData as any).entries());
-        const email = formJson.email;
-        console.log(email);
-        handleClose();
+    const FBhandleClickOpen = () => setOpen(true)
+    const FBhandleClose = () => setOpen(false)
+    const FBhandleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        FBhandleClose();
+        
     };
 
 
     return (
         <div className='w-full h-full flex flex-col justify-center items-center'>
-            <Button onClick={handleClickOpen}>Adicionar Jogo</Button>
+            <Button onClick={FBhandleClickOpen}>Adicionar Jogo Para Jogar</Button>
 
-            <Dialog open={open} onClose={handleClose} className='bg-slate-700'
+            <Dialog open={open} onClose={FBhandleClose} className='bg-slate-700'
                 sx={{
                     label: { color: '#3c3c3c' }
                 }}
             >
                 <DialogTitle sx={{ m: 0, p: 1.5, fontWeight: "bold" }} >
                     <div className='flex justify-between items-center'>
-                        Adicionar Jogo
-                        <span onClick={handleClose} className='hover:cursor-pointer'>
-                            <RiCloseCircleLine className='h-8 w-8  hover:size-10' />
+                        Adicionar Jogo Para Jogar
+                        <span onClick={FBhandleClose} className='hover:cursor-pointer'>
+                            <RiCloseCircleLine className='h-9 w-9  fill-red-500 hover:fill-red-700' />
                         </span>
                     </div>
                 </DialogTitle>
                 <DialogContent className='bg-[#f1f2f9]'>
-                    <form action="" onSubmit={handleSubmit} id="subscription-form" className=''>
+                    <form action="" onSubmit={FBhandleSubmit} id="subscription-form" className=''>
                         <div className='flex gap-4 mt-4 mb-2'>
                             <TextField
                                 className='shadow-lg my-1'
@@ -389,7 +381,7 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
                                 variant="outlined"
                                 value={status} onChange={(e) => { setStatus(e.target.value) }}
                             >
-                                {allStatus.map((status) => (
+                                {notInicialized.map((status) => (
                                     <MenuItem key={status.value} value={status.value}>
                                         {status.label}
                                     </MenuItem>
@@ -421,7 +413,7 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
 
                         <DialogActions>
                             <Button onClick={resetarForm}>Resetar</Button>
-                            <Button className='' type="submit" onClick={enviarJogo}>+ ADD Jooj</Button>
+                            <Button className='' type="submit" onClick={enviarJogo}>+ ADD Jooj P/ Jogar</Button>
                             {/* <Button className='' type="submit" onClick={addJogo}>+ ADD Jooj</Button> */}
                         </DialogActions>
 

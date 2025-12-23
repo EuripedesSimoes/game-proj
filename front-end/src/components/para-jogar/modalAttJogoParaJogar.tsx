@@ -9,7 +9,7 @@ import { FaPencilAlt, FaEraser } from "react-icons/fa";
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
 import { allPlatforms, allStatus, allGenres, allPriorities } from '@/services/listasParaFiltro';
-import type { GamePayload2, GamePayload3 } from '@/interfaces/gameDataTypes';
+import type { GamePayload3 } from '@/interfaces/gameDataTypes';
 import { collection, doc, getFirestore, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 
@@ -39,13 +39,10 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
     // OK-passar essas listas pra algum helper ou coisa assim
     // const allPlatforms,etc
 
-    // const queryClient = useQueryClient() // <--- novo
+    const queryClient = useQueryClient() // <--- novo
 
     const [open, setOpen] = useState(false);
-    const FBhandleClickOpen = () => {
-        setOpen(true),
-        console.log('gameidddd', gameId)
-    }
+    const FBhandleClickOpen = () => setOpen(true)
     const FBhandleClose = () => setOpen(false)
     const FBhandleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -92,9 +89,9 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
             status: status, //'In Progress',
             background_image: background_image, //''
         }
-        const joojDoc = doc(jogosParaJogarColeRef, gameId)
-        await updateDoc(joojDoc, payload)
-
+        await updateDoc(doc(jogosParaJogarColeRef, gameId), payload)
+        // <--- invalida a query e força refetch automático
+        queryClient.invalidateQueries({ queryKey: ['jogos-para-jogar'] })
         FBhandleClose() // fecha o dialog
     }
 
@@ -112,7 +109,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                     <div className='flex justify-between items-center'>
                         Atualizar Jogo Para Jogar
                         <span onClick={FBhandleClose} className='hover:cursor-pointer'>
-                            <RiCloseCircleLine className='h-8 w-8  hover:size-10' />
+                            <RiCloseCircleLine className='h-9 w-9  fill-red-500 hover:fill-red-700' />
                         </span>
                     </div>
                 </DialogTitle>

@@ -7,11 +7,16 @@ import API from '@/services/gameApiServices';
 // import { FaRegWindowClose } from 'react-icons/fa';
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
-import { allPriorities, allPlatforms, allStatus, allGenres } from '@/services/listasParaFiltro';
+import { allPriorities, allPlatforms, allStatus, allGenres, isReplayedList } from '@/services/listasParaFiltro';
 import type { GamePayload2 } from '@/interfaces/gameDataTypes';
+import { addDoc, collection, getFirestore } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
 
 // OK-passar pra algum helper ou coisa assim
 // type GamePayload2 = { name: string; etc...}
+type Props = {
+    isGame?: boolean
+}
 
 const AddGameModal = () => {
 
@@ -27,8 +32,9 @@ const AddGameModal = () => {
     const [priority, setPriority] = useState<string>('')
     const [platform, setPlatform] = useState<string>('')
     const [genre, setGenre] = useState<string>('')
-    // const [is_completed, setIs_completed] = useState<boolean>(false)
     const [status, setStatus] = useState<string>('')
+    const [replayed, setReplayed] = useState<string>('')
+    // const [is_completed, setIs_completed] = useState<boolean>(false)
     const [release_year, setRelease_year] = useState<number | string>('')
     const [year_started, setYear_started] = useState<number | string>('')
     const [year_finished, setYear_finished] = useState<number | string>('')
@@ -43,12 +49,23 @@ const AddGameModal = () => {
         setPlatform('')
         setGenre('')
         setStatus('')
+        setReplayed('')
         setRelease_year('')
         setYear_started('')
         setYear_finished('')
         setBackground_image('')
         //handleClose() // fecha o dialog
     }
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
+        authDomain: "my-game-list-6fd0f.firebaseapp.com",
+        projectId: "my-game-list-6fd0f",
+    };
+
+    const firebaseApp = initializeApp(firebaseConfig);
+    const db = getFirestore(firebaseApp)
+    const jogosParaJogar = collection(db, 'joojs') // referência à coleção 'jogos-para-jogar' no Firestore
 
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
     async function enviarJogo(e?: React.MouseEvent<HTMLButtonElement>) {
@@ -60,22 +77,24 @@ const AddGameModal = () => {
             priority: priority,
             platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
             genre: genre, // 'JPRG',   SELECT AQUI COM VÁRIAS OPÇÕES
+            status: status, //'In Progress',
+            replayed: replayed,
             //is_completed: is_completed , //false,
             release_year: release_year || '', // 2017,
-            status: status, //'In Progress',
             year_started: year_started || '', //2024,
             year_finished: year_finished || '', //null,
             background_image: background_image, //''
         }
-        const jogoSalvo = await API.salvarJogo(payload)
+        // const jogoSalvo = await API.salvarJogo(payload)
+        await addDoc(jogosParaJogar, payload)
 
         // <--- invalida a query e força refetch automático
-        queryClient.invalidateQueries({ queryKey: ['meu joojs'] })
+        queryClient.invalidateQueries({ queryKey: ['joojs'] })
 
         resetarForm()
         handleClose()
 
-        return jogoSalvo
+        // return jogoSalvo
     }
 
     const [open, setOpen] = useState(false);
@@ -105,42 +124,42 @@ const AddGameModal = () => {
                     <div className='flex justify-between items-center'>
                         Adicionar Jogo
                         <span onClick={handleClose} className='hover:cursor-pointer'>
-                            <RiCloseCircleLine className='h-8 w-8  hover:size-10' />
+                            <RiCloseCircleLine className='h-9 w-9  fill-red-500 hover:fill-red-700' />
                         </span>
                     </div>
                 </DialogTitle>
                 <DialogContent className='bg-[#f1f2f9]'>
                     <form action="" onSubmit={handleSubmit} id="subscription-form" className=''>
+                        <div className='flex gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
-                        <TextField
-                            className='shadow-lg my-1'
-                            sx={{
-                                backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
-                                '& .MuiOutlinedInput-root': {
-                                    // '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                    '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                    '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                },
-                            }}
-                            // autoFocus
-                            required
-                            fullWidth
-                            margin="dense"
-                            id="game_name"
-                            name="game_name"
-                            label="Nome do Jogo"
-                            type="text"
-                            variant="standard"
-                            value={addjogo}
-                            onChange={(e) => { setAddjogo(e.target.value) }}
-                        />
-                        <div className='grid grid-cols-3 gap-4 mt-4 mb-2'>
                             <TextField
-                                className='shadow-lg'
+                                className='shadow-lg my-1'
+                                sx={{
+                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
+                                    input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
+                                    '& .MuiOutlinedInput-root': {
+                                        // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                        '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                        '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                    },
+                                }}
+                                // autoFocus
+                                required
+                                fullWidth
+                                margin="dense"
+                                id="game_name"
+                                name="game_name"
+                                label="Nome do Jogo"
+                                type="text"
+                                variant="standard"
+                                value={addjogo}
+                                onChange={(e) => { setAddjogo(e.target.value) }}
+                            />
+                            <TextField
+                                className='shadow-lg my-1'
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+                                    input: { color: '#3c3c3c', p: 1.2 }, // text-slate-100
 
                                 }}
                                 // autoFocus
@@ -155,10 +174,10 @@ const AddGameModal = () => {
                                 onChange={(e) => { setHours_played(parseInt(e.target.value)) }}
                             />
                             <TextField
-                                className='shadow-lg'
+                                className='shadow-lg my-1'
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+                                    input: { color: '#3c3c3c', p: 1.2 }, // text-slate-100
 
                                 }}
                                 // autoFocus
@@ -172,6 +191,8 @@ const AddGameModal = () => {
                                 value={hours_expected}
                                 onChange={(e) => { setHours_expected(parseInt(e.target.value)) }}
                             />
+                        </div>
+                        <div className='grid grid-cols-3 gap-4 mt-2 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
                             <FormControl fullWidth variant="outlined" className='shadow-lg ' >
                                 <InputLabel
                                     id="priority-label"
@@ -232,9 +253,69 @@ const AddGameModal = () => {
                                     )}
                                 </Select>
                             </FormControl>
+                            <FormControl fullWidth variant="outlined" className='shadow-lg ' >
+                                <InputLabel
+                                    id="replayed-label"
+                                    sx={{
+                                        '&.MuiInputLabel-shrink': {
+                                            transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                        },
+                                    }}
+                                >
+                                    Rejogado?
+                                </InputLabel>
+                                <Select
+                                    label="Rejogado?"
+                                    id="replayed"
+                                    name="replayed"
+                                    variant="outlined"
+                                    required
+                                    value={replayed}
+                                    onChange={(e) => { setReplayed(e.target.value) }}
+                                    sx={{
+                                        p: 0.2,
+                                        "& .MuiSelect-icon": {
+                                            color: "black",
+                                        }
+                                    }}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            sx: {
+                                                backgroundColor: "#1c1c1c",
+                                                "& .MuiMenuItem-root": {
+                                                    opacity: '75%',
+                                                    "&.Mui-selected": {
+                                                        backgroundColor: "#2e2e3e", // background do option selecionado
+                                                        color: "white", //cor do texto do option selecionado
+                                                        fontWeight: 'bold',
+                                                        opacity: '100%',
+                                                    },
+                                                    "&:hover": {
+                                                        backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                        fontWeight: 'bold',
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    }}
+                                >
+                                    {isReplayedList.map((isRep) => (
+                                        <MenuItem key={isRep.value} value={isRep.value} sx={{
+                                            backgroundColor: '#1c1c1c',
+                                            color: '#f1f5f9',
+                                            '&:hover': {
+                                                backgroundColor: '#2b2b2b',
+                                            },
+                                        }}>
+                                            {isRep.label}
+                                        </MenuItem>
+                                    )
+                                    )}
+                                </Select>
+                            </FormControl>
                         </div>
 
-                        <div className='grid grid-cols-3 gap-4 mt-4 mb-2'>
+                        <div className='grid grid-cols-3 gap-4 mt-2 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
                             <FormControl fullWidth variant="outlined" className='shadow-lg' >
                                 <InputLabel
                                     id="plataforma-label"
@@ -391,7 +472,7 @@ const AddGameModal = () => {
                                 )}
                             </TextField>
                         </div>
-                        <div className='grid grid-cols-3 gap-4 my-1'>
+                        <div className='grid grid-cols-3 gap-4 mt-2 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
                             <TextField
                                 className='shadow-lg'
                                 sx={{

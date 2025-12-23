@@ -63,7 +63,7 @@
         {
             value: 'Não Iniciado',
             label: 'Não Iniciado'
-        }
+        },
     ]
     const allGenres = [
         {
@@ -103,9 +103,24 @@
             label: 'Metroidvania/Plataforma'
         }
     ]
+    const notInicialized = [
+        {
+            value: 'Não Iniciado',
+            label: 'Não Iniciado'
+        },
+    ]
+    const isReplayedList = [
+        {
+            value: 'Não',
+            label: '1ª vez jogando'
+        },
+        {
+            value: 'Sim', // verdadeiro valor que será passado para a API do Firebase
+            label: 'Rejoga(n)do' // label que será mostrada no formulário, na parte dos selects dos modais de ADD e ATT (sem relação com o <FilterComponent>)
+        }
+    ]
 
-
-    export { allPriorities, allPlatforms, allStatus, allGenres }
+    export { allPriorities, allPlatforms, allStatus, allGenres, notInicialized, isReplayedList }
 
 
     // ANTIGO SELECT DA MODAL_ADD_JOGO.tsx

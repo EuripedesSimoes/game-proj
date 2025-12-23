@@ -1,15 +1,11 @@
 
-import { useEffect, useMemo, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-
-// import { dbFirebase } from '../firebaseConfig.ts';
-
-// import { initializeApp } from "firebase/app";
+import { useMemo, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 //getFirestore: olha a aplicação, olhas as chaves secretas do firebaseCoonfig e repassa pro Firestore se tem permissão de admin para acessar o banco de dados
-import { getFirestore, getDocs, collection, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { getFirestore, getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -32,78 +28,39 @@ const firebaseConfig = {
     // appId: "1:982341506588:web:ac89acb8295ac1c78531d9"
 };
 
+// Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 
-// const dbFirebase = getFirestore(firebaseApp);
-
-// Initialize Firebase
-// const app = initializeApp(firebaseConfig);
-
 export default function AppParaJogar() {
+    
+    const queryClient = useQueryClient()
     const db = getFirestore(firebaseApp)
     const jogosParaJogarColeRef = collection(db, 'jogos-para-jogar') // referência à coleção 'jogos-para-jogar' no Firestore
-    const [users, setUsers] = useState<Array<Record<string, any> & { id: string }>>([])
-    const [isFetching, setIsFetching] = useState(true)
-    const [isError, setIsError] = useState(false)
 
-    // async function fbAddjooj() { // função para adicionar um novo jogo para a coleção
-    //     const fbNovoJooj: GamePayload2 = {
-    //         name: '2- Novo Jooj Firebase',
-    //         hours_played: 50,
-    //         hours_expected: 60,
-    //         priority: '',
-    //         platform: '3DS-Emulado',
-    //         genre: 'Ação',
-    //         release_year: 2025,
-    //         status: 'Para jogar',
-    //         year_started: 2025,
-    //         year_finished: 2025,
-    //         background_image: 'https://howlongtobeat.com/games/14968_Bravely_Default.jpg'
-    //     };
-    //     await addDoc(jogosParaJogarColeRef, fbNovoJooj);
-    // }
+    // Função para buscar jogos usando React Query
+    const fetchJogosParaJogar = async () => {
+        try {
+            const data = await getDocs(jogosParaJogarColeRef)
+            return data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+        } catch (err) {
+            console.error('Erro ao buscar jogos do Firebase:', err)
+            throw err
+        }
+    }
+
+    // useQuery para gerenciar o estado e cache dos jogos
+    const { data: users = [], isLoading: isFetching, isError } = useQuery({
+        queryKey: ['jogos-para-jogar'],
+        queryFn: fetchJogosParaJogar,
+    })
+
     async function fbDeletajooj(id: string) {
-        await deleteDoc(doc(db, 'jogos-para-jogar', id))
+        await deleteDoc(doc(jogosParaJogarColeRef, id))
+        // Invalidar a query para forçar um refetch
+        queryClient.invalidateQueries({ queryKey: ['jogos-para-jogar'] })
     }
-    async function fbAtualizajooj(id: string, dadosAtualizados: Partial<GamePayload2>) {
-        const joojDoc = doc(db, 'jogos-para-jogar', id)
-        await updateDoc(joojDoc, dadosAtualizados)
-    }
-
-    useEffect(() => {
-        const todosjogos = async () => {
-            setIsFetching(true)
-            setIsError(false)
-
-            try {
-                const data = await getDocs(jogosParaJogarColeRef)
-                setUsers(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-
-                console.log('1- Jogos do Firebase:', data.docs.map(doc => doc.data()));
-                console.log('2- Jogos do Firebase2:', data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-                console.log('Jogos do Firebase DATA:', data);
-            }
-            catch (err) {
-                console.error('Erro ao buscar jogos do Firebase:', err);
-                setIsError(true)
-            }
-            finally {
-                setIsFetching(false)
-            }
-        };
-        todosjogos()
-    }, [])
 
     // const joojsCollection = dbFirebase.collection('meu joojs');
-    // useEffect(() => {
-    //   const getJoojsFirebase = async () => {
-    //     const data = await joojsCollection.get()
-    //     const jogos = data.docs.map(doc => doc.data())
-    //     // setJoojs(jogos)
-    //     console.log('Jogos do Firebase:', jogos);
-    //   }
-    //   getJoojsFirebase()
-    // }, [])
 
 
     const [filter, setFilter] = useState('')
@@ -116,6 +73,7 @@ export default function AppParaJogar() {
         'Gênero': 'genre',
         'Status': 'status',
         'Prioridade': 'priority',
+        'Para Rejogar': 'replayed'
     }
 
     const filteredGames = useMemo(() => {
@@ -165,7 +123,7 @@ export default function AppParaJogar() {
         <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
             <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
             <AddGameModalParaJogar />
-            <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} />
+            <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} isGame={true}/>
 
 
             {isFetching ?
@@ -190,6 +148,7 @@ export default function AppParaJogar() {
                                         platform={game.platform}
                                         genre={game.genre}
                                         status={game.status}
+                                        replayed={game.replayed}
                                         release_year={game.release_year}
                                         background_image={game.background_image}
                                         deletajooj={fbDeletajooj}

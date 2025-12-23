@@ -1,5 +1,3 @@
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
 import './App.css'
 import { useExternaGameData, myGames } from './helpers/fetchingGameData.ts'
 import type { gameDataInterface, myGamesApiInterface } from './interfaces/gameDataTypes.ts'
@@ -21,40 +19,71 @@ import { Button } from "@/components/ui/button"
 // import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem } from '@mui/material';
 // import TextField from '@mui/material/TextField';
 import { Spinner } from "@/components/ui/spinner"
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import AddGameModal from './components/jogados/modalAddJogo.tsx';
-import AttGameModal from './components/jogados/modalAttJogo.tsx';
 import CardComponent from './components/jogados/cardComponent.tsx';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
 
-type GamePayload2 = {
-  name: string;
-  hours_played: number;
-  hours_expected: number;
-  platform: string;
-  genre: string;
-  is_completed?: boolean;
-  release_year: number;
-  status: string;
-  year_started: number;
-  year_finished: number | null;
-  background_image?: string;
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
+    authDomain: "my-game-list-6fd0f.firebaseapp.com",
+    projectId: "my-game-list-6fd0f",
 };
 
-// function App({name_Prop, hours_played_Prop, platform_Prop, genre_Prop, is_completed_Prop, release_year_Prop, status_Prop, year_started_Prop, year_finished_Prop, background_image_Prop }: GamePayload2) {
+// Initialize Firebase
+const firebaseApp = initializeApp(firebaseConfig);
+
 export default function App() {
   // const { data, isError, isFetching } = useExternaGameData()
-  const { data, isError, isFetching } = myGames()
-  const queryClient = useQueryClient() // <--- novo
+  // const { data, isError, isFetching } = myGames() db.json
   const [filter, setFilter] = useState('')
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({}) // estado com filtros por categoria
   const [sortBy, setSortBy] = useState<'name' | 'hours_played'>('name') // novo estado
 
+
+  const queryClient = useQueryClient()
+  const db = getFirestore(firebaseApp)
+  const jogosColeRef = collection(db, 'joojs') // referência à coleção 'jogos-para-jogar' no Firestore
+
+
+     // Função para buscar jogos usando React Query
+    const fetchJogosFB = async () => {
+        try {
+            const data = await getDocs(jogosColeRef)
+            return data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+        } catch (err) {
+            console.error('Erro ao buscar jogos do Firebase:', err)
+            throw err
+        }
+    }
+
+    // useQuery para gerenciar o estado e cache dos jogos
+    const { data: data = [], isLoading: isFetching, isError } = useQuery({
+        queryKey: ['joojs'],
+        queryFn: fetchJogosFB,
+    })
+
+    async function fbDeletajooj(id: string) {
+        await deleteDoc(doc(jogosColeRef, id))
+        // Invalidar a query para forçar um refetch automático
+        queryClient.invalidateQueries({ queryKey: ['joojs'] })
+    }
+
+  //   async function deletaJooj(id: string) {
+  //   // const deleted = await API.deletarJogo(id)
+  //   // <--- invalida a query e força refetch automático
+  //   queryClient.invalidateQueries({ queryKey: ['joojs'] })
+  //   // return deleted
+  // }
 
   const categoryToField: Record<string, string> = {
     'Plataforma': 'platform',   // ajuste se no seu db.json o campo for outro
     'Gênero': 'genre',
     'Status': 'status',
     'Prioridade': 'priority',
+    'Rejoga(n)do?': 'replayed',
   }
 
 
@@ -89,22 +118,15 @@ export default function App() {
     })
   }, [data, filter, selectedFilters])
 
-  const filterMyGames = (data ?? []).filter((game: myGamesApiInterface) =>
-    game.name.toLowerCase().includes(filter.toLowerCase())
+  // const filterMyGames = (data ?? []).filter((game: myGamesApiInterface) =>
+  //   game.name.toLowerCase().includes(filter.toLowerCase())
     // || game.hours_played
     // || setBtnFilter.toLowerCase().includes(filter.toLowerCase())
     //   || game.released.toLowerCase().includes(filter.toLowerCase())
     //   || game.released.substring(0, 4).toLowerCase().includes(filter.toLowerCase()),
     //   setTimeout(() => { }, 1000),
-  )
-  async function deletaJooj(id: string) {
-    const deleted = await API.deletarJogo(id)
+  // )
 
-    // <--- invalida a query e força refetch automático
-    queryClient.invalidateQueries({ queryKey: ['meu joojs'] })
-
-    return deleted
-  }
 
   // Ordena os jogos filtrados conforme sortBy
   const sortedGames = useMemo(() => {
@@ -122,7 +144,7 @@ export default function App() {
 
       <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
       <AddGameModal />
-      <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} />
+      <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} isGame={true} />
       {/* <FilterComponent value={filter} onChange={setFilter} /> */}
 
       {/* <div className='w-4/5 h-full flex justify-center items-center bg-blue-100'> */}
@@ -139,7 +161,7 @@ export default function App() {
         <>
           {/* <div className='flex flex-col justify-start min-h-screen w-full'> */}
 
-          <div className='grid grid-cols-4 gap-8 py-6 px-4 w-11/12 min-h-screen'>
+          <div className='grid grid-cols-5 gap-8 py-6 px-4 w-11/12 min-h-screen'>
             {sortedGames.map((game: myGamesApiInterface) => (
               <>
                 <CardComponent
@@ -151,11 +173,12 @@ export default function App() {
                   platform={game.platform}
                   genre={game.genre}
                   status={game.status}
+                  replayed={game.replayed}
                   release_year={game.release_year}
                   year_started={game.year_started !== '' ? game.year_started : '0'}
                   year_finished={game.year_finished !== '' ? game.year_finished : '0'}
                   background_image={game.background_image}
-                  deletajooj={deletaJooj}
+                  deletajooj={fbDeletajooj}
                 />
               </>
 

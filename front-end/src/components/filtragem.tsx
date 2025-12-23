@@ -13,6 +13,7 @@ type Props = {
     className?: string,
     onFiltersChange?: (f: Record<string, string>) => void, // <--- novo prop opcional
     onSortChange?: (v: 'name' | 'hours_played') => void
+    isGame: boolean
 }
 
 // const filtros = ['Action', 'Adventure', 'RPG', 'Strategy', 'Sports', 'Puzzle']
@@ -30,17 +31,20 @@ type Props = {
 // Ano de Lançamento dá pra deixar pra depois
 // Status: 'Finalizado', 'Em Andamento', 'Pausado', 'Abandonado'
 // Prioridade: '1ª Prioridade - Goats','2ª Prioridade - Alta', '3ª Prioridade - Média', '4ª Prioridade - Baixa, talvez algum dia', '5ª Prioridade - pelo nome, talvez'
-const filtros = ['Nome', 'Quant. Horas',]
 
-const filtrosSelect =
-    [
+export default function FilterComponent({ classnameFilter, value, onChange, className, onFiltersChange, onSortChange, isGame }: Props) {
+    const filtros = ['Nome', 'Quant. Horas',]
+
+    const filtrosSelect = [
         { categoria: 'Plataforma', opcoes: ['PC', 'Switch', 'PsVita', '3DS-Emulado', 'PSP-Emulado'] },
         { categoria: 'Gênero', opcoes: ['Ação', 'Aventura', 'RPG', 'JRPG', 'Estratégia', 'Esportes/Corrida', 'FPS', 'Soulslike', 'Metroidvania/Plataforma'] },
+        // { categoria: 'Status', opcoes: ['Finalizado', 'Jogando', 'Pausado', 'Abandonado', 'Não iniciado', ...(isGame ? ['Rejogado'] : [])] },
         { categoria: 'Status', opcoes: ['Finalizado', 'Jogando', 'Pausado', 'Abandonado', 'Não iniciado'] },
         { categoria: 'Prioridade', opcoes: ['1ª Prioridade', '2ª Prioridade', '3ª Prioridade', '4ª - Talvez algum dia', '5ª - Talvez pelo nome'] },
+        ...(isGame ? [{ categoria: 'Rejoga(n)do?', opcoes: ['Sim', 'Não'] }] : []) // entendi que pega o valor total do input EX: Irá mostrar se tiver Sim Rejogador, Sim Rejogrda;; Mas não mostra se tiver "im Rejogador"
+        // { categoria: 'Rejogador?', opcoes: ['Sim Rejogado', 'Não Rejogado'] },
     ];
 
-export default function FilterComponent({ classnameFilter, value, onChange, className, onFiltersChange, onSortChange }: Props) {
     // estado separado por categoria -> controlado
     const [selecionados, setSelecionados] = useState<Record<string, string>>(
         () => Object.fromEntries(filtrosSelect.map(filter => [filter.categoria, '']))
@@ -83,7 +87,7 @@ export default function FilterComponent({ classnameFilter, value, onChange, clas
     return (
         <>
             <div className={` flex justify-end p-2 w-full h-full ${classnameFilter} bg-black`}>
-                <div className={` grid grid-cols-7 justify-end gap-3 p-2 mr-2 w-full h-full border-white border-2 text-sm rounded-xl`}>
+                <div className={` grid ${isGame ? 'grid-cols-8' : 'grid-cols-7'} justify-end gap-3 p-2 mr-2 w-full h-full border-white border-2 text-sm rounded-xl`}>
 
                     <button
                         onClick={() => onSortChange && onSortChange('name')}
