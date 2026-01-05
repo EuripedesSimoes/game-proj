@@ -35,7 +35,7 @@ export default function CardComponent({ id, name, hours_played, hours_expected, 
 
 
     return (
-        <Card className='w-full h-[500px] gap-2 flex flex-col items-start cursor-pointer border-2 hover:border-4 border-white/50 hover:border-amber-500 transition-all bg-slate-900 shadow-4xl' key={id}>
+        <Card className='w-full h-[300px] min-[450px]:h-[500px] gap-2 flex flex-col items-start cursor-pointer border-2 hover:border-4 border-white/50 hover:border-amber-500 transition-all bg-slate-900 shadow-4xl' key={id}>
 
             <div className="absolute bg-white/20 z-10  rounded-lg shadow-lg  hover:bg-gray-600">
                 <Button className='bg-white/60 m-2' onClick={() => deletajooj(id)}>
@@ -56,7 +56,7 @@ export default function CardComponent({ id, name, hours_played, hours_expected, 
             <CardContent className='h-[40%] w-full p-2 flex flex-col justify-start items-start overflow-auto gap-3'>
 
                 <CardTitle className='text-white text-[14px] md:text-base border-b-2 w-full'>
-                    {name}
+                    {`${name} (${release_year})` }
                 </CardTitle>
 
                 <div className='flex w-full gap-x-2'>
@@ -64,7 +64,7 @@ export default function CardComponent({ id, name, hours_played, hours_expected, 
 
                     <CardDescription className={`text-white text-[14px] md:text-base font-bold border-b-2 flex justify-center items-end w-full`}>
                         {/* {replayed === 'Rejogado' ? 'Rejogado: ✅ Sim' :   'Rejogado: ❌ Não' } */}
-                        Rejoga(n)do: {replayed}
+                        Rejogando: {replayed}
                     </CardDescription>
                 </div>
 
@@ -88,16 +88,16 @@ export default function CardComponent({ id, name, hours_played, hours_expected, 
                                 : status === 'Não Iniciado' && 'text-white'}`}>
                     Status: {status === 'Finalizado' ? `✅ ${status}  (${year_finished})` : status === 'Pausado' ? `${status} ⏸️` : status === 'Jogando' ? `${status} 🎮` : `${status}`}
                 </CardDescription>
-                <CardDescription className='text-white text-[14px] md:text-[15px] border-b-2 w-full flex justify-center items-end '>
+                <CardDescription className='text-white w-full text-[14px] md:text-[15px] border-b-2 flex justify-center items-end '>
                     Gênero: {genre}
                 </CardDescription>
 
                 {/* CARD FILTRO PRIORIDADE */}
-                <CardDescription className={`text-white text-[14px] md:text-base border-b-2 flex flex-row justify-center 2xl:justify-start items-end `}>
+                <CardDescription className={`text-white w-full text-[14px] md:text-base border-b-2 flex flex-row justify-center 2xl:justify-center items-end `}>
                     Prioridade:
-                    <span className={`font-bold ${priority === '1- Principal' ? 'text-red-600' : priority === '2- Secundário' && 'text-yellow-600'}`}>
+                    <p className={`px-2 font-bold ${priority === '1- Principal' ? 'text-red-600' : priority === '2- Secundário' && 'text-yellow-600'}`}>
                         {priority}
-                    </span>
+                    </p>
                 </CardDescription>
             </CardContent>
         </Card>

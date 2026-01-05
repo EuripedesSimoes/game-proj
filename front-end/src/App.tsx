@@ -144,7 +144,7 @@ export default function App() {
 
       <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
       <AddGameModal />
-      <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} isGame={true} />
+      <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} isGameReplayed={true} />
       {/* <FilterComponent value={filter} onChange={setFilter} /> */}
 
       {/* <div className='w-4/5 h-full flex justify-center items-center bg-blue-100'> */}
@@ -161,7 +161,7 @@ export default function App() {
         <>
           {/* <div className='flex flex-col justify-start min-h-screen w-full'> */}
 
-          <div className='grid grid-cols-5 gap-8 py-6 px-4 w-11/12 min-h-screen'>
+          <div className='grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 py-6 px-4 w-11/12 min-h-screen'>
             {sortedGames.map((game: myGamesApiInterface) => (
               <>
                 <CardComponent

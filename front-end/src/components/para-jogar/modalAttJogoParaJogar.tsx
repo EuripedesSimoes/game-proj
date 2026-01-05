@@ -8,7 +8,7 @@ import API from '@/services/gameApiServices';
 import { FaPencilAlt, FaEraser } from "react-icons/fa";
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
-import { allPlatforms, allStatus, allGenres, allPriorities } from '@/services/listasParaFiltro';
+import { allPlatforms, allStatus, allGenres, allPriorities, isReplayedList } from '@/services/listasParaFiltro';
 import type { GamePayload3 } from '@/interfaces/gameDataTypes';
 import { collection, doc, getFirestore, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
@@ -24,6 +24,7 @@ type AttProps = {
         platform: string;
         genre: string;
         status: string;
+        replayed: string;
         is_completed?: boolean;
         release_year: number | string;
         year_started?: number | string;
@@ -61,6 +62,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
     const [genre, setGenre] = useState<string>(data?.genre || '')
     // const [is_completed, setIs_completed] = useState<boolean>(false)
     const [status, setStatus] = useState<string>(data?.status || '')
+    const [replayed, setReplayed] = useState<string>(data?.replayed || '')
     const [release_year, setRelease_year] = useState<number | string>(data?.release_year || '')
     const [background_image, setBackground_image] = useState<string>(data?.background_image || '')
 
@@ -87,6 +89,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
             //is_completed: is_completed , //false,
             release_year: release_year || '', // 2017,
             status: status, //'In Progress',
+            replayed: replayed, // Não
             background_image: background_image, //''
         }
         await updateDoc(doc(jogosParaJogarColeRef, gameId), payload)
@@ -113,11 +116,15 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                         </span>
                     </div>
                 </DialogTitle>
+
                 <DialogContent className='bg-[#f1f2f9]'>
+
                     <form action="" onSubmit={FBhandleSubmit} id="subscription-form" className=''>
-                        <div className='flex gap-4 mt-4 mb-2'>
+
+                        <div className='grid grid-cols-4 md:flex gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+
                             <TextField
-                                className='shadow-lg my-1'
+                                className='shadow-lg my-1 col-span-4'
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
                                     input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
@@ -140,7 +147,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                                 onChange={(e) => { setNome_jogo(e.target.value) }}
                             />
                             <TextField
-                                className='shadow-lg my-1'
+                                className='shadow-lg my-1 col-span-2'
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
                                     input: { color: '#3c3c3c', p: 1, py: 1.2 }, // text-slate-100
@@ -158,7 +165,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                                 onChange={(e) => { setHours_expected(parseInt(e.target.value)) }}
                             />
                             <TextField
-                                className='shadow-lg my-1'
+                                className='shadow-lg my-1 col-span-2'
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
                                     input: { color: '#3c3c3c', p: 1, py: 1.2 }, // text-slate-100
@@ -176,9 +183,9 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                             />
                         </div>
 
-                        <div className='grid grid-cols-4 gap-4 mt-4 mb-2'>
+                        <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
-                            <FormControl fullWidth variant="outlined" className='shadow-lg'>
+                            <FormControl fullWidth variant="outlined" className='shadow-lg md:col-span-2'>
                                 <InputLabel
                                     id="priority-label"
                                     sx={{
@@ -238,7 +245,72 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                                     )}
                                 </Select>
                             </FormControl>
+                            <FormControl fullWidth variant="outlined" className='shadow-lg ' >
+                                <InputLabel
+                                    id="replayed-label"
+                                    sx={{
+                                        '&.MuiInputLabel-shrink': {
+                                            transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                        },
+                                    }}
+                                >
+                                    Rejogado?
+                                </InputLabel>
+                                <Select
+                                    label="Rejogado"
+                                    id="replayed"
+                                    name="replayed"
+                                    variant="outlined"
+                                    required
+                                    value={replayed}
+                                    onChange={(e) => { setReplayed(e.target.value) }}
+                                    sx={{
+                                        p: 0.2,
+                                        "& .MuiSelect-icon": {
+                                            color: "black",
+                                        }
+                                    }}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            sx: {
+                                                backgroundColor: "#1c1c1c",
+                                                "& .MuiMenuItem-root": {
+                                                    opacity: '75%',
+                                                    "&.Mui-selected": {
+                                                        backgroundColor: "#2e2e3e", // background do option selecionado
+                                                        color: "white", //cor do texto do option selecionado
+                                                        fontWeight: 'bold',
+                                                        opacity: '100%',
+                                                    },
+                                                    "&:hover": {
+                                                        backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                        fontWeight: 'bold',
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    }}
+                                >
+                                    {isReplayedList.map((isRep) => (
+                                        <MenuItem key={isRep.value} value={isRep.value} sx={{
+                                            backgroundColor: '#1c1c1c',
+                                            color: '#f1f5f9',
+                                            '&:hover': {
+                                                backgroundColor: '#2b2b2b',
+                                            },
+                                        }}>
+                                            {isRep.label}
+                                        </MenuItem>
+                                    )
+                                    )}
+                                </Select>
+                            </FormControl>
 
+
+                        </div>
+
+                        <div className='grid md:grid-cols-2 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+                            
                             <FormControl fullWidth variant="outlined" className='shadow-lg' >
                                 <InputLabel
                                     id="plataforma-label"
@@ -375,7 +447,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                                     ))
                                 }
                             </TextField>
-                            <TextField
+                            {/* <TextField
                                 className='shadow-lg'
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
@@ -396,7 +468,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                                     </MenuItem>
                                 )
                                 )}
-                            </TextField>
+                            </TextField> */}
                         </div>
 
                         <TextField
@@ -420,9 +492,8 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                             value={background_image} onChange={(e) => { setBackground_image(e.target.value) }}
                         />
 
-                        <DialogActions>
+                        <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
                             <Button className='' type="submit" onClick={fbAtualizarJogo}>+ ATT Jooj P/ jogar</Button>
-                            {/* <Button className='' type="submit" onClick={addJogo}>+ ADD Jooj</Button> */}
                         </DialogActions>
 
                     </form>

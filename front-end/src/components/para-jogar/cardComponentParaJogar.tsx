@@ -28,7 +28,7 @@ export default function CardComponentParaJogar({ id, name, hours_expected, prior
 
 
     return (
-        <Card className='w-full h-[500px] gap-2 flex flex-col items-start cursor-pointer border-2 hover:border-4 border-white/50 hover:border-amber-500 transition-all bg-slate-900 shadow-4xl' key={id}>
+        <Card className='w-full h-[300px] min-[450px]:h-[500px] gap-2 flex flex-col items-start cursor-pointer border-2 hover:border-4 border-white/50 hover:border-amber-500 transition-all bg-slate-900 shadow-4xl' key={id}>
 
             <div className="absolute bg-black/20 z-10  rounded-lg shadow-lg  hover:bg-gray-600">
                 <Button className='bg-white/60 m-2' onClick={() => deletajooj(id)}>
@@ -37,7 +37,7 @@ export default function CardComponentParaJogar({ id, name, hours_expected, prior
                     </span>
                 </Button>
                 {/* COLOCAR AQUI A FUNÇÃO DE ABRIR O MODAL */}
-                <AttGameModalParaJogar gameId={id} data={{ id, name, hours_expected, platform, genre, release_year, status, priority, background_image }} />
+                <AttGameModalParaJogar gameId={id} data={{ id, name, hours_expected, platform, genre, release_year, status, replayed, priority, background_image }} />
             </div>
 
             <img
@@ -49,7 +49,7 @@ export default function CardComponentParaJogar({ id, name, hours_expected, prior
             <CardContent className='h-[40%] w-full p-2 flex flex-col justify-start items-start overflow-auto gap-3'>
 
                 <CardTitle className='text-white text-[14px] md:text-base border-b-2 w-full'>
-                    {name}
+                    {`${name} (${release_year})` }
                 </CardTitle>
 
                 <div className='flex w-full gap-x-2'>
@@ -77,7 +77,7 @@ export default function CardComponentParaJogar({ id, name, hours_expected, prior
                     </CardDescription>
 
                 </div>
-                <CardDescription className='text-white text-[14px] md:text-[15px] border-b-2 w-full flex justify-center items-end '>
+                <CardDescription className='text-white w-full text-[14px] md:text-[15px] border-b-2 flex justify-center items-end '>
                     Gênero: {genre}
                 </CardDescription>
 

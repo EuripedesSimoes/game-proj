@@ -73,7 +73,7 @@ export default function AppParaJogar() {
         'Gênero': 'genre',
         'Status': 'status',
         'Prioridade': 'priority',
-        'Para Rejogar': 'replayed'
+        'Para Rejogar?': 'replayed'
     }
 
     const filteredGames = useMemo(() => {
@@ -123,7 +123,7 @@ export default function AppParaJogar() {
         <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
             <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
             <AddGameModalParaJogar />
-            <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} isGame={true}/>
+            <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} isGameReplayed={false}/>
 
 
             {isFetching ?
@@ -137,7 +137,7 @@ export default function AppParaJogar() {
                     <p className='text-white'>Serviço não pegou os jogos para jogar</p>
                 ) :
                     (
-                        <div className='grid grid-cols-4 gap-8 py-6 px-4 w-11/12 min-h-screen'>
+                        <div className='grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 min-[1720px]:grid-cols-5 gap-8 py-6 px-4 w-11/12 min-h-screen'>
                             {sortedGames.map((game: myGamesApiInterface) => {
                                 return (
                                     <CardComponentParaJogar

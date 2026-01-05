@@ -7,7 +7,7 @@ import API from '@/services/gameApiServices';
 // import { FaRegWindowClose } from 'react-icons/fa';
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
-import { allPriorities, allPlatforms, allGenres, notInicialized } from '@/services/listasParaFiltro';
+import { allPriorities, allPlatforms, allGenres, notInicialized, isReplayedList } from '@/services/listasParaFiltro';
 import type { GamePayload2 } from '@/interfaces/gameDataTypes';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
@@ -30,6 +30,7 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
     const [genre, setGenre] = useState<string>('')
     // const [is_completed, setIs_completed] = useState<boolean>(false)
     const [status, setStatus] = useState<string>('')
+    const [replayed, setReplayed] = useState<string>('')
     const [release_year, setRelease_year] = useState<number | string>('')
     const [background_image, setBackground_image] = useState<string>('')
 
@@ -41,6 +42,7 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
         setPlatform('')
         setGenre('')
         setStatus('')
+        setReplayed('')
         setRelease_year('')
         setBackground_image('')
         //handleClose() // fecha o dialog
@@ -67,13 +69,14 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
             //is_completed: is_completed , //false,
             release_year: release_year || '', // 2017,
             status: status, //'In Progress',
+            replayed: replayed, //Não,
             background_image: background_image, //''
         }
         await addDoc(jogosParaJogarColeRef, payload);
-        
+
         // Invalidar a query para forçar um refetch automático
         queryClient.invalidateQueries({ queryKey: ['jogos-para-jogar'] })
-        
+
         resetarForm()
         FBhandleClose()
     }
@@ -83,7 +86,7 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
     const FBhandleClose = () => setOpen(false)
     const FBhandleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         FBhandleClose();
-        
+
     };
 
 
@@ -104,11 +107,15 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
                         </span>
                     </div>
                 </DialogTitle>
+                
                 <DialogContent className='bg-[#f1f2f9]'>
+
                     <form action="" onSubmit={FBhandleSubmit} id="subscription-form" className=''>
-                        <div className='flex gap-4 mt-4 mb-2'>
+
+                        <div className='grid grid-cols-4 md:flex gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+
                             <TextField
-                                className='shadow-lg my-1'
+                                className='shadow-lg my-1 col-span-4'
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
                                     input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
@@ -131,7 +138,7 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
                                 onChange={(e) => { setAddjogo(e.target.value) }}
                             />
                             <TextField
-                                className='shadow-lg my-1'
+                                className='shadow-lg my-1 col-span-4'
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
                                     input: { color: '#3c3c3c', p: 1, py: 1.2 }, // text-slate-100
@@ -149,7 +156,7 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
                                 onChange={(e) => { setHours_expected(parseInt(e.target.value)) }}
                             />
                             <TextField
-                                className='shadow-lg my-1'
+                                className='shadow-lg my-1 col-span-2'
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
                                     input: { color: '#3c3c3c', p: 1, py: 1.2 }, // text-slate-100
@@ -167,9 +174,9 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
                             />
                         </div>
 
-                        <div className='grid grid-cols-4 gap-4 mt-4 mb-2'>
+                        <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
-                            <FormControl fullWidth variant="outlined" className='shadow-lg'>
+                            <FormControl fullWidth variant="outlined" className='shadow-lg md:col-span-2'>
                                 <InputLabel
                                     id="priority-label"
                                     sx={{
@@ -229,6 +236,70 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
                                     )}
                                 </Select>
                             </FormControl>
+
+                            <FormControl fullWidth variant="outlined" className='shadow-lg ' >
+                                <InputLabel
+                                    id="replayed-label"
+                                    sx={{
+                                        '&.MuiInputLabel-shrink': {
+                                            transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                        },
+                                    }}
+                                >
+                                    Rejogado?
+                                </InputLabel>
+                                <Select
+                                    label="Rejogado?"
+                                    id="replayed"
+                                    name="replayed"
+                                    variant="outlined"
+                                    required
+                                    value={replayed}
+                                    onChange={(e) => { setReplayed(e.target.value) }}
+                                    sx={{
+                                        p: 0.2,
+                                        "& .MuiSelect-icon": {
+                                            color: "black",
+                                        }
+                                    }}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            sx: {
+                                                backgroundColor: "#1c1c1c",
+                                                "& .MuiMenuItem-root": {
+                                                    opacity: '75%',
+                                                    "&.Mui-selected": {
+                                                        backgroundColor: "#2e2e3e", // background do option selecionado
+                                                        color: "white", //cor do texto do option selecionado
+                                                        fontWeight: 'bold',
+                                                        opacity: '100%',
+                                                    },
+                                                    "&:hover": {
+                                                        backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                        fontWeight: 'bold',
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    }}
+                                >
+                                    {isReplayedList.map((isRep) => (
+                                        <MenuItem key={isRep.value} value={isRep.value} sx={{
+                                            backgroundColor: '#1c1c1c',
+                                            color: '#f1f5f9',
+                                            '&:hover': {
+                                                backgroundColor: '#2b2b2b',
+                                            },
+                                        }}>
+                                            {isRep.label}
+                                        </MenuItem>
+                                    )
+                                    )}
+                                </Select>
+                            </FormControl>
+                        </div>
+
+                        <div className='grid md:grid-cols-2 gap-4 mt-2 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
                             <FormControl fullWidth variant="outlined" className='shadow-lg' >
                                 <InputLabel
@@ -366,7 +437,7 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
                                     ))
                                 }
                             </TextField>
-                            <TextField
+                            {/* <TextField
                                 className='shadow-lg'
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
@@ -387,8 +458,9 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
                                     </MenuItem>
                                 )
                                 )}
-                            </TextField>
+                            </TextField> */}
                         </div>
+
 
                         <TextField
                             className='shadow-lg'
@@ -411,9 +483,9 @@ const AddGameModalParaJogar = ({ addJogo }: Props) => {
                             value={background_image} onChange={(e) => { setBackground_image(e.target.value) }}
                         />
 
-                        <DialogActions>
-                            <Button onClick={resetarForm}>Resetar</Button>
-                            <Button className='' type="submit" onClick={enviarJogo}>+ ADD Jooj P/ Jogar</Button>
+                        <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
+                            <Button className='max-[400px]:w-42 bg-red-500' onClick={resetarForm}>Resetar</Button>
+                            <Button className='max-[400px]:w-54' type="submit" onClick={enviarJogo}>+ ADD Jooj P/ Jogar</Button>
                             {/* <Button className='' type="submit" onClick={addJogo}>+ ADD Jooj</Button> */}
                         </DialogActions>
 

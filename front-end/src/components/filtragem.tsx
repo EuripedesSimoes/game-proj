@@ -13,7 +13,7 @@ type Props = {
     className?: string,
     onFiltersChange?: (f: Record<string, string>) => void, // <--- novo prop opcional
     onSortChange?: (v: 'name' | 'hours_played') => void
-    isGame: boolean
+    isGameReplayed: boolean
 }
 
 // const filtros = ['Action', 'Adventure', 'RPG', 'Strategy', 'Sports', 'Puzzle']
@@ -32,17 +32,17 @@ type Props = {
 // Status: 'Finalizado', 'Em Andamento', 'Pausado', 'Abandonado'
 // Prioridade: '1ª Prioridade - Goats','2ª Prioridade - Alta', '3ª Prioridade - Média', '4ª Prioridade - Baixa, talvez algum dia', '5ª Prioridade - pelo nome, talvez'
 
-export default function FilterComponent({ classnameFilter, value, onChange, className, onFiltersChange, onSortChange, isGame }: Props) {
+export default function FilterComponent({ classnameFilter, value, onChange, className, onFiltersChange, onSortChange, isGameReplayed }: Props) {
     const filtros = ['Nome', 'Quant. Horas',]
 
     const filtrosSelect = [
         { categoria: 'Plataforma', opcoes: ['PC', 'Switch', 'PsVita', '3DS-Emulado', 'PSP-Emulado'] },
         { categoria: 'Gênero', opcoes: ['Ação', 'Aventura', 'RPG', 'JRPG', 'Estratégia', 'Esportes/Corrida', 'FPS', 'Soulslike', 'Metroidvania/Plataforma'] },
-        // { categoria: 'Status', opcoes: ['Finalizado', 'Jogando', 'Pausado', 'Abandonado', 'Não iniciado', ...(isGame ? ['Rejogado'] : [])] },
+        // { categoria: 'Status', opcoes: ['Finalizado', 'Jogando', 'Pausado', 'Abandonado', 'Não iniciado', ...(isGameReplayed ? ['Rejogado'] : [])] },
         { categoria: 'Status', opcoes: ['Finalizado', 'Jogando', 'Pausado', 'Abandonado', 'Não iniciado'] },
         { categoria: 'Prioridade', opcoes: ['1ª Prioridade', '2ª Prioridade', '3ª Prioridade', '4ª - Talvez algum dia', '5ª - Talvez pelo nome'] },
-        ...(isGame ? [{ categoria: 'Rejoga(n)do?', opcoes: ['Sim', 'Não'] }] : []) // entendi que pega o valor total do input EX: Irá mostrar se tiver Sim Rejogador, Sim Rejogrda;; Mas não mostra se tiver "im Rejogador"
-        // { categoria: 'Rejogador?', opcoes: ['Sim Rejogado', 'Não Rejogado'] },
+        // ...(isGameReplayed ? [{ categoria: `${isGameReplayed ?  'Rejoga(n)do?' : 'Para rejogar?'}`, opcoes: ['Sim', 'Não'] }] : []) // entendi que pega o valor total do input EX: Irá mostrar se tiver Sim Rejogador, Sim Rejogrda;; Mas não mostra se tiver "im Rejogador"
+        { categoria: `${isGameReplayed ?  'Rejoga(n)do?' : 'Para Rejogar?'}`, opcoes: ['Sim', 'Não'] }
     ];
 
     // estado separado por categoria -> controlado
@@ -86,8 +86,8 @@ export default function FilterComponent({ classnameFilter, value, onChange, clas
 
     return (
         <>
-            <div className={` flex justify-end p-2 w-full h-full ${classnameFilter} bg-black`}>
-                <div className={` grid ${isGame ? 'grid-cols-8' : 'grid-cols-7'} justify-end gap-3 p-2 mr-2 w-full h-full border-white border-2 text-sm rounded-xl`}>
+            <div className={` flex flex-col xl:flex-row gap-2 justify-end p-2 w-full h-full ${classnameFilter} bg-black`}>
+                <div className={`grid  ${isGameReplayed ? 'grid-cols-2 sm:grid-cols-3 xl:grid-cols-8' : 'grid-cols-2 sm:grid-cols-3 xl:grid-cols-8'} justify-end gap-3 p-2 mr-2 w-full h-full border-white border-2 text-sm rounded-xl`}>
 
                     <button
                         onClick={() => onSortChange && onSortChange('name')}
@@ -107,7 +107,7 @@ export default function FilterComponent({ classnameFilter, value, onChange, clas
                             <select
                                 value={selecionados[categoria] ?? ''}
                                 onChange={(e) => handleSelectChange(categoria, e.target.value)}
-                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 text-white focus:ring-blue-500"
+                                className="w-full h-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 text-white focus:ring-blue-500"
                             >
                                 <option value="" className="bg-black" disabled>{categoria}</option>
                                 {opcoes.map((opcao) => (
@@ -125,7 +125,7 @@ export default function FilterComponent({ classnameFilter, value, onChange, clas
                     </button>
                 </div>
 
-                <div className='w-72 flex items-center border-2 border-white rounded-2xl'>
+                <div className='w-full sm:w-144 xl:w-72 md:h-auto flex items-center border-2 border-white rounded-2xl'>
                     <label htmlFor="searchGame" className='pr-1 pl-3 flex items-center'>
                         <FaSearch className='fill-white h-5 w-5' />
                     </label>

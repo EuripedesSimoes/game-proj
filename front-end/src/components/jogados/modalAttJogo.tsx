@@ -34,7 +34,6 @@ type AttProps = {
     };
 }
 // OK-passar pra algum helper ou coisa assim
-// type GamePayload3 = {name: string; etc...};
 
 const AttGameModal = ({ gameId, data }: AttProps) => {
 
@@ -126,10 +125,10 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                 </DialogTitle>
                 <DialogContent className='bg-[#f1f2f9]'>
                     <form action="" onSubmit={handleSubmit} id="subscription-form" className=''>
-                        <div className='flex gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+                        <div className='grid grid-cols-4 md:flex gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
                             <TextField
-                                className='shadow-lg my-1'
+                                className='shadow-lg my-1 col-span-4'
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
                                     input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
@@ -152,7 +151,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                 onChange={(e) => { setNome_jogo(e.target.value) }}
                             />
                             <TextField
-                                className='shadow-lg'
+                                className='shadow-lg col-span-2'
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
                                     input: { color: '#3c3c3c', p: 1 }, // text-slate-100
@@ -170,7 +169,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                 onChange={(e) => { setHours_played(parseInt(e.target.value)) }}
                             />
                             <TextField
-                                className='shadow-lg'
+                                className='shadow-lg col-span-2'
                                 sx={{
                                     backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
                                     input: { color: '#3c3c3c', p: 1 }, // text-slate-100
@@ -188,8 +187,10 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                 onChange={(e) => { setHours_expected(parseInt(e.target.value)) }}
                             />
                         </div>
-                        <div className='grid grid-cols-3 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
-                            <FormControl fullWidth variant="outlined" className='shadow-lg ' >
+
+                        <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+
+                            <FormControl fullWidth variant="outlined" className='shadow-lg md:col-span-2' >
                                 <InputLabel
                                     id="priority-label"
                                     sx={{
@@ -311,8 +312,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                             </FormControl>
                         </div>
 
+                        <div className='grid md:grid-cols-3 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
-                        <div className='grid grid-cols-3 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
                             <FormControl fullWidth variant="outlined" className='shadow-lg' >
                                 <InputLabel
                                     id="plataforma-label"
@@ -542,7 +543,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                             value={background_image} onChange={(e) => { setBackground_image(e.target.value) }}
                         />
 
-                        <DialogActions>
+                        <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
                             <Button className='' type="submit" onClick={AtualizarJogo}>+ ATT Jooj</Button>
                             {/* <Button onClick={handleClose}>Close</Button> */}
                         </DialogActions>
