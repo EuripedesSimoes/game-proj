@@ -11,21 +11,28 @@ import { allPriorities, allPlatforms, allStatus, allGenres, isReplayedList } fro
 import type { GamePayload2 } from '@/interfaces/gameDataTypes';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { gamePayload2Schema, type GamePayload2Validated, gameSchema, normalizeYear } from '@/helpers/gameFormSchemas'
+import { z } from 'zod';
 
 // OK-passar pra algum helper ou coisa assim
 type Props = {
     isGame?: boolean
 }
 
-const AddGameModal = () => {
+type FormData = z.infer<typeof gameSchema>
 
-    // OK-passar essas listas pra algum helper ou coisa assim
-    // const allPlatforms
+export default function AddGameModal() {
+
+    const { register, handleSubmit, formState: { errors }, control } = useForm<FormData>({
+        resolver: zodResolver(gameSchema)
+    })
 
     const queryClient = useQueryClient() // <--- novo
 
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
-    const [addjogo, setAddjogo] = useState<string>('')
+    const [name, setName] = useState<string>('')
     const [hours_played, setHours_played] = useState<number | string>('')
     const [hours_expected, setHours_expected] = useState<number | string>('')
     const [priority, setPriority] = useState<string>('')
@@ -41,7 +48,7 @@ const AddGameModal = () => {
 
     function resetarForm() {
         // limpar os inputs (opcional)
-        setAddjogo('')
+        setName('')
         setHours_played('')
         setHours_expected('')
         setPriority('')
@@ -70,18 +77,18 @@ const AddGameModal = () => {
     async function enviarJogo(e?: React.MouseEvent<HTMLButtonElement>) {
         e?.preventDefault();
         const payload: GamePayload2 = {
-            name: addjogo, //'Octopath Traveler',
-            hours_played: hours_played || '', //86
-            hours_expected: hours_expected || '', //60,
+            name: name, //'Octopath Traveler',
+            hours_played: hours_played, //86
+            hours_expected: hours_expected, //60,
             priority: priority,
             platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
             genre: genre, // 'JPRG',   SELECT AQUI COM VÁRIAS OPÇÕES
             status: status, //'In Progress',
             replayed: replayed, //Não,
             //is_completed: is_completed , //false,
-            release_year: release_year || '', // 2017,
-            year_started: year_started || '', //2024,
-            year_finished: year_finished || '', //null,
+            release_year: release_year, // 2017,
+            year_started: year_started, //2024,
+            year_finished: year_finished, //null,
             background_image: background_image, //''
         }
         // const jogoSalvo = await API.salvarJogo(payload)
@@ -99,7 +106,7 @@ const AddGameModal = () => {
     const [open, setOpen] = useState(false);
     const handleClickOpen = () => setOpen(true)
     const handleClose = () => setOpen(false)
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmitForm = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         const formJson = Object.fromEntries((formData as any).entries());
@@ -107,7 +114,9 @@ const AddGameModal = () => {
         console.log(email);
         handleClose();
     };
-
+    const onSubmit = (data: FormData) => {
+        console.log('dadoe m casa', data)
+    }
 
     return (
         <div className='w-full h-full flex flex-col justify-center items-center'>
@@ -127,9 +136,10 @@ const AddGameModal = () => {
                         </span>
                     </div>
                 </DialogTitle>
+
                 <DialogContent className='bg-[#f1f2f9]'>
 
-                    <form action="" onSubmit={handleSubmit} id="subscription-form" className=''>
+                    <form action="" onSubmit={() => {handleSubmit(onSubmit); handleSubmitForm}} id="subscription-form" className=''>
 
                         <div className='grid grid-cols-4 md:flex gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
@@ -145,6 +155,7 @@ const AddGameModal = () => {
                                     },
                                 }}
                                 // autoFocus
+                                {...register('name')}
                                 required
                                 fullWidth
                                 margin="dense"
@@ -153,9 +164,10 @@ const AddGameModal = () => {
                                 label="Nome do Jogo"
                                 type="text"
                                 variant="standard"
-                                value={addjogo}
-                                onChange={(e) => { setAddjogo(e.target.value) }}
+                                value={name}
+                                onChange={(e) => { setName(e.target.value) }}
                             />
+                            {errors.name?.message && <p className='text-sm font-medium text-red-600'>{errors.name?.message}</p>}
                             <TextField
                                 className='shadow-lg my-1 col-span-2'
                                 sx={{
@@ -163,6 +175,7 @@ const AddGameModal = () => {
                                     input: { color: '#3c3c3c', p: 1.2 }, // text-slate-100
 
                                 }}
+                                {...register('hours_played')}
                                 // autoFocus
                                 required
                                 margin="dense"
@@ -181,6 +194,7 @@ const AddGameModal = () => {
                                     input: { color: '#3c3c3c', p: 1.2 }, // text-slate-100
 
                                 }}
+                                {...register('hours_expected')}
                                 // autoFocus
                                 required
                                 margin="dense"
@@ -204,10 +218,11 @@ const AddGameModal = () => {
                                             transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
                                         },
                                     }}
-                                >
+                                    >
                                     Prioridade
                                 </InputLabel>
                                 <Select
+                                    {...register('priority')}
                                     label="Prioridade"
                                     id="priority"
                                     name="priority"
@@ -268,6 +283,7 @@ const AddGameModal = () => {
                                     Rejogado?
                                 </InputLabel>
                                 <Select
+                                {...register('replayed')}
                                     label="Rejogado?"
                                     id="replayed"
                                     name="replayed"
@@ -475,6 +491,7 @@ const AddGameModal = () => {
                                 )}
                             </TextField>
                         </div>
+
                         <div className='grid grid-cols-3 gap-4 mt-2 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
                             <TextField
                                 className='shadow-lg'
@@ -559,5 +576,3 @@ const AddGameModal = () => {
         </div>
     )
 }
-
-export default AddGameModal;

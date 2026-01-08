@@ -14,7 +14,7 @@ export interface myGamesApiInterface {
     priority: string;
     platform: string;
     genre: string;
-    is_completed?: boolean;
+    // is_completed?: boolean;
     release_year: number | string;
     status: string;
     replayed: string;
@@ -27,14 +27,14 @@ export interface myGamesApiInterface {
 export type GamePayload2 = {
     name: string;
     hours_played?: number | string;
-    hours_expected?: number | string;
+    hours_expected: number | string;
     priority: string;
     platform: string;
     genre: string;
     status: string;
     replayed?: string;
-    is_completed?: boolean;
-    release_year: number | string;
+    // is_completed?: boolean;
+    release_year: number | string | 'Sem ano';
     year_started?: number | string;
     year_finished?: number | string;
     background_image?: string;
@@ -44,14 +44,14 @@ export type GamePayload2 = {
 export type GamePayload3 = {
     name: string;
     hours_played?: number | string;
-    hours_expected?: number | string;
+    hours_expected: number | string;
     priority: string;
     platform: string;
     genre: string;
     status: string;
     replayed?: string;
-    is_completed?: boolean;
-    release_year: number | string;
+    // is_completed?: boolean;
+    release_year: number | string | 'Sem ano';
     year_started?: number | string;
     year_finished?: number | string;
     background_image?: string;

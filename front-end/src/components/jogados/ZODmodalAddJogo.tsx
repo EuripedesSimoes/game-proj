@@ -1,0 +1,600 @@
+import { useState } from 'react'
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import { useQueryClient } from '@tanstack/react-query';
+import API from '@/services/gameApiServices';
+// import { FaRegWindowClose } from 'react-icons/fa';
+import { RiCloseCircleLine } from "react-icons/ri";
+import Select from '@mui/material/Select';
+import { allPriorities, allPlatforms, allStatus, allGenres, isReplayedList } from '@/services/listasParaFiltro';
+import type { GamePayload2 } from '@/interfaces/gameDataTypes';
+import { addDoc, collection, getFirestore } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod';
+import { gamePayload2Schema, type GamePayload2Validated, gameSchema, normalizeYear } from '@/helpers/gameFormSchemas'
+import { ms } from 'zod/v4/locales';
+import { FaClock } from 'react-icons/fa';
+import { FieldValue } from 'firebase-admin/firestore';
+
+// OK-passar pra algum helper ou coisa assim
+type Props = {
+    isGame?: boolean
+}
+
+export type FormData = z.infer<typeof gameSchema>;
+
+export default function ZodAddGameModal() {
+
+
+    const { register, handleSubmit, formState: { errors }, control, reset, watch } = useForm<FormData>({
+        resolver: zodResolver(gameSchema),
+
+        defaultValues: {
+            name: '',
+            priority: '',
+            platform: '',
+            genre: '',
+            status: '',
+            replayed: '',
+        }
+        //     name: '',
+        //     hours_played: undefined,
+        //     hours_expected: undefined,
+        //     ...
+    })
+
+    function resetarForm() {
+        // alert(anoFin)
+        reset()
+
+    }
+
+    const queryClient = useQueryClient() // <--- novo
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
+        authDomain: "my-game-list-6fd0f.firebaseapp.com",
+        projectId: "my-game-list-6fd0f",
+    };
+
+    const firebaseApp = initializeApp(firebaseConfig);
+    const db = getFirestore(firebaseApp)
+    const jogosParaJogar = collection(db, 'joojs') // referência à coleção 'jogos-para-jogar' no Firestore
+
+    // onSubmit receberá dados já validados pelo Zod via react-hook-form
+    const onSubmit = async (data: FormData) => {
+        try {
+            await addDoc(jogosParaJogar, data as any)
+            queryClient.invalidateQueries({ queryKey: ['joojs'] })
+            reset()
+            // resetarForm()
+            handleClose()
+        } catch (err) {
+            console.error('Erro ao salvar jogo:', err)
+        }
+    }
+
+    const [open, setOpen] = useState(false);
+    const handleClickOpen = () => setOpen(true)
+    const handleClose = () => setOpen(false)
+
+    function ado() {
+        console.log('ado')
+    }
+
+    const horasJogadas = watch("hours_played");
+    const horasEsperada = watch("hours_expected");
+    const anoLancado = watch("release_year");
+    const anoStartado = watch("year_started");
+    const anoFin = watch("year_finished");
+    // console.log('anofin', anoFin)
+
+    return (
+        <div className='w-full h-full flex flex-col justify-center items-center'>
+            <Button onClick={handleClickOpen}>Adicionar Jogo</Button>
+
+            <Dialog open={open} onClose={handleClose} className='bg-slate-700'
+                sx={{
+                    input: { color: '#f1f5f9' },
+                    label: { color: '#3c3c3c' }
+                }}
+            >
+                <DialogTitle sx={{ m: 0, p: 1.5, fontWeight: "bold" }} >
+                    <div className='flex justify-between items-center'>
+                        Adicionar Jogo
+                        <span onClick={handleClose} className='hover:cursor-pointer'>
+                            <RiCloseCircleLine className='h-9 w-9  fill-red-500 hover:fill-red-700' />
+                        </span>
+                    </div>
+                </DialogTitle>
+
+                <DialogContent className='bg-[#f1f2f9]'>
+
+                    <form action="" onSubmit={handleSubmit(onSubmit)} id="subscription-form" className=''>
+
+                        <div className='grid grid-cols-4 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+
+                            <div className=' col-span-2'>
+                                <TextField
+                                    className='shadow-lg my-1'
+                                    sx={{
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
+                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                    }}
+                                    // autoFocus
+                                    {...register('name')}
+                                    fullWidth
+                                    margin="dense"
+                                    id="name"
+                                    name="name"
+                                    label="Nome do Jogo"
+                                    type="text"
+                                    variant="standard"
+                                />
+                                {errors.name?.message && <p className='text-sm font-medium text-red-600'>{errors.name?.message}</p>}
+                            </div>
+
+                            <div className=' col-span-1'>
+                                <TextField
+                                    className='shadow-lg my-1'
+                                    sx={{
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                        input: { color: '#3c3c3c', p: 1.2 }, // text-slate-100
+
+                                    }}
+                                    {...register('hours_played', { valueAsNumber: true })}
+                                    // error={!!errors.hours_played}
+                                    // helperText={errors.hours_played?.message}
+                                    // autoFocus
+                                    value={isNaN(horasJogadas) ? '' : horasJogadas}
+                                    margin="dense"
+                                    id="hours_played"
+                                    name="hours_played"
+                                    label="Horas jogadas"
+                                    type="text"
+                                    variant="standard"
+                                />
+                                {errors.hours_played?.message && <p className='flex items-center gap-2 text-sm font-medium text-red-600'>
+                                    <FaClock className='size-3' /> {errors.hours_played?.message}
+                                </p>}
+                            </div>
+
+                            <div className='col-span-1'>
+                                <TextField
+                                    className='shadow-lg my-1'
+                                    sx={{
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                        input: { color: '#3c3c3c', p: 1.2 }, // text-slate-100
+
+                                    }}
+                                    {...register('hours_expected', { valueAsNumber: true })}
+                                    // error={!!errors.hours_expected}
+                                    // helperText={errors.hours_expected?.message}
+                                    // autoFocus
+                                    value={isNaN(horasEsperada) ? '' : horasEsperada}
+
+                                    margin="dense"
+                                    id="hours_expected"
+                                    name="hours_expected"
+                                    label="Horas esperadas"
+                                    type="text"
+                                    variant="standard"
+                                />
+                                {errors.hours_expected?.message && <p className='flex items-center gap-2 text-sm font-medium text-red-600'>
+                                    <FaClock className='size-3' /> {errors.hours_expected?.message}
+                                </p>}
+                            </div>
+                        </div>
+
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+
+                            <div className=' md:col-span-1'>
+                                <FormControl fullWidth variant="outlined" className='shadow-lg md:col-span-2' >
+                                    <InputLabel
+                                        id="priority-label"
+                                        sx={{
+                                            '&.MuiInputLabel-shrink': {
+                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                            },
+                                        }}
+                                    >
+                                        Prioridade
+                                    </InputLabel>
+                                    <Select
+                                        {...register('priority')}
+                                        label="Prioridade"
+                                        id="priority"
+                                        name="priority"
+                                        variant="outlined"
+                                        // defaultValue={FieldValue}
+                                        
+                                        // required
+                                        sx={{
+                                            p: 0.2,
+                                            "& .MuiSelect-icon": {
+                                                color: "black",
+                                            }
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    backgroundColor: "#1c1c1c",
+                                                    "& .MuiMenuItem-root": {
+                                                        opacity: '75%',
+                                                        "&.Mui-selected": {
+                                                            backgroundColor: "#2e2e3e", // background do option selecionado
+                                                            color: "white", //cor do texto do option selecionado
+                                                            fontWeight: 'bold',
+                                                            opacity: '100%',
+                                                        },
+                                                        "&:hover": {
+                                                            backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                            fontWeight: 'bold',
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        }}
+
+                                    >
+                                        {allPriorities.map((prios) => (
+                                            <MenuItem key={prios.value} value={prios.value} sx={{
+                                                backgroundColor: '#1c1c1c',
+                                                color: '#f1f5f9',
+                                                '&:hover': {
+                                                    backgroundColor: '#2b2b2b',
+                                                },
+                                            }}>
+                                                {prios.label}
+                                            </MenuItem>
+                                        )
+                                        )}
+                                    </Select>
+
+                                </FormControl>
+
+                                {errors.priority?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.priority?.message}</p>}
+                            </div>
+
+                            <div className=''>
+
+                                <FormControl fullWidth variant="outlined" className='shadow-lg' >
+                                    <InputLabel
+                                        id="replayed-label"
+                                        sx={{
+                                            '&.MuiInputLabel-shrink': {
+                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                            },
+                                        }}
+                                    >
+                                        Rejogado?
+                                    </InputLabel>
+                                    <Select
+                                        {...register('replayed')}
+                                        label="Rejogado?"
+                                        id="replayed"
+                                        name="replayed"
+                                        variant="outlined"
+                                        // required
+                                        sx={{
+                                            p: 0.2,
+                                            "& .MuiSelect-icon": {
+                                                color: "black",
+                                            }
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    backgroundColor: "#1c1c1c",
+                                                    "& .MuiMenuItem-root": {
+                                                        opacity: '75%',
+                                                        "&.Mui-selected": {
+                                                            backgroundColor: "#2e2e3e", // background do option selecionado
+                                                            color: "white", //cor do texto do option selecionado
+                                                            fontWeight: 'bold',
+                                                            opacity: '100%',
+                                                        },
+                                                        "&:hover": {
+                                                            backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                            fontWeight: 'bold',
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        }}
+                                    >
+                                        {isReplayedList.map((isRep) => (
+                                            <MenuItem key={isRep.value} value={isRep.value} sx={{
+                                                backgroundColor: '#1c1c1c',
+                                                color: '#f1f5f9',
+                                                '&:hover': {
+                                                    backgroundColor: '#2b2b2b',
+                                                },
+                                            }}>
+                                                {isRep.label}
+                                            </MenuItem>
+                                        )
+                                        )}
+                                    </Select>
+                                </FormControl>
+
+                                {errors.replayed?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.replayed?.message}</p>}
+                            </div>
+
+                        </div>
+
+                        <div className='grid md:grid-cols-3 gap-4 mt-2 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+
+                            <div>
+                                <FormControl fullWidth variant="outlined" className='shadow-lg' >
+                                    <InputLabel
+                                        id="plataforma-label"
+                                        sx={{
+                                            '&.MuiInputLabel-shrink': {
+                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                            },
+                                        }}
+                                    >
+                                        Plataforma
+                                    </InputLabel>
+                                    <Select
+                                        {...register('platform')}
+                                        label="Plataforma"
+                                        id="platform"
+                                        name="platform"
+                                        variant="outlined"
+                                        // className={`bg-yellow-200`}
+                                        sx={{
+                                            // label:{ color: 'violet'},
+                                            "& .MuiSelect-icon": {
+                                                color: "black",
+                                            }
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    backgroundColor: "#1c1c1c",
+                                                    // color: "red",  //muda nada
+                                                    "& .MuiMenuItem-root": {
+                                                        opacity: '75%',
+                                                        //color: "white",  // já é branco por padrão
+                                                        "&.Mui-selected": {
+                                                            backgroundColor: "#2e2e3e", // background do option selecionado
+                                                            color: "white", //cor do texto do option selecionado
+                                                            fontWeight: 'bold',
+                                                            opacity: '100%',
+                                                        },
+                                                        "&:hover": {
+                                                            // transform: "translateY(4px) time(0.9s)",  //muda nada
+                                                            backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                            //color: "red", //cor do texto do option ao passar mouse por cima
+                                                            fontWeight: 'bold',
+                                                            // opacity: '100%',
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        }}
+                                    >
+                                        {allPlatforms.map((plats) => (
+                                            <MenuItem key={plats.value} value={plats.value} sx={{
+                                                backgroundColor: '#1c1c1c',
+                                                color: '#f1f5f9',
+                                                '&:hover': {
+                                                    backgroundColor: '#2b2b2b',
+                                                },
+                                            }}>
+                                                {plats.label}
+                                            </MenuItem>
+                                        )
+                                        )}
+                                    </Select>
+                                </FormControl>
+
+                                {errors.platform?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.platform?.message}</p>}
+                            </div>
+
+                            <div>
+                                <FormControl fullWidth variant="outlined" className='shadow-lg' >
+
+                                    <InputLabel
+                                        id="genre-label"
+                                        sx={{
+                                            '&.MuiInputLabel-shrink': {
+                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                            },
+                                        }}
+                                    >
+                                        Gênero
+                                    </InputLabel>
+                                    <Select
+                                        className='shadow-lg'
+                                        sx={{
+                                            backgroundColor: '#f1f5f9',
+                                            // p: 0.5,
+                                            //input: { color: '#3c3c3c' }, // text-slate-100
+                                            '& .MuiInputLabel-root': {
+                                                // color: '#2563eb',
+                                            },
+                                            '& .MuiInputLabel-shrink': {
+                                                transform: 'translate(10px, -12px) scale(0.75)', // ajusta posição
+                                                //backgroundColor: '#fef08a', // mesma cor do fundo para não "cortar"
+                                                //padding: '0 4px', // cria espaço para a label não sobrepor a borda
+                                            },
+                                        }}
+                                        {...register('genre')}
+                                        label="Gênero"
+                                        id="genre"
+                                        name="genre"
+                                        variant="outlined"
+                                    >
+                                        {
+                                            allGenres.map((genre) => (
+                                                <MenuItem key={genre.value} value={genre.value} sx={{
+                                                    backgroundColor: '#1c1c1c',
+                                                    color: '#f1f5f9',
+                                                    '&:hover': {
+                                                        backgroundColor: '#2b2b2b',
+                                                    },
+                                                }}>
+                                                    {genre.label}
+                                                </MenuItem>
+                                            ))
+                                        }
+                                    </Select>
+                                </FormControl>
+
+                                {errors.genre?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.genre?.message}</p>}
+
+                            </div>
+                            <div>
+                                <FormControl fullWidth variant="outlined" className='shadow-lg' >
+                                    <InputLabel
+                                        id="status-label"
+                                        sx={{
+                                            '&.MuiInputLabel-shrink': {
+                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                            },
+                                        }}
+                                    >
+                                        Status
+                                    </InputLabel>
+                                    <Select
+                                        className='shadow-lg'
+                                        sx={{
+                                            backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                            input: { color: '#3c3c3c' }, // text-slate-100
+                                        }}
+                                        // autoFocus
+                                        {...register('status')}
+                                        id="status"
+                                        name="status"
+                                        label="Status"
+                                        variant="outlined"
+                                    >
+                                        {allStatus.map((status) => (
+                                            <MenuItem key={status.value} value={status.value}>
+                                                {status.label}
+                                            </MenuItem>
+                                        )
+                                        )}
+                                    </Select>
+                                </FormControl>
+
+                                {errors.status?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.status?.message}</p>}
+                            </div>
+                        </div>
+
+                        <div className='grid grid-cols-3 gap-4 mt-2 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+                            <div>
+                                <TextField
+                                    className='shadow-lg'
+                                    sx={{
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+
+                                    }}
+                                    {...register('release_year', { valueAsNumber: true })}
+                                    // autoFocus
+                                    value={isNaN(anoLancado) ? '' : anoLancado}
+                                    margin="dense"
+                                    id="release_year"
+                                    name="release_year"
+                                    label="Ano Lançamento"
+                                    type="text"
+                                    variant="standard"
+                                />
+
+                                {errors.release_year?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.release_year?.message}</p>}
+                            </div>
+                            <div>
+                                <TextField
+                                    className='shadow-lg'
+                                    sx={{
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+
+                                    }}
+                                    {...register('year_started', { valueAsNumber: true })}
+                                    // autoFocus
+                                    value={isNaN(anoStartado) ? '' : anoStartado}
+                                    margin="dense"
+                                    id="year_started"
+                                    name="year_started"
+                                    label="Ano Iniciado"
+                                    type="text"
+                                    variant="standard"
+                                />
+
+                                {errors.year_started?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.year_started?.message}</p>}
+                            </div>
+                            <div>
+                                <TextField
+                                    className='shadow-lg'
+                                    sx={{
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+
+                                    }}
+                                    {...register("year_finished", {
+                                        setValueAs: normalizeYear,
+                                    })}
+                                    // {...register("year_finished", { valueAsNumber: true })}
+                                    // value={anoStartado === undefined ? 2010 : anoStartado}
+                                    // autoFocus
+                                    margin="dense"
+                                    id="year_finished"
+                                    name="year_finished"
+                                    label="Ano Finalizado"
+                                    type="text"
+                                    variant="standard"
+                                />
+
+                                {errors.year_finished?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.year_finished?.message}</p>}
+                            </div>
+                        </div>
+
+                        <div>
+                            <TextField
+                                className='shadow-lg'
+                                sx={{
+                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                        '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                        '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                    },
+                                }}
+                                {...register('background_image')}
+                                margin="dense"
+                                fullWidth
+                                id="background_image"
+                                name="background_image"
+                                label="Foto da Capa (URL)"
+                                type="text"
+                                variant="standard"
+                            />
+
+                            {errors.background_image?.message && <p className='text-sm font-medium text-red-600'>{errors.background_image?.message}</p>}
+                        </div>
+
+                        <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
+                            <Button className='max-[400px]:w-42 bg-red-500' onClick={resetarForm}>Resetar</Button>
+                            <Button className='max-[400px]:w-54' type="submit">+ ADD Jooj</Button>
+                        </DialogActions>
+
+                    </form>
+                </DialogContent>
+            </Dialog>
+        </div>
+    )
+}
