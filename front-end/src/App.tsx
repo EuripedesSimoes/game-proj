@@ -24,6 +24,7 @@ import AddGameModal from './components/jogados/modalAddJogo.tsx';
 import CardComponent from './components/jogados/cardComponent.tsx';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
+import ZodAddGameModal from './components/jogados/ZODmodalAddJogo.tsx';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -143,7 +144,7 @@ export default function App() {
     <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
 
       <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
-      <AddGameModal />
+      <ZodAddGameModal />
       <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} isGameReplayed={true} />
       {/* <FilterComponent value={filter} onChange={setFilter} /> */}
 

@@ -1,28 +1,32 @@
 import { z } from 'zod';
 
-// Schema para validar e transformar campos numéricos
-// Se vazio, retorna "Sem horas"; se preenchido, valida número (positivo)
-
-
 export const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\;/`~])/;
 
 export const noSpaceRegex = /^\S*$/;
 
 export const noAccentsRegex = /^[\x00-\x7F]*$/;
 
+const msgErro = "Mínimo: 1 hora";
+const msgErro2 = "Ano mínimo: 2010-2026"
+const msgErro3 = "Ano mínimo: 1980-2026"
 
-export const releaseYearField = z.union([
+export const finishedFieldValue = z.union([
     z.literal("Sem ano"),
-    z.number().int(),
-]);
- export const normalizeYear = (val: unknown): number | "Sem ano" => {
-    if (val === null || val === undefined) return "Sem ano";
+    z.number().min(2010, msgErro2).max(2026, "Máximo 2026").int(),
+    z.undefined().transform((val) => (val === "" ? undefined : val)), // Se for "", vira undefined
+    z.literal(0) // Para o estado inicial quando muda para Finalizado
 
-    if (typeof val === "string") {
-        const v = val.trim();
-        if (v === "") return "Sem ano";
-        const n = Number(v);
-        if (!isNaN(n)) return Math.trunc(n);
+]);
+export const normalizeYear = (val: unknown): number | "Sem ano" => {
+    if (val === null || val === undefined || val === false) return "Sem ano"; // se val for nulo ou indefinido retorna cuzao
+
+    if (typeof val === "string") { // se o tipo primitivo de val foi "string"
+        const v = val.trim();      // ele tira o espaços em branco
+        if (v === "") return "Sem ano"; // se só for espaço em branco retorna cuzao
+        const n = Number(v);          // tentar numerificar o valor se tiver tipo isso EX: "2" 
+        if (!isNaN(n)) return Math.trunc(n); // Se não for isNaN (eu acho) retorna esse calculo ai
+        // if (!Number(v) && typeof val !== "string") return "cuzcuz"
+        // if (isNaN(n)) return "Sem ano"
     }
 
     if (typeof val === "number") {
@@ -32,15 +36,20 @@ export const releaseYearField = z.union([
     return "Sem ano";
 };
 
-const msgErro = "Mínimo: 1 hora";
-const msgErro2 = "Ano mínimo: 2010-2026"
-const msgErro3 = "Ano mínimo: 1980-2026"
+// Remove qualquer caractere que não seja número
+export const normalizeOnlyNumbers = (val: string | number): number => {
+  if (typeof val === "number") return val;
+  const onlyNumbers = val.replace(/\D/g, ""); // Remove tudo que não é dígito
+  return onlyNumbers === "" ? 0 : Number(onlyNumbers); 
+};
 
+
+// Esquema de validações para modal de adicionar jogo jogado
 export const gameSchema = z.object({
     name: z
         .string()
         .trim()
-        .min(3, "Nome deve ter no mínimo 3 caracteres"),
+        .min(1, "Nome deve ter no mínimo 1 caractere"),
 
     hours_played: z.number({
         error: (issue) => issue.input === undefined
@@ -54,7 +63,8 @@ export const gameSchema = z.object({
             : msgErro
     }).min(1, msgErro),
 
-    priority: z.string().min(1, "Defina a prioridade do jogo"),
+    // priority: z.union([z.string().min(1, "Defina a prioridade do jogo")]).nullable().optional(),
+    priority: z.string().min(1, "Defina a prioridade do jogo").nullable(),
     replayed: z.string().min(1, "Defina se está jogando pela 1ª vez ou não"),
     platform: z.string().min(1, "Escolha a plataforma do jogo"),
     genre: z.string().min(1, "Escolha o gênero do jogo"),
@@ -74,7 +84,7 @@ export const gameSchema = z.object({
     // .refine((val) => { val >= data.y })
     ,
 
-    year_finished: releaseYearField.optional(),
+    year_finished: finishedFieldValue.optional(),
 
     background_image: z.string().optional(),
 })
@@ -108,6 +118,13 @@ export const gameSchema = z.object({
                 path: ["year_finished"], // O erro aparecerá no campo released_year
             })
         }
+        // if (hasFinished && typeof data.year_finished !== 'number' ) {
+        //     ctx.addIssue({
+        //         code: 'custom',
+        //         message: "Ano inválido",
+        //         path: ["year_finished"], // O erro aparecerá no campo released_year
+        //     })
+        // }
         // if ( data.year_finished > data.year_started) {
         //     ctx.addIssue({
         //         code: z.ZodIssueCode.custom,
@@ -122,6 +139,114 @@ export const gameSchema = z.object({
 //     path: ["release_year"], // path of error
 //   });
 
+export const gameAttSchema = z.object({
+    name: z.string().min(1, "Nome deve ter no mínimo 1 caractere").optional(),
+
+    hours_played: z.number({
+        error: (issue) => issue.input === undefined
+            ? "This field is required"
+            : msgErro
+    }).min(1, msgErro).default(1).optional(),
+
+    hours_expected: z.number({
+        error: (issue) => issue.input === undefined
+            ? "This field is required"
+            : msgErro
+    }).min(1, msgErro).optional(),
+
+    priority: z.string().min(1, "Defina a prioridade do jogo").optional(),
+    replayed: z.string().min(1, "Defina se está jogando pela 1ª vez ou não").optional(),
+    platform: z.string().min(1, "Escolha a plataforma do jogo").optional(),
+    genre: z.string().min(1, "Escolha o gênero do jogo").optional(),
+    status: z.enum(["Finalizado", "Jogando", "Pausado", "Abandonado", "Não iniciado"]).optional(),
+
+    release_year: z.number().min(1980, msgErro3).max(2026, msgErro3).optional(),
+
+    year_started: z.number().min(2000, msgErro2).max(2026, msgErro2).optional()
+    // .refine((val) => { val >= data.y })
+    ,
+
+    year_finished: finishedFieldValue.optional(),
+
+    background_image: z.string().optional(),
+})
+    .superRefine((data, ctx) => {
+        const hasFinished = typeof data.year_finished === 'number' && data.year_finished < 2026
+        // const lancamentoNumber = typeof data.release_year === 'number'
+
+        // 1.1. Released_year precisa ser igual ou menor que os outros dois
+        if (typeof data.release_year === 'number' && typeof data.year_started === 'number' && data.release_year > data.year_started)
+            ctx.addIssue({
+                code: 'custom',
+                message: "Ano de lançamento maior que ano iniciado",
+                path: ["release_year"], // O erro aparecerá no campo released_year
+            })
+        // ctx.addIssue({
+        //     code: 'custom',
+        //     message: "Ano de lançamento maior que ano iniciado",
+        //     path: ["year_started"], // O erro aparecerá no campo released_year
+        // })
+        // 1.2. Released_year precisa ser igual ou menor que os outros dois
+        if (hasFinished && typeof data.release_year === 'number' && data.release_year > Number(data.year_finished))
+            ctx.addIssue({
+                code: 'custom',
+                message: "Ano de lançamento maior que ano finalizado",
+                path: ["release_year"], // O erro aparecerá no campo released_year
+            })
+        // 2.2. Year_started precisa ser igual ou menor que o finished
+        if (hasFinished && typeof data.year_started === 'number' && data.year_started > Number(data.year_finished)) {
+            ctx.addIssue({
+                code: 'custom',
+                message: "Ano finalizado menor que ano de início",
+                path: ["year_finished"], // O erro aparecerá no campo released_year
+            })
+        }
+        if (Number(data.year_finished) > 2026) {
+            ctx.addIssue({
+                code: 'custom',
+                message: "Ano maior que 2026",
+                path: ["year_finished"], // O erro aparecerá no campo released_year
+            })
+        }
+    })
+    .refine((data) => {
+        if (data.status === "Finalizado" && data.year_finished === "Sem ano") {
+            return false; // Erro: Se finalizou, precisa de um ano
+        }
+        return true;
+    }, {
+        message: "Ano é obrigatório para jogos finalizados",
+        path: ["year_finished"]
+    })
+
+export const gameToPlaySchema = z.object({
+    name: z
+        .string()
+        .trim()
+        .min(1, "Nome deve ter no mínimo 1 caractere"),
+
+    hours_expected: z.number({
+        error: (issue) => issue.input === undefined
+            ? "This field is required"
+            : msgErro
+    }).min(1, msgErro),
+
+    release_year: z.number({
+        error: (issue) => issue.input === undefined
+            ? "This field is required"
+            : msgErro3
+    }).min(1980, msgErro3).max(2026, msgErro3),
+
+    priority: z.string().min(1, "Defina a prioridade do jogo"),
+    replayed: z.string().min(1, "Defina se está jogando pela 1ª vez ou não"),
+    platform: z.string().min(1, "Escolha a plataforma do jogo"),
+    genre: z.string().min(1, "Escolha o gênero do jogo"),
+
+    background_image: z.string(),
+})
+
+
+
 const hoursField = z.preprocess((val) => {
     if (val === null || val === undefined) return 'Sem horas'
     if (typeof val === 'string') {
@@ -134,17 +259,7 @@ const hoursField = z.preprocess((val) => {
     return 'Sem horas'
 }, z.union([z.literal('Sem horas'), z.number().positive()]))
 
-// const releaseYearField = z.preprocess((val) => {
-//     if (val === null || val === undefined) return 'Sem ano'
-//     if (typeof val === 'string') {
-//         const v = val.trim()
-//         if (v === '') return 'Sem ano'
-//         const n = Number(v)
-//         if (!isNaN(n)) return Math.trunc(n)
-//     }
-//     if (typeof val === 'number') return Math.trunc(val)
-//     return 'Sem ano'
-// }, z.union([z.literal('Sem ano'), z.number().int()]))
+
 
 const yearSchema = z
     .preprocess(
@@ -162,21 +277,6 @@ const yearSchema = z
     );
 
 
-// Schema para adicionar jogo para jogar (modalAddJogoParaJogar)
-export const gamePayload2Schema = z.object({
-    name: z.string().trim().min(1, 'Nome do jogo é obrigatório'),
-    hours_played: z.number().optional(),
-    hours_expected: z.number().optional(),
-    priority: z.string().trim().min(1, 'Prioridade é obrigatória'),
-    platform: z.string().trim().min(1, 'Plataforma é obrigatória'),
-    genre: z.string().trim().min(1, 'Gênero é obrigatório'),
-    status: z.string().trim().min(1, 'Status é obrigatório'),
-    release_year: z.number().optional(),
-    year_started: z.number().optional(),
-    year_finished: z.number().optional(),
-    replayed: z.string().trim().optional(),
-    background_image: z.string().trim().optional(),
-});
 
 // Schema para atualizar jogo (modalAttJogo)
 export const gamePayload3Schema = z.object({
@@ -204,27 +304,6 @@ export const gamePayload3Schema = z.object({
     background_image: z.string().trim().optional(),
 });
 
-// const hoursField = z.preprocess((val) => {
-//   if (val === null || val === undefined) return 'Sem horas'
-//   if (typeof val === 'string') {
-//     const v = val.trim()
-//     if (v === '') return 'Sem horas'
-//     const n = Number(v)
-//     if (!isNaN(n)) return n
-//   }
-//   if (typeof val === 'number') return val
-//   return 'Sem horas'
-// }, z.union([z.literal('Sem horas'), z.number().positive()]))
 
-// const hourField = z.preprocess(
-//     (val) => {
-//         if (val !== undefined || val === null || val === '' || val === ) return 0;
-//         return Number(val);
-//     },
-//     z.number().min(1, ',in').optional()
-// )
-
-
-// Tipos TypeScript inferidos do Zod
-export type GamePayload2Validated = z.infer<typeof gamePayload2Schema>;
+// const finishedFieldValue = z.preprocess((val) => {
 export type GamePayload3Validated = z.infer<typeof gamePayload3Schema>;

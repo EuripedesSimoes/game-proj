@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
 import TextField from '@mui/material/TextField';
@@ -14,10 +14,9 @@ import { initializeApp } from 'firebase/app';
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod';
-import { gamePayload2Schema, type GamePayload2Validated, gameSchema, normalizeYear } from '@/helpers/gameFormSchemas'
-import { ms } from 'zod/v4/locales';
+import { gameSchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/gameFormSchemas'
+// import { ms } from 'zod/v4/locales';
 import { FaClock } from 'react-icons/fa';
-import { FieldValue } from 'firebase-admin/firestore';
 
 // OK-passar pra algum helper ou coisa assim
 type Props = {
@@ -29,27 +28,15 @@ export type FormData = z.infer<typeof gameSchema>;
 export default function ZodAddGameModal() {
 
 
-    const { register, handleSubmit, formState: { errors }, control, reset, watch } = useForm<FormData>({
+    const { register, handleSubmit, formState: { errors }, control, reset, watch, setValue } = useForm<FormData>({
         resolver: zodResolver(gameSchema),
-
-        defaultValues: {
-            name: '',
-            priority: '',
-            platform: '',
-            genre: '',
-            status: '',
-            replayed: '',
-        }
-        //     name: '',
-        //     hours_played: undefined,
-        //     hours_expected: undefined,
-        //     ...
     })
 
     function resetarForm() {
         // alert(anoFin)
-        reset()
-
+        reset({
+            priority: null
+        });
     }
 
     const queryClient = useQueryClient() // <--- novo
@@ -68,10 +55,10 @@ export default function ZodAddGameModal() {
     const onSubmit = async (data: FormData) => {
         try {
             await addDoc(jogosParaJogar, data as any)
-            queryClient.invalidateQueries({ queryKey: ['joojs'] })
             reset()
             // resetarForm()
             handleClose()
+            queryClient.invalidateQueries({ queryKey: ['joojs'] })
         } catch (err) {
             console.error('Erro ao salvar jogo:', err)
         }
@@ -90,6 +77,26 @@ export default function ZodAddGameModal() {
     const anoLancado = watch("release_year");
     const anoStartado = watch("year_started");
     const anoFin = watch("year_finished");
+    const pri = watch('priority')
+    const statusWatch = watch('status')
+
+    const anoFinalizado = watch('year_finished')
+
+        useEffect(() => {
+            if (statusWatch !== "Finalizado") {
+                // Se não está finalizado, forçamos a string
+                setValue("year_finished", "Sem ano");
+            } else {
+                // Se mudou para "Finalizado"
+                if (anoFinalizado === "Sem ano") {
+                    // Aqui você decide: 0 para campo vazio ou 1 conforme sua lógica anterior
+                    // Usar o normalize garante que o valor seja tratado como número pelo Zod
+                    const valorInicial = normalizeOnlyNumbers(""); // Retornará o fallback da sua função (0 ou 1)
+                    setValue("year_finished", valorInicial);
+                }
+            }
+        }, [statusWatch, setValue, anoFinalizado]);
+
     // console.log('anofin', anoFin)
 
     return (
@@ -192,6 +199,7 @@ export default function ZodAddGameModal() {
                                     <FaClock className='size-3' /> {errors.hours_expected?.message}
                                 </p>}
                             </div>
+
                         </div>
 
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
@@ -215,7 +223,7 @@ export default function ZodAddGameModal() {
                                         name="priority"
                                         variant="outlined"
                                         // defaultValue={FieldValue}
-                                        
+
                                         // required
                                         sx={{
                                             p: 0.2,
@@ -246,13 +254,14 @@ export default function ZodAddGameModal() {
 
                                     >
                                         {allPriorities.map((prios) => (
-                                            <MenuItem key={prios.value} value={prios.value} sx={{
-                                                backgroundColor: '#1c1c1c',
-                                                color: '#f1f5f9',
-                                                '&:hover': {
-                                                    backgroundColor: '#2b2b2b',
-                                                },
-                                            }}>
+                                            <MenuItem key={prios.value} value={prios.value}
+                                                sx={{
+                                                    backgroundColor: '#1c1c1c',
+                                                    color: '#f1f5f9',
+                                                    '&:hover': {
+                                                        backgroundColor: '#2b2b2b',
+                                                    },
+                                                }}>
                                                 {prios.label}
                                             </MenuItem>
                                         )
@@ -262,6 +271,7 @@ export default function ZodAddGameModal() {
                                 </FormControl>
 
                                 {errors.priority?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.priority?.message}</p>}
+                                {/* {pri === null && <p className='text-sm font-medium text-red-600 pt-1'>skibd</p>} */}
                             </div>
 
                             <div className=''>
@@ -455,6 +465,7 @@ export default function ZodAddGameModal() {
                                 {errors.genre?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.genre?.message}</p>}
 
                             </div>
+
                             <div>
                                 <FormControl fullWidth variant="outlined" className='shadow-lg' >
                                     <InputLabel
@@ -491,6 +502,7 @@ export default function ZodAddGameModal() {
 
                                 {errors.status?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.status?.message}</p>}
                             </div>
+
                         </div>
 
                         <div className='grid grid-cols-3 gap-4 mt-2 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
@@ -515,6 +527,7 @@ export default function ZodAddGameModal() {
 
                                 {errors.release_year?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.release_year?.message}</p>}
                             </div>
+
                             <div>
                                 <TextField
                                     className='shadow-lg'
@@ -536,6 +549,7 @@ export default function ZodAddGameModal() {
 
                                 {errors.year_started?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.year_started?.message}</p>}
                             </div>
+
                             <div>
                                 <TextField
                                     className='shadow-lg'
@@ -556,6 +570,13 @@ export default function ZodAddGameModal() {
                                     label="Ano Finalizado"
                                     type="text"
                                     variant="standard"
+                                    disabled={statusWatch !== "Finalizado" && true}
+                                    value={anoFinalizado === 0 ? "" : anoFinalizado}
+                                    onChange={(e) => {
+                                        const cleanedValue = e.target.value.replace(/\D/g, "");
+                                        // Se o usuário apagar tudo, você pode decidir se deixa vazio ou coloca 0
+                                        setValue('year_finished', cleanedValue === "" ? 0 : Number(cleanedValue));
+                                    }}
                                 />
 
                                 {errors.year_finished?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.year_finished?.message}</p>}
@@ -588,7 +609,7 @@ export default function ZodAddGameModal() {
                         </div>
 
                         <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
-                            <Button className='max-[400px]:w-42 bg-red-500' onClick={resetarForm}>Resetar</Button>
+                            {/* <Button className='max-[400px]:w-42 bg-red-500' onClick={resetarForm}>Resetar</Button> */}
                             <Button className='max-[400px]:w-54' type="submit">+ ADD Jooj</Button>
                         </DialogActions>
 

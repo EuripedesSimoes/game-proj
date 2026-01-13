@@ -13,7 +13,7 @@ import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { gamePayload2Schema, type GamePayload2Validated, gameSchema, normalizeYear } from '@/helpers/gameFormSchemas'
+import { gameSchema, normalizeYear } from '@/helpers/gameFormSchemas'
 import { z } from 'zod';
 
 // OK-passar pra algum helper ou coisa assim

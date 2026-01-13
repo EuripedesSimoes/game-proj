@@ -1,4 +1,4 @@
-import { useState, type SetStateAction } from 'react'
+import { useEffect, useState, type SetStateAction } from 'react'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
 import TextField from '@mui/material/TextField';
@@ -13,61 +13,55 @@ import { allPlatforms, allStatus, allGenres, allPriorities, isReplayedList } fro
 import type { GamePayload3 } from '@/interfaces/gameDataTypes';
 import { collection, doc, getFirestore, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod';
+import { gameAttSchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/gameFormSchemas'
 
 type AttProps = {
     gameId: any;
     data: {
         id: string
         name: string;
-        hours_played?: number | string;
-        hours_expected?: number | string;
+        hours_played: number;
+        hours_expected: number;
         priority: string;
         platform: string;
         genre: string;
-        status: string;
+        status: any;
         replayed: string
-        is_completed?: boolean;
-        release_year: number | string;
-        year_started?: number | string;
-        year_finished?: number | string;
+        // is_completed: boolean;
+        release_year: number;
+        year_started: number;
+        year_finished?: number | string | undefined;
         background_image?: string;
     };
 }
-// OK-passar pra algum helper ou coisa assim
+
+export type FormData = z.infer<typeof gameAttSchema>;
 
 const AttGameModal = ({ gameId, data }: AttProps) => {
 
-    // OK-passar essas listas pra algum helper ou coisa assim
-    // const allPlatforms,etc
+    const { register, handleSubmit, formState: { errors }, control, reset, watch, setValue } = useForm<FormData>({
+        resolver: zodResolver(gameAttSchema),
+
+        defaultValues: {
+            name: data?.name || '',
+            hours_played: data?.hours_played ? Number(data.hours_played) : undefined,
+            hours_expected: data?.hours_expected ? Number(data.hours_expected) : undefined,
+            priority: data?.priority || '',
+            replayed: data?.replayed || '',
+            platform: data?.platform || '',
+            genre: data?.genre || '',
+            status: data?.status,
+            release_year: data?.release_year ? Number(data.release_year) : undefined,
+            year_started: data?.year_started ? Number(data.year_started) : undefined,
+            year_finished: typeof data?.year_finished === 'string' ? "Sem ano" : typeof data?.year_finished === 'number' ? Number(data.year_finished) : undefined,
+            background_image: data?.background_image || '',
+        }
+    })
 
     const queryClient = useQueryClient() // <--- novo
-
-    const [open, setOpen] = useState(false);
-    const handleClickOpen = () => setOpen(true)
-    const handleClose = () => setOpen(false)
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const formJson = Object.fromEntries((formData as any).entries());
-        const email = formJson.email;
-        console.log(email);
-        handleClose();
-    };
-
-    // PASSAR PARA O ARQUIVO formAddGame.tsx 
-    const [nome_jogo, setNome_jogo] = useState<string>(data?.name || '')
-    const [hours_played, setHours_played] = useState<number | string>(data?.hours_played || '')
-    const [hours_expected, setHours_expected] = useState<number | string>(data?.hours_expected || '')
-    const [priority, setPriority] = useState(data?.priority || '')
-    const [platform, setPlatform] = useState<string>(data?.platform || '')
-    const [genre, setGenre] = useState<string>(data?.genre || '')
-    // const [is_completed, setIs_completed] = useState<boolean>(false)
-    const [status, setStatus] = useState<string>(data?.status || '')
-    const [replayed, setReplayed] = useState<string>(data?.replayed || '')
-    const [release_year, setRelease_year] = useState<number | string>(data?.release_year || '')
-    const [year_started, setYear_started] = useState<number | string>(data?.year_started || '')
-    const [year_finished, setYear_finished] = useState<number | string>(data?.year_finished || '')
-    const [background_image, setBackground_image] = useState<string>(data?.background_image || '')
 
     const firebaseConfig = {
         apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
@@ -79,31 +73,76 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
     const db = getFirestore(firebaseApp)
     const jogosColeRef = collection(db, 'joojs') // referência à coleção 'joojs' no Firestore
 
-    async function AtualizarJogo(e?: React.MouseEvent<HTMLButtonElement>) {
-        e?.preventDefault();
-        const payload: GamePayload3 = {
-            name: nome_jogo, //'Octopath Traveler',
-            hours_played: hours_played || '', //86
-            hours_expected: hours_expected || '', //60,
-            priority: priority,
-            platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
-            genre: genre, // 'JPRG',   SELECT AQUI COM VÁRIAS OPÇÕES
-            //is_completed: is_completed , //false,
-            release_year: release_year || '', // 2017,
-            status: status, //'In Progress',
-            replayed: replayed, // Não
-            year_started: year_started || '', //2024,
-            year_finished: year_finished || '', //null,
-            background_image: background_image, //''
+    // onSubmit receberá dados já validados pelo Zod via react-hook-form
+    const onSubmit = async (data: FormData) => {
+        try {
+            queryClient.invalidateQueries({ queryKey: ['joojs'] })
+            await updateDoc(doc(jogosColeRef, gameId), data as any)
+            reset()
+            // resetarForm()
+            handleClose()
+            // if (status !== 'Finalizado') return year_finished === "Sem nome"
+        } catch (err) {
+            console.error('Erro ao salvar jogo:', err)
         }
-        // const jogoAtualizado = await API.attJogo(gameId, payload)
-        await updateDoc(doc(jogosColeRef, gameId), payload)
-        // <--- invalida a query e força refetch automático
-        queryClient.invalidateQueries({ queryKey: ['joojs'] })
-        handleClose() // fecha o dialog
-
-        // return jogoAtualizado
     }
+    useEffect(() => {
+        reset({
+            name: data?.name || '',
+            hours_played: data?.hours_played ? Number(data.hours_played) : undefined,
+            hours_expected: data?.hours_expected ? Number(data.hours_expected) : undefined,
+            priority: data?.priority || '',
+            replayed: data?.replayed || '',
+            platform: data?.platform || '',
+            genre: data?.genre || '',
+            status: data?.status || '',
+            release_year: data?.release_year ? Number(data.release_year) : undefined,
+            year_started: data?.year_started ? Number(data.year_started) : undefined,
+            year_finished: typeof data?.year_finished === 'string' ? "Sem ano" : typeof data?.year_finished === 'number' ? Number(data.year_finished) : undefined,
+            background_image: data?.background_image || '',
+        })
+    }, [data, reset]) // Executa quando 'data' muda
+
+
+    const [open, setOpen] = useState(false);
+    const handleClickOpen = () =>
+        setOpen(true)
+
+    const handleClose = () => setOpen(false)
+
+    // Usando o watch() para ler os valores:
+    const nomeJogo = watch('name')
+    const horasJogadas = watch('hours_played')
+    const horasEsperadas = watch('hours_expected')
+    const prioridade = watch('priority')
+    const rejogado = watch('replayed')
+    const plataforma = watch('platform')
+    const genero = watch('genre')
+    const statusJogo = watch('status')
+    const anoLancado = watch('release_year')
+    const anoIniciado = watch('year_started')
+    const anoFinalizado = watch('year_finished')
+    const imagemFundo = watch('background_image')
+
+
+    useEffect(() => {
+        if (statusJogo !== "Finalizado") {
+            // Se não está finalizado, forçamos a string
+            setValue("year_finished", "Sem ano");
+        } else {
+            // Se mudou para "Finalizado"
+            if (anoFinalizado === "Sem ano") {
+                // Aqui você decide: 0 para campo vazio ou 1 conforme sua lógica anterior
+                // Usar o normalize garante que o valor seja tratado como número pelo Zod
+                const valorInicial = normalizeOnlyNumbers(""); // Retornará o fallback da sua função (0 ou 1)
+                setValue("year_finished", valorInicial);
+            }
+        }
+    }, [statusJogo, setValue, anoFinalizado]);
+    // Nota sobre o Firebase: Ao enviar "Sem ano", o Firebase salvará como string. 
+    // Se preferir economizar espaço, você pode transformar "Sem ano" em null dentro da função onSubmit antes de enviar para a API.
+
+
 
     return (
         <>
@@ -114,6 +153,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                     <FaPencilAlt className="h-6.5 w-6.5 text-white/80" />
                 </span>
             </Button>
+
             <Dialog open={open} onClose={handleClose} className='bg-slate-500/95'>
                 <DialogTitle sx={{ m: 0, p: 1.5, fontWeight: "bold" }} >
                     <div className='flex justify-between items-center'>
@@ -124,427 +164,427 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                     </div>
                 </DialogTitle>
                 <DialogContent className='bg-[#f1f2f9]'>
-                    <form action="" onSubmit={handleSubmit} id="subscription-form" className=''>
-                        <div className='grid grid-cols-4 md:flex gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
+                    <form action="" onSubmit={handleSubmit(onSubmit)} id="subscription-form" className=''>
+
+                        <div className='grid grid-cols-4 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+
+                            <div className=' col-span-2'>
+                                <TextField
+                                    className='shadow-lg my-1 col-span-4'
+                                    sx={{
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
+                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                    }}
+                                    // autoFocus
+                                    {...register('name')}
+                                    fullWidth
+                                    margin="dense"
+                                    id="name"
+                                    name="name"
+                                    label="Nome do Jogo"
+                                    type="text"
+                                    variant="standard"
+                                    value={nomeJogo}
+                                    onChange={(e) => {
+                                        // setNome_jogo(e.target.value) // remover todos os controladores de estado e botar setvalue
+                                        setValue('name', e.target.value)
+                                    }}
+                                />
+                                {errors.name?.message && <p className='text-sm font-medium text-red-600'>{errors.name?.message}</p>}
+                            </div>
+
+                            <div className=' col-span-1'>
+                                <TextField
+                                    className='shadow-lg col-span-2'
+                                    sx={{
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+
+                                    }}
+                                    // autoFocus
+                                    {...register('hours_played', {
+                                        // Garante que o valor final seja sempre um número antes de validar
+                                        setValueAs: normalizeOnlyNumbers,
+                                    })}
+                                    margin="dense"
+                                    id="hours_played"
+                                    name="hours_played"
+                                    label="Horas jogadas"
+                                    type="text"
+                                    variant="standard"
+                                    value={horasJogadas === 0 ? "" : horasJogadas}
+                                    onChange={(e) => {
+                                        const cleanedValue = e.target.value.replace(/\D/g, "");
+                                        // Se o usuário apagar tudo, você pode decidir se deixa vazio ou coloca 0
+                                        setValue('hours_played', cleanedValue === "" ? 0 : Number(cleanedValue));
+                                    }} />
+                                {errors.hours_played?.message && <p className='text-sm font-medium text-red-600'>{errors.hours_played?.message}</p>}
+                            </div>
+
+                            <div className=' col-span-1'>
+                                <TextField
+                                    className='shadow-lg col-span-2'
+                                    sx={{
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+
+                                    }}
+                                    // autoFocus
+                                    {...register('hours_expected', {
+                                        // Garante que o valor final seja sempre um número antes de validar
+                                        setValueAs: normalizeOnlyNumbers,
+                                    })}
+                                    margin="dense"
+                                    id="hours_expected"
+                                    name="hours_expected"
+                                    label="Horas esperadas"
+                                    type="text"
+                                    variant="standard"
+                                    value={horasEsperadas === 0 ? "" : horasEsperadas}
+                                    onChange={(e) => {
+                                        const cleanedValue = e.target.value.replace(/\D/g, "");
+                                        // Se o usuário apagar tudo, você pode decidir se deixa vazio ou coloca 0
+                                        setValue('hours_expected', cleanedValue === "" ? 0 : Number(cleanedValue));
+                                    }}
+                                // onChange={(e) => {
+                                //     const inputVal = e.target.value;
+                                //     // Aplicamos a normalização e atualizamos o estado do React Hook Form
+                                //     const cleaned = normalizeOnlyNumbers(inputVal);
+
+                                //     // Usamos o cleaned para atualizar o valor que o usuário vê
+                                //     setValue('hours_expected', cleaned);
+                                // }}
+                                />
+                                {errors.hours_expected?.message && <p className='text-sm font-medium text-red-600'>{errors.hours_expected?.message}</p>}
+                            </div>
+
+                        </div>
+
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+
+                            <div className=' md:col-span-1'>
+                                <FormControl fullWidth variant="outlined" className='shadow-lg md:col-span-2' >
+                                    <InputLabel
+                                        id="priority-label"
+                                        sx={{
+                                            '&.MuiInputLabel-shrink': {
+                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                            },
+                                        }}
+                                    >
+                                        Prioridade
+                                    </InputLabel>
+                                    <Select
+                                        {...register('priority')}
+                                        label="Prioridade"
+                                        id="priority"
+                                        name="priority"
+                                        variant="outlined"
+                                        sx={{
+                                            p: 0.2,
+                                            "& .MuiSelect-icon": {
+                                                color: "black",
+                                            }
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    backgroundColor: "#1c1c1c",
+                                                    "& .MuiMenuItem-root": {
+                                                        opacity: '75%',
+                                                        "&.Mui-selected": {
+                                                            backgroundColor: "#2e2e3e", // background do option selecionado
+                                                            color: "white", //cor do texto do option selecionado
+                                                            fontWeight: 'bold',
+                                                            opacity: '100%',
+                                                        },
+                                                        "&:hover": {
+                                                            backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                            fontWeight: 'bold',
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        }}
+                                        value={prioridade}
+                                        onChange={(e) => setValue('priority', e.target.value)}
+                                    >
+                                        {allPriorities.map((prios) => (
+                                            <MenuItem key={prios.value} value={prios.value} sx={{
+                                                backgroundColor: '#1c1c1c',
+                                                color: '#f1f5f9',
+                                                '&:hover': {
+                                                    backgroundColor: '#2b2b2b',
+                                                },
+                                            }}>
+                                                {prios.label}
+                                            </MenuItem>
+                                        )
+                                        )}
+                                    </Select>
+                                </FormControl>
+
+                                {errors.priority?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.priority?.message}</p>}
+                            </div>
+
+                            <div className=' md:col-span-1'>
+                                <FormControl fullWidth variant="outlined" className='shadow-lg ' >
+                                    <InputLabel
+                                        id="replayed-label"
+                                        sx={{
+                                            '&.MuiInputLabel-shrink': {
+                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                            },
+                                        }}
+                                    >
+                                        Rejogado?
+                                    </InputLabel>
+                                    <Select
+                                        {...register('replayed')}
+                                        label="Rejogado"
+                                        id="replayed"
+                                        name="replayed"
+                                        variant="outlined"
+                                        sx={{
+                                            p: 0.2,
+                                            "& .MuiSelect-icon": {
+                                                color: "black",
+                                            }
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    backgroundColor: "#1c1c1c",
+                                                    "& .MuiMenuItem-root": {
+                                                        opacity: '75%',
+                                                        "&.Mui-selected": {
+                                                            backgroundColor: "#2e2e3e", // background do option selecionado
+                                                            color: "white", //cor do texto do option selecionado
+                                                            fontWeight: 'bold',
+                                                            opacity: '100%',
+                                                        },
+                                                        "&:hover": {
+                                                            backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                            fontWeight: 'bold',
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        }}
+                                        value={rejogado}
+                                        onChange={(e) => setValue('replayed', e.target.value)}
+                                    >
+                                        {isReplayedList.map((isRep) => (
+                                            <MenuItem key={isRep.value} value={isRep.value}
+                                                sx={{
+                                                    backgroundColor: '#1c1c1c',
+                                                    color: '#f1f5f9',
+                                                    '&:hover': {
+                                                        backgroundColor: '#2b2b2b',
+                                                    },
+                                                }}>
+                                                {isRep.label}
+                                            </MenuItem>
+                                        )
+                                        )}
+                                    </Select>
+                                </FormControl>
+
+                                {errors.replayed?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.replayed?.message}</p>}
+                            </div>
+
+                        </div>
+
+                        <div className='grid grid-cols-3 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+
+                            <div className=''>
+                                <select
+                                    className='shadow-lg h-14 w-full border-1 border-black/30 rounded-sm'
+                                    {...register('platform')}
+                                    id="platform"
+                                    name="platform"
+                                    value={plataforma}
+                                    onChange={(e) => setValue('platform', e.target.value)}
+                                >
+                                    {allPlatforms.map((plats) => (
+                                        <option key={plats.value} value={plats.value}>
+                                            {plats.label}
+                                        </option>
+                                    )
+                                    )}
+                                </select>
+                                {errors.platform?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.platform?.message}</p>}
+                            </div>
+
+                            <div>
+                                <select
+                                    className='shadow-lg h-14 w-full border-1 border-black/30 rounded-sm'
+                                    {...register('genre')}
+                                    // select
+                                    id="genre"
+                                    name="genre"
+                                    value={genero}
+                                    onChange={(e) => setValue('genre', e.target.value)}
+                                // label="Gênero"
+                                // type="text"
+                                // variant="outlined"
+                                >
+                                    {
+                                        allGenres.map((genre) => (
+                                            <option key={genre.value} value={genre.value}>
+                                                {genre.label}
+                                            </option>
+                                        ))
+                                    }
+                                </select>
+                                {errors.genre?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.genre?.message}</p>}
+                            </div>
+
+                            <div>
+                                <select
+                                    className='shadow-lg h-14 w-full border-1 border-black/30 rounded-sm'
+                                    {...register('status')}
+                                    id="status"
+                                    name="status"
+                                    value={statusJogo}
+                                // onChange={(e) => {setValue('status', e.target.value); setFinalizado(statusJogo !== "Finalizado" ? false : true)}}
+                                >
+                                    {allStatus.map((status) => (
+                                        <option key={status.value} value={status.value}>
+                                            {status.label}
+                                        </option>
+                                    )
+                                    )}
+                                </select>
+                                {errors.status?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.status?.message}</p>}
+                            </div>
+
+                        </div>
+
+                        <div className='grid grid-cols-3 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+                            {/* ano de lançamento */}
+                            <div>
+                                <TextField
+                                    className='shadow-lg'
+                                    sx={{
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+                                    }}
+                                    // autoFocus
+                                    {...register('release_year', {
+                                        // Garante que o valor final seja sempre um número antes de validar
+                                        setValueAs: normalizeOnlyNumbers,
+                                    })}
+                                    margin="dense"
+                                    id="release_year"
+                                    name="release_year"
+                                    label="Ano Lançamento"
+                                    type="text"
+                                    variant="standard"
+                                    value={anoLancado === 0 ? "" : anoLancado}
+                                    onChange={(e) => {
+                                        const cleanedValue = e.target.value.replace(/\D/g, "");
+                                        // Se o usuário apagar tudo, você pode decidir se deixa vazio ou coloca 0
+                                        setValue('release_year', cleanedValue === "" ? 0 : Number(cleanedValue));
+                                    }}
+                                />
+                                {errors.release_year?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.release_year?.message}</p>}
+                            </div>
+                            {/* ano iniciado */}
+                            <div>
+                                <TextField
+                                    className='shadow-lg'
+                                    sx={{
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+
+                                    }}
+                                    // autoFocus
+                                    {...register('year_started', {
+                                        // Garante que o valor final seja sempre um número antes de validar
+                                        setValueAs: normalizeOnlyNumbers,
+                                    })}
+                                    margin="dense"
+                                    id="year_started"
+                                    name="year_started"
+                                    label="Ano Iniciado"
+                                    type="text"
+                                    variant="standard"
+                                    value={anoIniciado === 0 ? "" : anoIniciado}
+                                    onChange={(e) => {
+                                        const cleanedValue = e.target.value.replace(/\D/g, "");
+                                        // Se o usuário apagar tudo, você pode decidir se deixa vazio ou coloca 0
+                                        setValue('year_started', cleanedValue === "" ? 0 : Number(cleanedValue));
+                                    }}
+                                />
+                                {errors.year_started?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.year_started?.message}</p>}
+                            </div>
+                            {/* ano finalizado */}
+                            <div>
+                                <TextField
+                                    className='shadow-lg'
+                                    sx={{
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+
+                                    }}
+                                    {...register('year_finished', {
+                                        setValueAs: normalizeYear,
+                                    })}
+                                    // autoFocus
+                                    margin="dense"
+                                    id="year_finished"
+                                    name="year_finished"
+                                    label="Ano Finalizado"
+                                    type="text"
+                                    variant="standard"
+                                    disabled={statusJogo !== "Finalizado" && true}
+                                    // value={status !== "Finalizado" && year_finished === 'abc2' ? 'abc' : status === "Finalizado" && year_finished === 0}                                
+                                    value={anoFinalizado === 0 ? "" : anoFinalizado}
+                                    onChange={(e) => {
+                                        const cleanedValue = e.target.value.replace(/\D/g, "");
+                                        // Se o usuário apagar tudo, você pode decidir se deixa vazio ou coloca 0
+                                        setValue('year_finished', cleanedValue === "" ? 0 : Number(cleanedValue));
+                                    }}
+                                />
+                                {errors.year_finished?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.year_finished?.message}</p>}
+                            </div>
+                        </div>
+
+                        <div>
                             <TextField
-                                className='shadow-lg my-1 col-span-4'
+                                className='shadow-lg'
                                 sx={{
-                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                    input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
+                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
                                     '& .MuiOutlinedInput-root': {
-                                        // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                        '& fieldset': { borderColor: '#334155' }, // border-slate-700
                                         '&:hover fieldset': { borderColor: '#64748b' }, // hover border
                                         '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
                                     },
                                 }}
-                                // autoFocus
-                                required
+                                {...register('background_image')}
+                                margin="dense"
                                 fullWidth
-                                margin="dense"
-                                id="game_name"
-                                name="game_name"
-                                label="Nome do Jogo"
+                                id="background_image"
+                                name="background_image"
+                                label="Foto da Capa (URL)"
                                 type="text"
                                 variant="standard"
-                                value={nome_jogo}
-                                onChange={(e) => { setNome_jogo(e.target.value) }}
+                                value={imagemFundo}
+                                onChange={(e) => setValue('background_image', e.target.value)}
                             />
-                            <TextField
-                                className='shadow-lg col-span-2'
-                                sx={{
-                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
-                                }}
-                                // autoFocus
-                                required
-                                margin="dense"
-                                id="hours_played"
-                                name="hours_played"
-                                label="Horas jogadas"
-                                type="text"
-                                variant="standard"
-                                value={hours_played}
-                                onChange={(e) => { setHours_played(parseInt(e.target.value)) }}
-                            />
-                            <TextField
-                                className='shadow-lg col-span-2'
-                                sx={{
-                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
-                                }}
-                                // autoFocus
-                                required
-                                margin="dense"
-                                id="hours_expected"
-                                name="hours_expected"
-                                label="Horas esperadas"
-                                type="text"
-                                variant="standard"
-                                value={hours_expected}
-                                onChange={(e) => { setHours_expected(parseInt(e.target.value)) }}
-                            />
+                            {errors.background_image?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.background_image?.message}</p>}
                         </div>
-
-                        <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
-
-                            <FormControl fullWidth variant="outlined" className='shadow-lg md:col-span-2' >
-                                <InputLabel
-                                    id="priority-label"
-                                    sx={{
-                                        '&.MuiInputLabel-shrink': {
-                                            transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
-                                        },
-                                    }}
-                                >
-                                    Prioridade
-                                </InputLabel>
-                                <Select
-                                    label="Prioridade"
-                                    id="priority"
-                                    name="priority"
-                                    variant="outlined"
-                                    required
-                                    value={priority}
-                                    onChange={(e) => { setPriority(e.target.value) }}
-                                    sx={{
-                                        p: 0.2,
-                                        "& .MuiSelect-icon": {
-                                            color: "black",
-                                        }
-                                    }}
-                                    MenuProps={{
-                                        PaperProps: {
-                                            sx: {
-                                                backgroundColor: "#1c1c1c",
-                                                "& .MuiMenuItem-root": {
-                                                    opacity: '75%',
-                                                    "&.Mui-selected": {
-                                                        backgroundColor: "#2e2e3e", // background do option selecionado
-                                                        color: "white", //cor do texto do option selecionado
-                                                        fontWeight: 'bold',
-                                                        opacity: '100%',
-                                                    },
-                                                    "&:hover": {
-                                                        backgroundColor: "gray", // background do option ao passar mouse por cima
-                                                        fontWeight: 'bold',
-                                                    },
-                                                },
-                                            },
-                                        },
-                                    }}
-                                >
-                                    {allPriorities.map((prios) => (
-                                        <MenuItem key={prios.value} value={prios.value} sx={{
-                                            backgroundColor: '#1c1c1c',
-                                            color: '#f1f5f9',
-                                            '&:hover': {
-                                                backgroundColor: '#2b2b2b',
-                                            },
-                                        }}>
-                                            {prios.label}
-                                        </MenuItem>
-                                    )
-                                    )}
-                                </Select>
-                            </FormControl>
-                            <FormControl fullWidth variant="outlined" className='shadow-lg ' >
-                                <InputLabel
-                                    id="replayed-label"
-                                    sx={{
-                                        '&.MuiInputLabel-shrink': {
-                                            transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
-                                        },
-                                    }}
-                                >
-                                   Rejogado?
-                                </InputLabel>
-                                <Select
-                                    label="Rejogado"
-                                    id="replayed"
-                                    name="replayed"
-                                    variant="outlined"
-                                    required
-                                    value={replayed}
-                                    onChange={(e) => { setReplayed(e.target.value) }}
-                                    sx={{
-                                        p: 0.2,
-                                        "& .MuiSelect-icon": {
-                                            color: "black",
-                                        }
-                                    }}
-                                    MenuProps={{
-                                        PaperProps: {
-                                            sx: {
-                                                backgroundColor: "#1c1c1c",
-                                                "& .MuiMenuItem-root": {
-                                                    opacity: '75%',
-                                                    "&.Mui-selected": {
-                                                        backgroundColor: "#2e2e3e", // background do option selecionado
-                                                        color: "white", //cor do texto do option selecionado
-                                                        fontWeight: 'bold',
-                                                        opacity: '100%',
-                                                    },
-                                                    "&:hover": {
-                                                        backgroundColor: "gray", // background do option ao passar mouse por cima
-                                                        fontWeight: 'bold',
-                                                    },
-                                                },
-                                            },
-                                        },
-                                    }}
-                                >
-                                    {isReplayedList.map((isRep) => (
-                                        <MenuItem key={isRep.value} value={isRep.value} sx={{
-                                            backgroundColor: '#1c1c1c',
-                                            color: '#f1f5f9',
-                                            '&:hover': {
-                                                backgroundColor: '#2b2b2b',
-                                            },
-                                        }}>
-                                            {isRep.label}
-                                        </MenuItem>
-                                    )
-                                    )}
-                                </Select>
-                            </FormControl>
-                        </div>
-
-                        <div className='grid md:grid-cols-3 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
-
-                            <FormControl fullWidth variant="outlined" className='shadow-lg' >
-                                <InputLabel
-                                    id="plataforma-label"
-                                    sx={{
-                                        '&.MuiInputLabel-shrink': {
-                                            transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
-                                        },
-                                    }}
-                                >
-                                    Plataforma
-                                </InputLabel>
-                                <Select
-                                    label="Plataforma"
-                                    id="platform"
-                                    name="platform"
-                                    variant="outlined"
-                                    required
-                                    value={platform}
-                                    onChange={(e) => { setPlatform(e.target.value) }}
-                                    // className={`bg-yellow-200`}
-                                    sx={{
-                                        // label:{ color: 'violet'},
-                                        "& .MuiSelect-icon": {
-                                            color: "black",
-                                        }
-                                    }}
-                                    MenuProps={{
-                                        PaperProps: {
-                                            sx: {
-                                                backgroundColor: "#1c1c1c",
-                                                // color: "red",  //muda nada
-                                                "& .MuiMenuItem-root": {
-                                                    opacity: '75%',
-                                                    //color: "white",  // já é branco por padrão
-                                                    "&.Mui-selected": {
-                                                        backgroundColor: "#2e2e3e", // background do option selecionado
-                                                        color: "white", //cor do texto do option selecionado
-                                                        fontWeight: 'bold',
-                                                        opacity: '100%',
-                                                    },
-                                                    "&:hover": {
-                                                        // transform: "translateY(4px) time(0.9s)",  //muda nada
-                                                        backgroundColor: "gray", // background do option ao passar mouse por cima
-                                                        //color: "red", //cor do texto do option ao passar mouse por cima
-                                                        fontWeight: 'bold',
-                                                        // opacity: '100%',
-                                                    },
-                                                },
-                                            },
-                                        },
-                                    }}
-                                >
-                                    {allPlatforms.map((plats) => (
-                                        <MenuItem key={plats.value} value={plats.value} sx={{
-                                            backgroundColor: '#1c1c1c',
-                                            color: '#f1f5f9',
-                                            '&:hover': {
-                                                backgroundColor: '#2b2b2b',
-                                            },
-                                        }}>
-                                            {plats.label}
-                                        </MenuItem>
-                                    )
-                                    )}
-                                </Select>
-                            </FormControl>
-                            <TextField
-                                className='shadow-lg'
-                                sx={{
-                                    backgroundColor: '#f1f5f9',
-                                    // p: 0.5,
-                                    //input: { color: '#3c3c3c' }, // text-slate-100
-                                    '& .MuiInputLabel-root': {
-                                        // color: '#2563eb',
-                                    },
-                                    '& .MuiInputLabel-shrink': {
-                                        transform: 'translate(10px, -12px) scale(0.75)', // ajusta posição
-                                        //backgroundColor: '#fef08a', // mesma cor do fundo para não "cortar"
-                                        //padding: '0 4px', // cria espaço para a label não sobrepor a borda
-                                    },
-                                }}
-                                SelectProps={{
-                                    MenuProps: {
-                                        PaperProps: {
-                                            sx: {
-                                                backgroundColor: '#1c1c1c', // fundo do container
-                                                borderRadius: '4px',
-                                                padding: '2px',
-                                                margin: '1px',
-                                                "& .MuiMenuItem-root": {
-                                                    opacity: '75%',
-                                                    //color: "white",  // já é branco por padrão
-                                                    "&.Mui-selected": {
-                                                        backgroundColor: "#2e2e3e", // background do option selecionado
-                                                        color: "white", //cor do texto do option selecionado
-                                                        fontWeight: 'bold',
-                                                        opacity: '100%',
-                                                    },
-                                                    "&:hover": {
-                                                        // transform: "translateY(4px) time(0.9s)",  //muda nada
-                                                        backgroundColor: "gray", // background do option ao passar mouse por cima
-                                                        //color: "red", //cor do texto do option ao passar mouse por cima
-                                                        fontWeight: 'bold',
-                                                        // opacity: '100%',
-                                                    },
-                                                },
-                                            },
-                                        },
-                                    },
-                                }}
-                                required
-                                select
-                                id="genre"
-                                name="genre"
-                                label="Gênero"
-                                type="text"
-                                variant="outlined"
-                                value={genre} onChange={(e) => { setGenre(e.target.value) }}
-                            >
-                                {
-                                    allGenres.map((genre) => (
-                                        <MenuItem key={genre.value} value={genre.value} sx={{
-                                            backgroundColor: '#1c1c1c',
-                                            color: '#f1f5f9',
-                                            '&:hover': {
-                                                backgroundColor: '#2b2b2b',
-                                            },
-                                        }}>
-                                            {genre.label}
-                                        </MenuItem>
-                                    ))
-                                }
-                            </TextField>
-                            <TextField
-                                className='shadow-lg'
-                                sx={{
-                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                    input: { color: '#3c3c3c' }, // text-slate-100
-                                }}
-                                // autoFocus
-                                required
-                                select
-                                id="status"
-                                name="status"
-                                label="Status"
-                                variant="outlined"
-                                value={status} onChange={(e) => { setStatus(e.target.value) }}
-                            >
-                                {allStatus.map((status) => (
-                                    <MenuItem key={status.value} value={status.value}>
-                                        {status.label}
-                                    </MenuItem>
-                                )
-                                )}
-                            </TextField>
-                        </div>
-                        <div className='grid grid-cols-3 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
-                            <TextField
-                                className='shadow-lg'
-                                sx={{
-                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
-                                }}
-                                // autoFocus
-                                required
-                                margin="dense"
-                                id="release_year"
-                                name="release_year"
-                                label="Ano Lançamento"
-                                type="text"
-                                variant="standard"
-                                value={release_year} onChange={(e) => { setRelease_year(parseInt(e.target.value)) }}
-                            />
-                            <TextField
-                                className='shadow-lg'
-                                sx={{
-                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
-                                }}
-                                // autoFocus
-                                margin="dense"
-                                id="year_started"
-                                name="year_started"
-                                label="Ano Iniciado"
-                                type="text"
-                                variant="standard"
-                                value={year_started} onChange={(e) => { setYear_started(parseInt(e.target.value)) }}
-                            />
-                            <TextField
-                                className='shadow-lg'
-                                sx={{
-                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
-                                }}
-                                // autoFocus
-                                margin="dense"
-                                id="year_finished"
-                                name="year_finished"
-                                label="Ano Finalizado"
-                                type="text"
-                                variant="standard"
-                                value={year_finished} onChange={(e) => { setYear_finished(parseInt(e.target.value)) }}
-                            />
-                        </div>
-
-                        <TextField
-                            className='shadow-lg'
-                            sx={{
-                                backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-                                '& .MuiOutlinedInput-root': {
-                                    '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                    '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                    '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                },
-                            }}
-                            margin="dense"
-                            fullWidth
-                            id="background_image"
-                            name="background_image"
-                            label="Foto da Capa (URL)"
-                            type="text"
-                            variant="standard"
-                            value={background_image} onChange={(e) => { setBackground_image(e.target.value) }}
-                        />
 
                         <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
-                            <Button className='' type="submit" onClick={AtualizarJogo}>+ ATT Jooj</Button>
+                            <Button className='' type="submit" >+ ATT Jooj</Button>
                             {/* <Button onClick={handleClose}>Close</Button> */}
                         </DialogActions>
 
