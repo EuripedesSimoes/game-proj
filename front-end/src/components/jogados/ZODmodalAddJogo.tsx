@@ -68,10 +68,6 @@ export default function ZodAddGameModal() {
     const handleClickOpen = () => setOpen(true)
     const handleClose = () => setOpen(false)
 
-    function ado() {
-        console.log('ado')
-    }
-
     const horasJogadas = watch("hours_played");
     const horasEsperada = watch("hours_expected");
     const anoLancado = watch("release_year");
@@ -79,23 +75,24 @@ export default function ZodAddGameModal() {
     const anoFin = watch("year_finished");
     const pri = watch('priority')
     const statusWatch = watch('status')
+    const gameIMG = watch('gameImageInput')
 
     const anoFinalizado = watch('year_finished')
 
-        useEffect(() => {
-            if (statusWatch !== "Finalizado") {
-                // Se não está finalizado, forçamos a string
-                setValue("year_finished", "Sem ano");
-            } else {
-                // Se mudou para "Finalizado"
-                if (anoFinalizado === "Sem ano") {
-                    // Aqui você decide: 0 para campo vazio ou 1 conforme sua lógica anterior
-                    // Usar o normalize garante que o valor seja tratado como número pelo Zod
-                    const valorInicial = normalizeOnlyNumbers(""); // Retornará o fallback da sua função (0 ou 1)
-                    setValue("year_finished", valorInicial);
-                }
+    useEffect(() => {
+        if (statusWatch !== "Finalizado") {
+            // Se não está finalizado, forçamos a string
+            setValue("year_finished", "Sem ano");
+        } else {
+            // Se mudou para "Finalizado"
+            if (anoFinalizado === "Sem ano") {
+                // Aqui você decide: 0 para campo vazio ou 1 conforme sua lógica anterior
+                // Usar o normalize garante que o valor seja tratado como número pelo Zod
+                const valorInicial = normalizeOnlyNumbers(""); // Retornará o fallback da sua função (0 ou 1)
+                setValue("year_finished", valorInicial);
             }
-        }, [statusWatch, setValue, anoFinalizado]);
+        }
+    }, [statusWatch, setValue, anoFinalizado]);
 
     // console.log('anofin', anoFin)
 
@@ -103,6 +100,7 @@ export default function ZodAddGameModal() {
         <div className='w-full h-full flex flex-col justify-center items-center'>
             <Button onClick={handleClickOpen}>Adicionar Jogo</Button>
 
+            {/* Adicionar backdropblur-md */}
             <Dialog open={open} onClose={handleClose} className='bg-slate-700'
                 sx={{
                     input: { color: '#f1f5f9' },
@@ -607,6 +605,48 @@ export default function ZodAddGameModal() {
 
                             {errors.background_image?.message && <p className='text-sm font-medium text-red-600'>{errors.background_image?.message}</p>}
                         </div>
+                        <div className='flex flex-col items-center gap-3 text-xs '>
+
+                            <div className='w-[100px] h-[100px] rounded-xl bg-black/60 overflow-hidden'>
+                                <button type='button' className='w-full h-full' >100x100</button>
+                            </div>
+                            <button type='button'>
+                                <span>↑</span>
+                                <span>Add imagens</span>
+                            </button>
+                            <input type="file" name="gameImageInput" id="gameImageInput" accept='image/*' className='' />
+                        </div>
+
+                        {errors.background_image?.message && <p className='text-sm font-medium text-red-600'>{errors.background_image?.message}</p>}
+
+                        {/* <div className='flex flex-col items-center gap-3 text-xs '>
+                            <div className='w-[100px] h-[100px] rounded-xl bg-black/60 overflow-hidden'>
+                                <button type='button' className='w-full h-full' >{gameIMG || '100x100'}</button>
+                            </div>
+                            <TextField
+                                className='shadow-lg'
+                                sx={{
+                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
+                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                        '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                        '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                    },
+                                }}
+                                {...register('background_image')}
+                                margin="dense"
+                                fullWidth
+                                id="background_image"
+                                name="background_image"
+                                label="Foto da Capa (URL)"
+                                type="text"
+                                variant="standard"
+                            />
+                            <input {...register('background_image')} type="file" name="background_image" id="background_image" accept='image/*' className='' />
+
+                            {errors.background_image?.message && <p className='text-sm font-medium text-red-600'>{errors.background_image?.message}</p>}
+                        </div> */}
 
                         <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
                             {/* <Button className='max-[400px]:w-42 bg-red-500' onClick={resetarForm}>Resetar</Button> */}

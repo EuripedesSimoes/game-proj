@@ -38,9 +38,9 @@ export const normalizeYear = (val: unknown): number | "Sem ano" => {
 
 // Remove qualquer caractere que não seja número
 export const normalizeOnlyNumbers = (val: string | number): number => {
-  if (typeof val === "number") return val;
-  const onlyNumbers = val.replace(/\D/g, ""); // Remove tudo que não é dígito
-  return onlyNumbers === "" ? 0 : Number(onlyNumbers); 
+    if (typeof val === "number") return val;
+    const onlyNumbers = val.replace(/\D/g, ""); // Remove tudo que não é dígito
+    return onlyNumbers === "" ? 0 : Number(onlyNumbers);
 };
 
 
@@ -86,7 +86,10 @@ export const gameSchema = z.object({
 
     year_finished: finishedFieldValue.optional(),
 
+    // background_image: z.instanceof(FileList).optional(),
+    
     background_image: z.string().optional(),
+    gameImageInput: z.string().optional(),
 })
     .superRefine((data, ctx) => {
         const hasFinished = typeof data.year_finished === 'number' && data.year_finished < 2026
@@ -169,55 +172,56 @@ export const gameAttSchema = z.object({
     year_finished: finishedFieldValue.optional(),
 
     background_image: z.string().optional(),
+    gameImageInput: z.string().optional()
 })
-    .superRefine((data, ctx) => {
-        const hasFinished = typeof data.year_finished === 'number' && data.year_finished < 2026
-        // const lancamentoNumber = typeof data.release_year === 'number'
+        .superRefine((data, ctx) => {
+            const hasFinished = typeof data.year_finished === 'number' && data.year_finished < 2026
+            // const lancamentoNumber = typeof data.release_year === 'number'
 
-        // 1.1. Released_year precisa ser igual ou menor que os outros dois
-        if (typeof data.release_year === 'number' && typeof data.year_started === 'number' && data.release_year > data.year_started)
-            ctx.addIssue({
-                code: 'custom',
-                message: "Ano de lançamento maior que ano iniciado",
-                path: ["release_year"], // O erro aparecerá no campo released_year
-            })
-        // ctx.addIssue({
-        //     code: 'custom',
-        //     message: "Ano de lançamento maior que ano iniciado",
-        //     path: ["year_started"], // O erro aparecerá no campo released_year
-        // })
-        // 1.2. Released_year precisa ser igual ou menor que os outros dois
-        if (hasFinished && typeof data.release_year === 'number' && data.release_year > Number(data.year_finished))
-            ctx.addIssue({
-                code: 'custom',
-                message: "Ano de lançamento maior que ano finalizado",
-                path: ["release_year"], // O erro aparecerá no campo released_year
-            })
-        // 2.2. Year_started precisa ser igual ou menor que o finished
-        if (hasFinished && typeof data.year_started === 'number' && data.year_started > Number(data.year_finished)) {
-            ctx.addIssue({
-                code: 'custom',
-                message: "Ano finalizado menor que ano de início",
-                path: ["year_finished"], // O erro aparecerá no campo released_year
-            })
-        }
-        if (Number(data.year_finished) > 2026) {
-            ctx.addIssue({
-                code: 'custom',
-                message: "Ano maior que 2026",
-                path: ["year_finished"], // O erro aparecerá no campo released_year
-            })
-        }
-    })
-    .refine((data) => {
-        if (data.status === "Finalizado" && data.year_finished === "Sem ano") {
-            return false; // Erro: Se finalizou, precisa de um ano
-        }
-        return true;
-    }, {
-        message: "Ano é obrigatório para jogos finalizados",
-        path: ["year_finished"]
-    })
+            // 1.1. Released_year precisa ser igual ou menor que os outros dois
+            if (typeof data.release_year === 'number' && typeof data.year_started === 'number' && data.release_year > data.year_started)
+                ctx.addIssue({
+                    code: 'custom',
+                    message: "Ano de lançamento maior que ano iniciado",
+                    path: ["release_year"], // O erro aparecerá no campo released_year
+                })
+            // ctx.addIssue({
+            //     code: 'custom',
+            //     message: "Ano de lançamento maior que ano iniciado",
+            //     path: ["year_started"], // O erro aparecerá no campo released_year
+            // })
+            // 1.2. Released_year precisa ser igual ou menor que os outros dois
+            if (hasFinished && typeof data.release_year === 'number' && data.release_year > Number(data.year_finished))
+                ctx.addIssue({
+                    code: 'custom',
+                    message: "Ano de lançamento maior que ano finalizado",
+                    path: ["release_year"], // O erro aparecerá no campo released_year
+                })
+            // 2.2. Year_started precisa ser igual ou menor que o finished
+            if (hasFinished && typeof data.year_started === 'number' && data.year_started > Number(data.year_finished)) {
+                ctx.addIssue({
+                    code: 'custom',
+                    message: "Ano finalizado menor que ano de início",
+                    path: ["year_finished"], // O erro aparecerá no campo released_year
+                })
+            }
+            if (Number(data.year_finished) > 2026) {
+                ctx.addIssue({
+                    code: 'custom',
+                    message: "Ano maior que 2026",
+                    path: ["year_finished"], // O erro aparecerá no campo released_year
+                })
+            }
+        })
+        .refine((data) => {
+            if (data.status === "Finalizado" && data.year_finished === "Sem ano") {
+                return false; // Erro: Se finalizou, precisa de um ano
+            }
+            return true;
+        }, {
+            message: "Ano é obrigatório para jogos finalizados",
+            path: ["year_finished"]
+        })
 
 export const gameToPlaySchema = z.object({
     name: z

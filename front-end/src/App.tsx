@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button"
 // import TextField from '@mui/material/TextField';
 import { Spinner } from "@/components/ui/spinner"
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import AddGameModal from './components/jogados/modalAddJogo.tsx';
+import AddGameModal from './components/jogados/modalAddJogo.old.tsx';
 import CardComponent from './components/jogados/cardComponent.tsx';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, getDocs, collection, deleteDoc, doc } from 'firebase/firestore';

@@ -23,16 +23,16 @@ type AttProps = {
     data: {
         id: string
         name: string;
-        hours_played: number;
-        hours_expected: number;
+        hours_played: number | string | undefined;
+        hours_expected: number | string | undefined;
         priority: string;
         platform: string;
         genre: string;
         status: any;
         replayed: string
         // is_completed: boolean;
-        release_year: number;
-        year_started: number;
+        release_year: number | string | undefined;
+        year_started: number | string | undefined;
         year_finished?: number | string | undefined;
         background_image?: string;
     };
