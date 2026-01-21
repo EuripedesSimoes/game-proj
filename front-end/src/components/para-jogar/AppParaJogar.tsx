@@ -10,7 +10,7 @@ import { getFirestore, getDocs, collection, deleteDoc, doc } from 'firebase/fire
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 import type { GamePayload2, myGamesApiInterface } from '@/interfaces/gameDataTypes';
-import AddGameModal from '../jogados/modalAddJogo';
+import AddGameModal from '../jogados/modalAddJogo.old';
 import FilterComponent from '../filtragem';
 import { Button } from "@/components/ui/button"
 import { Spinner } from '../ui/spinner';

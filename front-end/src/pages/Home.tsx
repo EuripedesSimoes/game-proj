@@ -7,17 +7,31 @@ import App from '@/App.tsx';
 import AppParaJogar from '@/components/para-jogar/AppParaJogar.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Button } from "@/components/ui/button"
-import { Link } from 'react-router';
+import { useNavigate } from 'react-router';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/services/firebaseConfig';
+
+
 
 export function Home() {
 
     const queryClient = new QueryClient()
 
+    const navigate = useNavigate();
 
+    const handleLogout = async () => {
+        await signOut(auth);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        navigate('/login')
+        // <Navigate to='/login' />
+    }
+
+    const userAtual = auth.currentUser || null;
+    // userAtual !== null 
 
     return (
         <>
-            <Button> Você está logged <Link to='/login' className='decoration-dashed'>Clique para ir para o login</Link> </Button>
             <QueryClientProvider client={queryClient}>
 
                 <Box sx={{ borderBottom: 1, borderColor: 'divider', backgroundColor: 'black' }}>
@@ -34,6 +48,11 @@ export function Home() {
                             <Tabs.Trigger value='Tudo' className='bg-amber-400 border-2 border-amber-900 text-black font-semibold rounded-lg'>
                                 Tudo
                             </Tabs.Trigger>
+
+                            <Button onClick={handleLogout} className='absolute right-0 bg-slate-800 hover:bg-gray-900'>
+                                Bem vindo, <span className='text-blue-300 font-bold'> {`${userAtual !== null ? userAtual.displayName : ''}`} </span>.
+                                Você está <span className='text-green-300 font-bold'>LOGADO</span>, Clique para  <span className='text-red-500 font-bold'>DESLOGAR</span>
+                            </Button>
                         </Tabs.List>
 
 
@@ -51,6 +70,7 @@ export function Home() {
 
                     </Tabs.Root>
                 </Box>
+
 
             </QueryClientProvider>
 

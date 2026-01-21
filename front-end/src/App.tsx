@@ -1,20 +1,11 @@
 import './App.css'
-import { useExternaGameData, myGames } from './helpers/fetchingGameData.ts'
+// import { useExternaGameData, myGames } from './helpers/fetchingGameData.ts'
+// import API from './services/gameApiServices.ts'
+
 import type { gameDataInterface, myGamesApiInterface } from './interfaces/gameDataTypes.ts'
-import { FaPencilAlt, FaEraser } from "react-icons/fa";
-import {
-  Card,
-  // CardAction,
-  CardContent,
-  CardDescription,
-  // CardFooter,
-  // CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 
 import FilterComponent from './components/filtragem.tsx'
 import { useEffect, useMemo, useState } from 'react'
-import API from './services/gameApiServices.ts'
 import { Button } from "@/components/ui/button"
 // import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem } from '@mui/material';
 // import TextField from '@mui/material/TextField';
@@ -22,19 +13,10 @@ import { Spinner } from "@/components/ui/spinner"
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import AddGameModal from './components/jogados/modalAddJogo.old.tsx';
 import CardComponent from './components/jogados/cardComponent.tsx';
-import { initializeApp } from 'firebase/app';
 import { getFirestore, getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
 import ZodAddGameModal from './components/jogados/ZODmodalAddJogo.tsx';
+import { firebaseApp } from './services/firebaseConfig.ts';
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
-    authDomain: "my-game-list-6fd0f.firebaseapp.com",
-    projectId: "my-game-list-6fd0f",
-};
-
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
 
 export default function App() {
   // const { data, isError, isFetching } = useExternaGameData()
