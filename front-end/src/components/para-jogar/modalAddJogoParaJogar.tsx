@@ -17,6 +17,10 @@ import { z } from 'zod';
 import { gameToPlaySchema } from '@/helpers/gameFormSchemas'
 import { FaClock } from 'react-icons/fa';
 
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/services/firebaseConfig';
+import { getStorage } from 'firebase/storage';
+
 // OK-passar pra algum helper ou coisa assim
 // type GamePayload2 = { name: string; etc...}
 
@@ -32,8 +36,7 @@ export default function AddGameModalParaJogar({ addJogo }: Props) {
         resolver: zodResolver(gameToPlaySchema),
     })
 
-    const queryClient = useQueryClient()
-
+    const queryClient = useQueryClient() // <---
 
     const firebaseConfig = {
         apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
@@ -43,7 +46,13 @@ export default function AddGameModalParaJogar({ addJogo }: Props) {
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp)
-    const jogosParaJogarColeRef = collection(db, 'jogos-para-jogar') // referência à coleção 'jogos-para-jogar' no Firestore
+    // const storage = getStorage(firebaseApp);
+    // const jogosParaJogarColeRef = collection(db, 'jogos-para-jogar') // referência à coleção 'jogos-para-jogar' no Firestore
+
+    // 1. Obter o usuário logado
+    const [user] = useAuthState(auth);; // Assume que useAuth() retorna o objeto de usuário
+
+    // resquicios de um tempo
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
     // async function enviarJogo(e?: React.MouseEvent<HTMLButtonElement>) {
     //     e?.preventDefault();
@@ -114,13 +123,26 @@ export default function AddGameModalParaJogar({ addJogo }: Props) {
     //         }
     //     }
     // }
+
+    // onSubmit receberá dados já validados pelo Zod via react-hook-form
     const onSubmit = async (data: FormData) => {
+
+        if (!user?.uid) {
+            alert("Você precisa estar logado para adicionar jogos!");
+            return;
+        }
+        alert('Adicionando jogo para jogar no futuro para o usuário: ' + user.displayName + '\n' + 'de nome: ' + user.displayName);
+
+        // 2. Criar a referência da subcoleção
+        // collection(db, 'users', user.uid, 'joojs') aponta para users/{uid}/jogos-para-jogar
+        const userJogosParaJogarCollectionRef = collection(db, 'users', user.uid, 'jogos-para-jogar');
+
         try {
-            await addDoc(jogosParaJogarColeRef, data as any)
-            reset()
+            await addDoc(userJogosParaJogarCollectionRef, data as any)
+            queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos-para-jogar'] })
             // resetarForm()
+            reset()
             FBhandleClose()
-            queryClient.invalidateQueries({ queryKey: ['jogos-para-jogar'] })
         } catch (err) {
             console.error('Erro ao salvar jogo:', err)
         }
@@ -161,9 +183,9 @@ export default function AddGameModalParaJogar({ addJogo }: Props) {
 
                     <form action="" onSubmit={handleSubmit(onSubmit)} id="subscription-form" className=''>
 
-                        <div className='grid grid-cols-4 md:flex gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+                        <div className='grid grid-cols-4 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
-                            <div className=' col-span-4'>
+                            <div className='col-span-2'>
                                 <TextField
                                     className='shadow-lg my-1'
                                     sx={{
@@ -187,7 +209,7 @@ export default function AddGameModalParaJogar({ addJogo }: Props) {
                                 />
                                 {errors.name?.message && <p className='text-sm font-medium text-red-600'>{errors.name?.message}</p>}
                             </div>
-                            
+
                             <div className='col-span-1'>
                                 <TextField
                                     className='shadow-lg my-1'
@@ -214,7 +236,7 @@ export default function AddGameModalParaJogar({ addJogo }: Props) {
                                 </p>}
                             </div>
 
-                            <div>
+                            <div className='col-span-1'>
                                 <TextField
                                     className='shadow-lg'
                                     sx={{
@@ -557,7 +579,7 @@ export default function AddGameModalParaJogar({ addJogo }: Props) {
                 </DialogContent>
             </Dialog>
 
-            
+
         </div>
     )
 }

@@ -139,7 +139,7 @@ export default function AddGameModal() {
 
                 <DialogContent className='bg-[#f1f2f9]'>
 
-                    <form action="" onSubmit={() => {handleSubmit(onSubmit); handleSubmitForm}} id="subscription-form" className=''>
+                    <form action="" onSubmit={() => { handleSubmit(onSubmit); handleSubmitForm }} id="subscription-form" className=''>
 
                         <div className='grid grid-cols-4 md:flex gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
@@ -218,7 +218,7 @@ export default function AddGameModal() {
                                             transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
                                         },
                                     }}
-                                    >
+                                >
                                     Prioridade
                                 </InputLabel>
                                 <Select
@@ -283,7 +283,7 @@ export default function AddGameModal() {
                                     Rejogado?
                                 </InputLabel>
                                 <Select
-                                {...register('replayed')}
+                                    {...register('replayed')}
                                     label="Rejogado?"
                                     id="replayed"
                                     name="replayed"
@@ -566,7 +566,7 @@ export default function AddGameModal() {
                         />
 
                         <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
-                            <Button className='max-[400px]:w-42 bg-red-500'  onClick={resetarForm}>Resetar</Button>
+                            <Button className='max-[400px]:w-42 bg-red-500' onClick={resetarForm}>Resetar</Button>
                             <Button className='max-[400px]:w-54' type="submit" onClick={enviarJogo}>+ ADD Jooj</Button>
                         </DialogActions>
 

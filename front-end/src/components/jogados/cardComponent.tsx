@@ -56,11 +56,13 @@ export default function CardComponent({ id, name, hours_played, hours_expected, 
             <CardContent className='h-[40%] w-full p-2 flex flex-col justify-start items-start overflow-auto gap-3'>
 
                 <CardTitle className='text-white text-[14px] md:text-base border-b-2 w-full'>
-                    {`${name} (${release_year})` }
+                    {`${name} (${release_year})`}
                 </CardTitle>
 
                 <div className='flex w-full gap-x-2'>
-                    <CardDescription className='text-white text-[14px] md:text-base border-b-2 w-40 flex justify-center items-end'>{hours_played}{Number(hours_played) <= 1 ? ' hora' : ' horas'} </CardDescription>
+                    <CardDescription className='text-white text-[14px] md:text-base border-b-2 w-40 flex justify-center items-end'>
+                        {hours_played}{Number(hours_played) <= 1 ? ' hora' : ' horas'} {` / ${hours_expected}`}
+                    </CardDescription>
 
                     <CardDescription className={`text-white text-[14px] md:text-base font-bold border-b-2 flex justify-center items-end w-full`}>
                         {/* {replayed === 'Rejogado' ? 'Rejogado: ✅ Sim' :   'Rejogado: ❌ Não' } */}

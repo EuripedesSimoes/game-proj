@@ -1,65 +1,61 @@
-import { useState, type SetStateAction } from 'react'
+import { useEffect, useState, type SetStateAction } from 'react'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { useQueryClient } from '@tanstack/react-query';
 import API from '@/services/gameApiServices';
 // import { FaRegWindowClose } from 'react-icons/fa';
-import { FaPencilAlt, FaEraser, FaTrash, FaTrashAlt } from "react-icons/fa";
+import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
 import { allPlatforms, allStatus, allGenres, allPriorities, isReplayedList } from '@/services/listasParaFiltro';
 import type { GamePayload3 } from '@/interfaces/gameDataTypes';
 import { collection, doc, getFirestore, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod';
 import { gameToPlaySchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/gameFormSchemas'
 import { FaClock } from 'react-icons/fa';
+
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/services/firebaseConfig';
+import { getStorage } from 'firebase/storage';
 
 type AttProps = {
     gameId: any;
     data: {
         id: string
         name: string;
-        hours_played?: number | string;
-        hours_expected?: number | string;
+        // hours_played?: number | string;
+        hours_expected: number | string | undefined;
         priority: string;
         platform: string;
         genre: string;
         status: string;
         replayed: string;
-        is_completed?: boolean;
         release_year: number | string;
-        year_started?: number | string;
-        year_finished?: number | string;
+        // year_started?: number | string;
+        // year_finished?: number | string;
         background_image?: string;
     };
 }
 
 export type FormData = z.infer<typeof gameToPlaySchema>;
 
-// OK-passar pra algum helper ou coisa assim
-
 const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
 
-    // OK-passar essas listas pra algum helper ou coisa assim
-    // const allPlatforms,etc
-
-    const { register, handleSubmit, formState: { errors }, control, reset, watch, setValue } = useForm<FormData>({
+    const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm<FormData>({
         resolver: zodResolver(gameToPlaySchema),
+
+        defaultValues: {
+            hours_expected: data?.hours_expected ? Number(data.hours_expected) : undefined,
+        }
     })
-
-    const queryClient = useQueryClient() // <--- novo
-
-    const [open, setOpen] = useState(false);
-    const FBhandleClickOpen = () => setOpen(true)
-    const FBhandleClose = () => setOpen(false)
 
     // PASSAR PARA O ARQUIVO formAddGame.tsx 
     const [nome_jogo, setNome_jogo] = useState<string>(data?.name || '')
-    const [hours_expected, setHours_expected] = useState<number | string>(data?.hours_expected || '')
+    // const [hours_expected, setHours_expected] = useState<number | string>(data?.hours_expected || '')
     const [priority, setPriority] = useState(data?.priority || '')
     const [platform, setPlatform] = useState<string>(data?.platform || '')
     const [genre, setGenre] = useState<string>(data?.genre || '')
@@ -67,6 +63,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
     const [release_year, setRelease_year] = useState<number | string>(data?.release_year || '')
     // const [background_image, setBackground_image] = useState<string>(data?.background_image || '')
 
+    const queryClient = useQueryClient() // <--- novo
 
     const firebaseConfig = {
         apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
@@ -76,12 +73,27 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp)
-    const jogosParaJogarColeRef = collection(db, 'jogos-para-jogar') // referência à coleção 'jogos-para-jogar' no Firestore
+    // const storage = getStorage(firebaseApp);
+    // const jogosParaJogarColeRef = collection(db, 'jogos-para-jogar') // referência à coleção 'jogos-para-jogar' no Firestore
+
+    // 1. Obter o usuário logado
+    const [user] = useAuthState(auth);; // Assume que useAuth() retorna o objeto de usuário
 
     const onSubmit = async (data: FormData) => {
+
+        if (!user?.uid) {
+            alert("Você precisa estar logado para adicionar jogos!");
+            return;
+        }
+        alert('Alterando informações de jogo para jogar no futuro para o usuário: ' + user.displayName + '\n' + 'de nome: ' + user.displayName);
+
+        // 2. Criar a referência da subcoleção
+        // collection(db, 'users', user.uid, 'joojs') aponta para users/{uid}/jogos-para-jogar
+        const userJogosParaJogarCollectionRef = collection(db, 'users', user.uid, 'jogos-para-jogar');
+
         try {
-            await updateDoc(doc(jogosParaJogarColeRef, gameId), data as any)
-            queryClient.invalidateQueries({ queryKey: ['jogos-para-jogar'] })
+            queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos-para-jogar'] })
+            await updateDoc(doc(userJogosParaJogarCollectionRef, gameId), data as any)
             // resetarForm()
             reset()
             FBhandleClose()
@@ -89,36 +101,25 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
             console.error('Erro ao salvar jogo:', err)
         }
     }
+    useEffect(() => {
+        reset({
+            hours_expected: data?.hours_expected ? Number(data.hours_expected) : undefined,
+        })
+    }, [data, reset]) // Executa quando 'data' muda
 
-    // resquiscios de um tempo
-    // async function fbAtualizarJogo(e?: React.MouseEvent<HTMLButtonElement>) {
-    //     e?.preventDefault();
+    const [open, setOpen] = useState(false);
+    const FBhandleClickOpen = () => setOpen(true)
+    const FBhandleClose = () => setOpen(false)
 
-    //     const payload: GamePayload3 = {
-    //         name: nome_jogo, //'Octopath Traveler',
-    //         hours_expected: hours_expected !== '' ? hours_expected : '0', //60,
-    //         priority: priority,
-    //         platform: platform, //'Switch',   SELECT AQUI COM VÁRIAS OPÇÕES
-    //         genre: genre, // 'JPRG',   SELECT AQUI COM VÁRIAS OPÇÕES
-    //         //is_completed: is_completed , //false,
-    //         release_year: release_year || '', // 2017,
-    //         status: status, //'In Progress',
-    //         replayed: replayed, // Não
-    //         background_image: background_image, //''
-    //     }
-    //     await updateDoc(doc(jogosParaJogarColeRef, gameId), payload)
-    //     // <--- invalida a query e força refetch automático
-    //     queryClient.invalidateQueries({ queryKey: ['jogos-para-jogar'] })
-    //     FBhandleClose() // fecha o dialog
-    // }
+
     // Usando o watch() para ler os valores:
-    const nomeJogo = watch('name')
+    // const nomeJogo = watch('name')
     const horasEsperadas = watch('hours_expected')
-    const prioridade = watch('priority')
-    const rejogado = watch('replayed')
-    const plataforma = watch('platform')
-    const genero = watch('genre')
-    const anoLancado = watch('release_year')
+    // const anoLancado = watch('release_year')
+    // const prioridade = watch('priority')
+    // const rejogado = watch('replayed')
+    // const plataforma = watch('platform')
+    // const genero = watch('genre')
     const imagemFundo = watch('background_image')
 
     return (
@@ -193,7 +194,11 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                                     type="text"
                                     variant="standard"
                                     value={horasEsperadas === 0 ? "" : horasEsperadas}
-                                    onChange={(e) => setHours_expected(e.target.value)}
+                                    onChange={(e) => {
+                                        const cleanedValue = e.target.value.replace(/\D/g, "");
+                                        // Se o usuário apagar tudo, você pode decidir se deixa vazio ou coloca 0
+                                        setValue('hours_expected', cleanedValue === "" ? 0 : Number(cleanedValue));
+                                    }}
                                 />
                                 {errors.hours_expected?.message && <p className='text-sm font-medium text-red-600'>{errors.hours_expected?.message}</p>}
                             </div>

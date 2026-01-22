@@ -17,30 +17,38 @@ import { Spinner } from '../ui/spinner';
 import AddGameModalParaJogar from './modalAddJogoParaJogar';
 import CardComponentParaJogar from './cardComponentParaJogar';
 
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
-    authDomain: "my-game-list-6fd0f.firebaseapp.com",
-    projectId: "my-game-list-6fd0f",
-    // storageBucket: "my-game-list-6fd0f.firebasestorage.app",
-    // messagingSenderId: "982341506588",
-    // appId: "1:982341506588:web:ac89acb8295ac1c78531d9"
-};
-
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/services/firebaseConfig';
 
 export default function AppParaJogar() {
-    
+
     const queryClient = useQueryClient()
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
+        authDomain: "my-game-list-6fd0f.firebaseapp.com",
+        projectId: "my-game-list-6fd0f",
+    };
+
+    // Initialize Firebase
+    const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp)
-    const jogosParaJogarColeRef = collection(db, 'jogos-para-jogar') // referência à coleção 'jogos-para-jogar' no Firestore
+
+    // 1. Obter o usuário logado
+    const [user] = useAuthState(auth);; // Assume que useAuth() retorna o objeto de usuário
+
+    if (!user?.uid) {
+        return;
+    }
+    // 2. Criar a referência da subcoleção
+    // const jogosParaJogarColeRef = collection(db, 'jogos-para-jogar') // referência à coleção 'jogos-para-jogar' no Firestore
+    const userJogosParaJogarCollectionRef = collection(db, 'users', user.uid, 'jogos-para-jogar');
 
     // Função para buscar jogos usando React Query
     const fetchJogosParaJogar = async () => {
         try {
-            const data = await getDocs(jogosParaJogarColeRef)
+            const data = await getDocs(userJogosParaJogarCollectionRef)
             return data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
         } catch (err) {
             console.error('Erro ao buscar jogos do Firebase:', err)
@@ -50,26 +58,25 @@ export default function AppParaJogar() {
 
     // useQuery para gerenciar o estado e cache dos jogos
     const { data: users = [], isLoading: isFetching, isError } = useQuery({
-        queryKey: ['jogos-para-jogar'],
+        queryKey: ['users', user.uid, 'jogos-para-jogar'],  // Atualizado para incluir o UID do usuário
         queryFn: fetchJogosParaJogar,
     })
 
     async function fbDeletajooj(id: string) {
-        await deleteDoc(doc(jogosParaJogarColeRef, id))
+        if (!user?.uid) {
+            return;
+        }
+        await deleteDoc(doc(userJogosParaJogarCollectionRef, id))
         // Invalidar a query para forçar um refetch
-        queryClient.invalidateQueries({ queryKey: ['jogos-para-jogar'] })
+        queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos-para-jogar'] })  // Já consistente, mas agora a queryKey corresponde
     }
-
-    // const joojsCollection = dbFirebase.collection('meu joojs');
-
 
     const [filter, setFilter] = useState('')
     const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({}) // estado com filtros por categoria
     const [sortBy, setSortBy] = useState<'name' | 'hours_played'>('name') // novo estado
 
     const categoryToField: Record<string, string> = {
-
-        'Plataforma': 'platform',   // ajuste se no seu db.json o campo for outro
+        'Plataforma': 'platform',   // ajustar se no db.json o campo for outro
         'Gênero': 'genre',
         'Status': 'status',
         'Prioridade': 'priority',
@@ -123,7 +130,7 @@ export default function AppParaJogar() {
         <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
             <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
             <AddGameModalParaJogar />
-            <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} isGameReplayed={false}/>
+            <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} isGameReplayed={false} />
 
 
             {isFetching ?

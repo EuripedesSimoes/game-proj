@@ -24,7 +24,7 @@ type dadosJogos = {
     deletajooj: (id: string) => Promise<void>
 }
 
-export default function CardComponentParaJogar({ id, name, hours_expected, priority, platform, genre, status, replayed, release_year,  background_image, deletajooj }: dadosJogos) {
+export default function CardComponentParaJogar({ id, name, hours_expected, priority, platform, genre, status, replayed, release_year, background_image, deletajooj }: dadosJogos) {
 
 
     return (
@@ -37,7 +37,7 @@ export default function CardComponentParaJogar({ id, name, hours_expected, prior
                     </span>
                 </Button>
                 {/* COLOCAR AQUI A FUNÇÃO DE ABRIR O MODAL */}
-                <AttGameModalParaJogar gameId={id} data={{ id, name, hours_expected, platform, genre, release_year, status, replayed, priority, background_image }} />
+                <AttGameModalParaJogar gameId={id} data={{ id, name, hours_expected, platform, genre, release_year, status, replayed, priority, background_image }} /> {/* excluir aqui esses itens de data */}
             </div>
 
             <img
@@ -49,11 +49,13 @@ export default function CardComponentParaJogar({ id, name, hours_expected, prior
             <CardContent className='h-[40%] w-full p-2 flex flex-col justify-start items-start overflow-auto gap-3'>
 
                 <CardTitle className='text-white text-[14px] md:text-base border-b-2 w-full'>
-                    {`${name} (${release_year})` }
+                    {`${name} (${release_year})`}
                 </CardTitle>
 
                 <div className='flex w-full gap-x-2'>
-                    <CardDescription className='text-white text-[14px] md:text-base border-b-2 w-40 flex justify-center items-end'>{hours_expected}{Number(hours_expected) <= 1 ? ' hora' : ' horas'} </CardDescription>
+                    <CardDescription className='text-white text-[14px] md:text-base border-b-2 w-40 flex justify-center items-end'>
+                        {hours_expected}{Number(hours_expected) <= 1 ? ' hora' : ' horas'}
+                    </CardDescription>
 
                     <CardDescription className={`text-white text-[14px] md:text-base font-bold border-b-2 flex justify-center items-end w-full`}>
                         {/* {replayed === 'Rejogado' ? 'Rejogado: ✅ Sim' :   'Rejogado: ❌ Não' } */}

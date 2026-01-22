@@ -18,6 +18,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod';
 import { gameAttSchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/gameFormSchemas'
 
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/services/firebaseConfig';
+import { getStorage } from 'firebase/storage';
+
 type AttProps = {
     gameId: any;
     data: {
@@ -30,7 +34,6 @@ type AttProps = {
         genre: string;
         status: any;
         replayed: string
-        // is_completed: boolean;
         release_year: number | string | undefined;
         year_started: number | string | undefined;
         year_finished?: number | string | undefined;
@@ -42,7 +45,7 @@ export type FormData = z.infer<typeof gameAttSchema>;
 
 const AttGameModal = ({ gameId, data }: AttProps) => {
 
-    const { register, handleSubmit, formState: { errors }, control, reset, watch, setValue } = useForm<FormData>({
+    const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm<FormData>({
         resolver: zodResolver(gameAttSchema),
 
         defaultValues: {
@@ -71,17 +74,31 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp)
-    const jogosColeRef = collection(db, 'joojs') // referência à coleção 'joojs' no Firestore
+    // const storage = getStorage(firebaseApp);
+    //const jogosColeRef = collection(db, 'joojs') // referência à coleção 'joojs' no Firestore
+
+    // 1. Obter o usuário logado
+    const [user] = useAuthState(auth);; // Assume que useAuth() retorna o objeto de usuário
 
     // onSubmit receberá dados já validados pelo Zod via react-hook-form
     const onSubmit = async (data: FormData) => {
+
+        if (!user?.uid) {
+            alert("Você precisa estar logado para adicionar jogos!");
+            return;
+        }
+        alert('Salvando jogo para o usuário: ' + user.uid + 'de nome: ' + user.displayName);
+
+        // 2. Criar a referência da subcoleção
+        // collection(db, 'users', user.uid, 'joojs') aponta para users/{uid}/joojs
+        const userJogosCollectionRef = collection(db, 'users', user.uid, 'jogos');
+
         try {
-            queryClient.invalidateQueries({ queryKey: ['joojs'] })
-            await updateDoc(doc(jogosColeRef, gameId), data as any)
-            reset()
+            queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos'] })
+            await updateDoc(doc(userJogosCollectionRef, gameId), data as any)
             // resetarForm()
+            reset()
             handleClose()
-            // if (status !== 'Finalizado') return year_finished === "Sem nome"
         } catch (err) {
             console.error('Erro ao salvar jogo:', err)
         }
@@ -105,9 +122,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
 
     const [open, setOpen] = useState(false);
-    const handleClickOpen = () =>
-        setOpen(true)
-
+    const handleClickOpen = () => setOpen(true)
     const handleClose = () => setOpen(false)
 
     // Usando o watch() para ler os valores:
@@ -141,8 +156,6 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
     }, [statusJogo, setValue, anoFinalizado]);
     // Nota sobre o Firebase: Ao enviar "Sem ano", o Firebase salvará como string. 
     // Se preferir economizar espaço, você pode transformar "Sem ano" em null dentro da função onSubmit antes de enviar para a API.
-
-
 
     return (
         <>

@@ -17,6 +17,8 @@ import { getFirestore, getDocs, collection, deleteDoc, doc } from 'firebase/fire
 import ZodAddGameModal from './components/jogados/ZODmodalAddJogo.tsx';
 import { firebaseApp } from './services/firebaseConfig.ts';
 
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/services/firebaseConfig';
 
 export default function App() {
   // const { data, isError, isFetching } = useExternaGameData()
@@ -28,33 +30,46 @@ export default function App() {
 
   const queryClient = useQueryClient()
   const db = getFirestore(firebaseApp)
-  const jogosColeRef = collection(db, 'joojs') // referência à coleção 'jogos-para-jogar' no Firestore
+  //const jogosColeRef = collection(db, 'joojs') // referência à coleção 'jogos-para-jogar' no Firestore
 
+  // 1. Obter o usuário logado
+  const [user] = useAuthState(auth);; // Assume que useAuth() retorna o objeto de usuário
 
-     // Função para buscar jogos usando React Query
-    const fetchJogosFB = async () => {
-        try {
-            const data = await getDocs(jogosColeRef)
-            return data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-        } catch (err) {
-            console.error('Erro ao buscar jogos do Firebase:', err)
-            throw err
-        }
+  if (!user?.uid) {
+    return;
+  }
+
+  // 2. Criar a referência da subcoleção
+  // collection(db, 'users', user.uid, 'joojs') aponta para users/{uid}/joojs
+  const userJogosCollectionRef = collection(db, 'users', user.uid, 'jogos');
+
+  // Função para buscar jogos usando React Query
+  const fetchJogosFB = async () => {
+    try {
+      const data = await getDocs(userJogosCollectionRef)
+      return data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+    } catch (err) {
+      console.error('Erro ao buscar jogos do Firebase:', err)
+      throw err
     }
+  }
 
-    // useQuery para gerenciar o estado e cache dos jogos
-    const { data: data = [], isLoading: isFetching, isError } = useQuery({
-        queryKey: ['joojs'],
-        queryFn: fetchJogosFB,
-    })
+  // useQuery para gerenciar o estado e cache dos jogos
+  const { data: data = [], isLoading: isFetching, isError } = useQuery({
+    queryKey: ['users', user.uid, 'jogos'],
+    queryFn: fetchJogosFB,
+  })
 
-    async function fbDeletajooj(id: string) {
-        await deleteDoc(doc(jogosColeRef, id))
-        // Invalidar a query para forçar um refetch automático
-        queryClient.invalidateQueries({ queryKey: ['joojs'] })
+  async function fbDeletajooj(id: string) {
+    if (!user?.uid) {
+      return;
     }
+    await deleteDoc(doc(userJogosCollectionRef, id))
+    // Invalidar a query para forçar um refetch automático
+    queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos'] })
+  }
 
-  //   async function deletaJooj(id: string) {
+  //   async function deletaJooj(id: string) {'users', user.uid, 'jogos'
   //   // const deleted = await API.deletarJogo(id)
   //   // <--- invalida a query e força refetch automático
   //   queryClient.invalidateQueries({ queryKey: ['joojs'] })
@@ -62,13 +77,12 @@ export default function App() {
   // }
 
   const categoryToField: Record<string, string> = {
-    'Plataforma': 'platform',   // ajuste se no seu db.json o campo for outro
+    'Plataforma': 'platform',   // ajustar se no db.json o campo for outro
     'Gênero': 'genre',
     'Status': 'status',
     'Prioridade': 'priority',
     'Rejoga(n)do?': 'replayed',
   }
-
 
   const filteredGames = useMemo(() => {
     const list = (data ?? []) as myGamesApiInterface[]
@@ -103,11 +117,11 @@ export default function App() {
 
   // const filterMyGames = (data ?? []).filter((game: myGamesApiInterface) =>
   //   game.name.toLowerCase().includes(filter.toLowerCase())
-    // || game.hours_played
-    // || setBtnFilter.toLowerCase().includes(filter.toLowerCase())
-    //   || game.released.toLowerCase().includes(filter.toLowerCase())
-    //   || game.released.substring(0, 4).toLowerCase().includes(filter.toLowerCase()),
-    //   setTimeout(() => { }, 1000),
+  // || game.hours_played
+  // || setBtnFilter.toLowerCase().includes(filter.toLowerCase())
+  //   || game.released.toLowerCase().includes(filter.toLowerCase())
+  //   || game.released.substring(0, 4).toLowerCase().includes(filter.toLowerCase()),
+  //   setTimeout(() => { }, 1000),
   // )
 
 

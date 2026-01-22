@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-import { Link, useNavigate, Navigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 import { Button } from "@/components/ui/button"
 
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { auth, firebaseApp } from "@/services/firebaseConfig";
+import { auth } from "@/services/firebaseConfig";
 import { updateProfile } from "firebase/auth";
 
 // import react_logo from 'src/assets/react.svg'
@@ -33,17 +33,10 @@ export function Register() {
 
                 // 2. Extrai as informações atualizadas
                 const token = await res.user.getIdToken();
-
-                // // Agora o res.user.displayName já terá o valor correto
-                // const userData = {
-                //     email: res.user.email,
-                //     uid: res.user.uid,
-                //     displayName: userName // Usamos a variável do estado para garantir
-                // };
                 const userData = { email: res.user.email, uid: res.user.uid };
                 const userNameData = { displayName: res.user.displayName }
 
-                // Salva no localStorage
+                // 3. Salva no localStorage
                 localStorage.setItem('token', token);
                 localStorage.setItem('user', JSON.stringify(userData));
                 localStorage.setItem('userName', JSON.stringify(userNameData));

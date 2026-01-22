@@ -26,9 +26,11 @@ export function Login() {
         const res = await signInWithEmailAndPassword(email, password);
 
         if (res) {
+            // 1. Extrai as informações atualizadas
             const token = await res.user.getIdToken();
             const userData = { email: res.user.email, uid: res.user.uid };
 
+            // 2. Pega do localStorage
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(userData));
 
@@ -52,8 +54,6 @@ export function Login() {
         const email = userAtual.email;
         const photoURL = userAtual.photoURL;
         const token =  userAtual.getIdToken()
-        // const token = userAtual.acessToken;
-        // const emailVerified = userAtual.emailVerified;
         const uid = userAtual.uid;
         console.log(
             ` email: ${email}` + "\n" +
@@ -63,6 +63,7 @@ export function Login() {
             ` token : ${token} `
         )
     }
+
     return (
         <>
             {loading ? <div className="w-screen h-screen flex flex-col items-center justify-center bg-slate-400/40">

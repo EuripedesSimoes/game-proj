@@ -87,9 +87,21 @@ export const gameSchema = z.object({
     year_finished: finishedFieldValue.optional(),
 
     // background_image: z.instanceof(FileList).optional(),
+    // background_image: z.string().optional()
     
-    background_image: z.string().optional(),
-    gameImageInput: z.string().optional(),
+    // background_image: z
+    // .any()
+    // .transform((files) => (files instanceof FileList ? files[0] : files))
+    // // .refine((file) => {
+    // //   if (!file) return true; // Permite opcional
+    // //   return file.size <= 5000000; // Exemplo: limite 5MB
+    // // }, "O arquivo deve ter no máximo 5MB")
+    // .refine((file) => {
+    //   if (!file) return true;
+    //   return ['image/jpeg', 'image/png', 'image/webp'].includes(file.type);
+    // }, "Somente arquivos .jpg, .png ou .webp são aceitos")
+    // .optional(),
+    // gameImageInput: z.string().optional(),
 })
     .superRefine((data, ctx) => {
         const hasFinished = typeof data.year_finished === 'number' && data.year_finished < 2026
