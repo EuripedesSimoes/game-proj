@@ -2,64 +2,83 @@ import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { useQueryClient } from '@tanstack/react-query';
-import API from '@/services/gameApiServices';
-// import { FaRegWindowClose } from 'react-icons/fa';
+// import API from '@/services/gameApiServices';
+// import type { GamePayload2 } from '@/interfaces/gameDataTypes';
 import { RiCloseCircleLine } from "react-icons/ri";
+import { FaClock } from 'react-icons/fa';
 import Select from '@mui/material/Select';
 import { allPriorities, allPlatforms, allStatus, allGenres, isReplayedList } from '@/services/listasParaFiltro';
-import type { GamePayload2 } from '@/interfaces/gameDataTypes';
+
+import { useQueryClient } from '@tanstack/react-query';
 import { addDoc, collection, getFirestore } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
-import { useForm, Controller } from 'react-hook-form'
+
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod';
 import { gameSchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/gameFormSchemas'
 // import { ms } from 'zod/v4/locales';
-import { FaClock } from 'react-icons/fa';
 
-// OK-passar pra algum helper ou coisa assim
-type Props = {
-    isGame?: boolean
-}
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, firebaseConfig } from '@/services/firebaseConfig';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 
 export type FormData = z.infer<typeof gameSchema>;
 
 export default function ZodAddGameModal() {
 
-
-    const { register, handleSubmit, formState: { errors }, control, reset, watch, setValue } = useForm<FormData>({
+    const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm<FormData>({
         resolver: zodResolver(gameSchema),
     })
 
-    function resetarForm() {
-        // alert(anoFin)
-        reset({
-            priority: null
-        });
-    }
-
     const queryClient = useQueryClient() // <--- novo
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
-        authDomain: "my-game-list-6fd0f.firebaseapp.com",
-        projectId: "my-game-list-6fd0f",
-    };
-
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp)
-    const jogosParaJogar = collection(db, 'joojs') // referência à coleção 'jogos-para-jogar' no Firestore
+    // const jogosParaJogar = collection(db, 'joojs') // referência à coleção 'jogos-para-jogar' no Firestore
+
+    // 1. Obter o usuário logado
+    const [user] = useAuthState(auth);; // Assume que useAuth() retorna o objeto de usuário
 
     // onSubmit receberá dados já validados pelo Zod via react-hook-form
     const onSubmit = async (data: FormData) => {
+
+        if (!user?.uid) {
+            alert("Você precisa estar logado para adicionar jogos!");
+            return;
+        }
+        alert('Salvando jogo para o usuário: ' + user.displayName + '\n' + 'de nome: ' + user.displayName);
+
+        // 2. Criar a referência da subcoleção
+        // collection(db, 'users', user.uid, 'joojs') aponta para users/{uid}/joojs
+        const userJogosCollectionRef = collection(db, 'users', user.uid, 'jogos');
+
         try {
-            await addDoc(jogosParaJogar, data as any)
+            let finalImageUrl = "";
+
+            // 1. Se o usuário escolheu uma imagem, fazemos o upload agora
+            if (imageFile) {
+                const storage = getStorage();
+                const storageRef = ref(storage, `users/${user.uid}/jogos/${Date.now()}_${imageFile.name}`);
+
+                // AGUARDA o upload terminar
+                const snapshot = await uploadBytes(storageRef, imageFile);
+
+                // PEGA o link permanente da imagem no Firebase
+                finalImageUrl = await getDownloadURL(snapshot.ref);
+            }
+
+            await addDoc(userJogosCollectionRef, {
+                ...data,
+                background_image: finalImageUrl // Link que funciona em qualquer lugar
+            });
             reset()
-            // resetarForm()
+            setImageFile(null);
+            setPreviewURL(null);
             handleClose()
-            queryClient.invalidateQueries({ queryKey: ['joojs'] })
-        } catch (err) {
+            queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos'] })
+        }
+        catch (err) {
             console.error('Erro ao salvar jogo:', err)
         }
     }
@@ -72,11 +91,10 @@ export default function ZodAddGameModal() {
     const horasEsperada = watch("hours_expected");
     const anoLancado = watch("release_year");
     const anoStartado = watch("year_started");
-    const anoFin = watch("year_finished");
-    const pri = watch('priority')
+    // const anoFin = watch("year_finished");
+    // const pri = watch('priority')
     const statusWatch = watch('status')
-    const gameIMG = watch('gameImageInput')
-
+    // const gameIMG = watch('background_image')
     const anoFinalizado = watch('year_finished')
 
     useEffect(() => {
@@ -94,7 +112,22 @@ export default function ZodAddGameModal() {
         }
     }, [statusWatch, setValue, anoFinalizado]);
 
-    // console.log('anofin', anoFin)
+    const [projectImage, setProjectImage] = useState<string | null>(null)
+    const [imageFile, setImageFile] = useState<File | null>(null); // Guardamos o ARQUIVO real
+    const [previewURL, setPreviewURL] = useState<string | null>(null); // Guardamos o PREVIEW (blob)
+
+    function triggerImageInput(id: string) {
+        document.getElementById('background_image')?.click();
+    }
+
+    function handleImageInput(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImageFile(file); // Salva o arquivo para usar no onSubmit
+            setPreviewURL(URL.createObjectURL(file)); // Gera o preview visual
+        }
+        return null
+    }
 
     return (
         <div className='w-full h-full flex flex-col justify-center items-center'>
@@ -122,7 +155,7 @@ export default function ZodAddGameModal() {
 
                         <div className='grid grid-cols-4 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
-                            <div className=' col-span-2'>
+                            <div className='col-span-2'>
                                 <TextField
                                     className='shadow-lg my-1'
                                     sx={{
@@ -147,7 +180,7 @@ export default function ZodAddGameModal() {
                                 {errors.name?.message && <p className='text-sm font-medium text-red-600'>{errors.name?.message}</p>}
                             </div>
 
-                            <div className=' col-span-1'>
+                            <div className='col-span-1'>
                                 <TextField
                                     className='shadow-lg my-1'
                                     sx={{
@@ -582,6 +615,26 @@ export default function ZodAddGameModal() {
                         </div>
 
                         <div>
+                            <div className='flex flex-row items-center gap-3 text-xs '>
+
+                                <div className='w-[150px] h-[150px] rounded-xl bg-black/60 overflow-hidden'>
+                                    {previewURL ? (
+                                        <img src={previewURL} className='object-cover object-center' />)
+                                        :
+                                        (<button type='button' onClick={() => triggerImageInput('background_image')} className='w-full h-full' >150x150</button>)
+                                    }
+                                </div>
+                                <button type='button' onClick={() => triggerImageInput('background_image')}>
+                                    <span>↑</span>
+                                    <span>Add imagens</span>
+                                </button>
+                                <input type="file" name="background_image" id="background_image" accept='image/*' className='hidden'
+                                    onChange={((ev) => setProjectImage(handleImageInput(ev)))} />
+
+                            </div>
+                        </div>
+
+                        {/* <div>
                             <TextField
                                 className='shadow-lg'
                                 sx={{
@@ -604,20 +657,37 @@ export default function ZodAddGameModal() {
                             />
 
                             {errors.background_image?.message && <p className='text-sm font-medium text-red-600'>{errors.background_image?.message}</p>}
-                        </div>
-                        <div className='flex flex-col items-center gap-3 text-xs '>
+                        </div> */}
 
-                            <div className='w-[100px] h-[100px] rounded-xl bg-black/60 overflow-hidden'>
-                                <button type='button' className='w-full h-full' >100x100</button>
-                            </div>
-                            <button type='button'>
-                                <span>↑</span>
-                                <span>Add imagens</span>
-                            </button>
-                            <input type="file" name="gameImageInput" id="gameImageInput" accept='image/*' className='' />
-                        </div>
 
-                        {errors.background_image?.message && <p className='text-sm font-medium text-red-600'>{errors.background_image?.message}</p>}
+                        {/* <div>
+                            <label htmlFor="background_image">
+                                <input
+                                    {...register('background_image')}
+                                    accept="image/*"
+                                    id="background_image"
+                                    type="file"
+                                    className="hidden" // Esconda o input padrão se quiser estilizar com botão
+                                />
+                                <Button variant="contained" component="span" fullWidth sx={{ mb: 1 }}>
+                                    Upload da Capa
+                                </Button>
+                            </label>
+
+                            {watch('background_image')?.[0] && (
+                                <p className="text-xs text-slate-500">{watch('background_image')[0].name}</p>
+                            )}
+
+                            {errors.background_image?.message && (
+                                <p className='text-sm font-medium text-red-600'>
+                                    {String(errors.background_image.message)}
+                                </p>
+                            )}
+                        </div> */}
+
+
+
+                        {/* {errors.background_image?.message && <p className='text-sm font-medium text-red-600'>{errors.background_image?.message}</p>} */}
 
                         {/* <div className='flex flex-col items-center gap-3 text-xs '>
                             <div className='w-[100px] h-[100px] rounded-xl bg-black/60 overflow-hidden'>

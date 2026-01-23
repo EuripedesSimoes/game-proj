@@ -1,26 +1,28 @@
-import { useEffect, useState, type SetStateAction } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { useQueryClient } from '@tanstack/react-query';
-import API from '@/services/gameApiServices';
+// import API from '@/services/gameApiServices';
+// import type { GamePayload3 } from '@/interfaces/gameDataTypes';
 // import { FaRegWindowClose } from 'react-icons/fa';
-import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
+// import { FaClock } from 'react-icons/fa';
+import { FaPencilAlt } from "react-icons/fa";
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
-import { allPlatforms, allStatus, allGenres, allPriorities, isReplayedList } from '@/services/listasParaFiltro';
-import type { GamePayload3 } from '@/interfaces/gameDataTypes';
+import { allPlatforms, allGenres, allPriorities, isReplayedList } from '@/services/listasParaFiltro';
+
+import { useQueryClient } from '@tanstack/react-query';
 import { collection, doc, getFirestore, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
+
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod';
-import { gameToPlaySchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/gameFormSchemas'
-import { FaClock } from 'react-icons/fa';
+import { gameToPlaySchema, normalizeOnlyNumbers } from '@/helpers/gameFormSchemas'
 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/services/firebaseConfig';
-import { getStorage } from 'firebase/storage';
+import { auth, firebaseConfig } from '@/services/firebaseConfig';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 type AttProps = {
     gameId: any;
@@ -65,12 +67,6 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
 
     const queryClient = useQueryClient() // <--- novo
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
-        authDomain: "my-game-list-6fd0f.firebaseapp.com",
-        projectId: "my-game-list-6fd0f",
-    };
-
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp)
     // const storage = getStorage(firebaseApp);
@@ -92,12 +88,32 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
         const userJogosParaJogarCollectionRef = collection(db, 'users', user.uid, 'jogos-para-jogar');
 
         try {
+            let finalImageUrl = "";
+
+            // 1. Se o usuário escolheu uma imagem, fazemos o upload agora
+            if (imageFile) {
+                const storage = getStorage();
+                const storageRef = ref(storage, `users/${user.uid}/jogos-para-jogar/${Date.now()}_${imageFile.name}`);
+
+                // AGUARDA o upload terminar
+                const snapshot = await uploadBytes(storageRef, imageFile);
+
+                // PEGA o link permanente da imagem no Firebase
+                finalImageUrl = await getDownloadURL(snapshot.ref);
+            }
+
             queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos-para-jogar'] })
-            await updateDoc(doc(userJogosParaJogarCollectionRef, gameId), data as any)
-            // resetarForm()
+            await updateDoc(doc(userJogosParaJogarCollectionRef, gameId), {
+                ...data,
+                background_image: finalImageUrl // Link que funciona em qualquer lugar
+            });
             reset()
+            setImageFile(null);
+            setPreviewURL(null);
             FBhandleClose()
-        } catch (err) {
+            queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos-para-jogar'] })
+        }
+        catch (err) {
             console.error('Erro ao salvar jogo:', err)
         }
     }
@@ -111,16 +127,24 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
     const FBhandleClickOpen = () => setOpen(true)
     const FBhandleClose = () => setOpen(false)
 
-
-    // Usando o watch() para ler os valores:
-    // const nomeJogo = watch('name')
     const horasEsperadas = watch('hours_expected')
-    // const anoLancado = watch('release_year')
-    // const prioridade = watch('priority')
-    // const rejogado = watch('replayed')
-    // const plataforma = watch('platform')
-    // const genero = watch('genre')
-    const imagemFundo = watch('background_image')
+
+    const [projectImage, setProjectImage] = useState<string | null>(null)
+    const [imageFile, setImageFile] = useState<File | null>(null); // Guardamos o ARQUIVO real
+    const [previewURL, setPreviewURL] = useState<string | null>(null); // Guardamos o PREVIEW (blob)
+
+    function triggerImageInput(id: string) {
+        document.getElementById('background_image')?.click();
+    }
+
+    function handleImageInput(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImageFile(file); // Salva o arquivo para usar no onSubmit
+            setPreviewURL(URL.createObjectURL(file)); // Gera o preview visual
+        }
+        return null
+    }
 
     return (
         <>
@@ -522,39 +546,22 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                         </div>
 
                         <div className='flex flex-row justify-between relative'>
-                            <TextField
-                                className='shadow-lg'
-                                sx={{
-                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-                                    '& .MuiOutlinedInput-root': {
-                                        '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                        '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                        '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                    },
-                                }}
-                                {...register('background_image')}
-                                margin="dense"
-                                fullWidth
-                                id="background_image"
-                                name="background_image"
-                                label="Foto da Capa (URL)"
-                                type="text"
-                                variant="standard"
-                                value={imagemFundo}
-                                onChange={
-                                    (e) => { setValue('background_image', e.target.value) }
-                                }
-                            />
-                            {errors.background_image?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.background_image?.message}</p>}
+                            <div className='flex flex-row items-center gap-3 text-xs '>
 
-                            <div className='absolute top-0 right-0 h-full focus:border-red-400'>
-                                <button type='button' className='h-full ' onClick={() => {
-                                    // setBackground_image('')
-                                    setValue('background_image', '')
-                                }}>
-                                    <FaTrashAlt size='28px' fill='red' />
+                                <div className='w-[150px] h-[150px] rounded-xl bg-black/60 overflow-hidden'>
+                                    {previewURL ? (
+                                        <img src={previewURL} className='object-cover object-center' />)
+                                        :
+                                        (<button type='button' onClick={() => triggerImageInput('background_image')} className='w-full h-full' >150x150</button>)
+                                    }
+                                </div>
+                                <button type='button' onClick={() => triggerImageInput('background_image')}>
+                                    <span>↑</span>
+                                    <span>Add imagens</span>
                                 </button>
+                                <input type="file" name="background_image" id="background_image" accept='image/*' className='hidden'
+                                    onChange={((ev) => setProjectImage(handleImageInput(ev)))} />
+
                             </div>
                         </div>
 

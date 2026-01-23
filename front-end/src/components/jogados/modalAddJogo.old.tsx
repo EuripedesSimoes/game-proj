@@ -15,6 +15,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { gameSchema, normalizeYear } from '@/helpers/gameFormSchemas'
 import { z } from 'zod';
+import { firebaseConfig } from '@/services/firebaseConfig';
 
 // OK-passar pra algum helper ou coisa assim
 type Props = {
@@ -62,12 +63,6 @@ export default function AddGameModal() {
         setBackground_image('')
         //handleClose() // fecha o dialog
     }
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
-        authDomain: "my-game-list-6fd0f.firebaseapp.com",
-        projectId: "my-game-list-6fd0f",
-    };
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp)

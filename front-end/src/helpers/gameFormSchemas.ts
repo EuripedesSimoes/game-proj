@@ -88,7 +88,7 @@ export const gameSchema = z.object({
 
     // background_image: z.instanceof(FileList).optional(),
     // background_image: z.string().optional()
-    
+
     // background_image: z
     // .any()
     // .transform((files) => (files instanceof FileList ? files[0] : files))
@@ -176,64 +176,58 @@ export const gameAttSchema = z.object({
     status: z.enum(["Finalizado", "Jogando", "Pausado", "Abandonado", "Não iniciado"]).optional(),
 
     release_year: z.number().min(1980, msgErro3).max(2026, msgErro3).optional(),
-
-    year_started: z.number().min(2000, msgErro2).max(2026, msgErro2).optional()
-    // .refine((val) => { val >= data.y })
-    ,
-
+    year_started: z.number().min(2000, msgErro2).max(2026, msgErro2).optional(),
     year_finished: finishedFieldValue.optional(),
-
-    background_image: z.string().optional(),
-    gameImageInput: z.string().optional()
+    // background_image: z.string().optional(),
 })
-        .superRefine((data, ctx) => {
-            const hasFinished = typeof data.year_finished === 'number' && data.year_finished < 2026
-            // const lancamentoNumber = typeof data.release_year === 'number'
+    .superRefine((data, ctx) => {
+        const hasFinished = typeof data.year_finished === 'number' && data.year_finished < 2026
+        // const lancamentoNumber = typeof data.release_year === 'number'
 
-            // 1.1. Released_year precisa ser igual ou menor que os outros dois
-            if (typeof data.release_year === 'number' && typeof data.year_started === 'number' && data.release_year > data.year_started)
-                ctx.addIssue({
-                    code: 'custom',
-                    message: "Ano de lançamento maior que ano iniciado",
-                    path: ["release_year"], // O erro aparecerá no campo released_year
-                })
-            // ctx.addIssue({
-            //     code: 'custom',
-            //     message: "Ano de lançamento maior que ano iniciado",
-            //     path: ["year_started"], // O erro aparecerá no campo released_year
-            // })
-            // 1.2. Released_year precisa ser igual ou menor que os outros dois
-            if (hasFinished && typeof data.release_year === 'number' && data.release_year > Number(data.year_finished))
-                ctx.addIssue({
-                    code: 'custom',
-                    message: "Ano de lançamento maior que ano finalizado",
-                    path: ["release_year"], // O erro aparecerá no campo released_year
-                })
-            // 2.2. Year_started precisa ser igual ou menor que o finished
-            if (hasFinished && typeof data.year_started === 'number' && data.year_started > Number(data.year_finished)) {
-                ctx.addIssue({
-                    code: 'custom',
-                    message: "Ano finalizado menor que ano de início",
-                    path: ["year_finished"], // O erro aparecerá no campo released_year
-                })
-            }
-            if (Number(data.year_finished) > 2026) {
-                ctx.addIssue({
-                    code: 'custom',
-                    message: "Ano maior que 2026",
-                    path: ["year_finished"], // O erro aparecerá no campo released_year
-                })
-            }
-        })
-        .refine((data) => {
-            if (data.status === "Finalizado" && data.year_finished === "Sem ano") {
-                return false; // Erro: Se finalizou, precisa de um ano
-            }
-            return true;
-        }, {
-            message: "Ano é obrigatório para jogos finalizados",
-            path: ["year_finished"]
-        })
+        // 1.1. Released_year precisa ser igual ou menor que os outros dois
+        if (typeof data.release_year === 'number' && typeof data.year_started === 'number' && data.release_year > data.year_started)
+            ctx.addIssue({
+                code: 'custom',
+                message: "Ano de lançamento maior que ano iniciado",
+                path: ["release_year"], // O erro aparecerá no campo released_year
+            })
+        // ctx.addIssue({
+        //     code: 'custom',
+        //     message: "Ano de lançamento maior que ano iniciado",
+        //     path: ["year_started"], // O erro aparecerá no campo released_year
+        // })
+        // 1.2. Released_year precisa ser igual ou menor que os outros dois
+        if (hasFinished && typeof data.release_year === 'number' && data.release_year > Number(data.year_finished))
+            ctx.addIssue({
+                code: 'custom',
+                message: "Ano de lançamento maior que ano finalizado",
+                path: ["release_year"], // O erro aparecerá no campo released_year
+            })
+        // 2.2. Year_started precisa ser igual ou menor que o finished
+        if (hasFinished && typeof data.year_started === 'number' && data.year_started > Number(data.year_finished)) {
+            ctx.addIssue({
+                code: 'custom',
+                message: "Ano finalizado menor que ano de início",
+                path: ["year_finished"], // O erro aparecerá no campo released_year
+            })
+        }
+        if (Number(data.year_finished) > 2026) {
+            ctx.addIssue({
+                code: 'custom',
+                message: "Ano maior que 2026",
+                path: ["year_finished"], // O erro aparecerá no campo released_year
+            })
+        }
+    })
+    .refine((data) => {
+        if (data.status === "Finalizado" && data.year_finished === "Sem ano") {
+            return false; // Erro: Se finalizou, precisa de um ano
+        }
+        return true;
+    }, {
+        message: "Ano é obrigatório para jogos finalizados",
+        path: ["year_finished"]
+    })
 
 export const gameToPlaySchema = z.object({
     name: z
@@ -258,9 +252,8 @@ export const gameToPlaySchema = z.object({
     platform: z.string().min(1, "Escolha a plataforma do jogo"),
     genre: z.string().min(1, "Escolha o gênero do jogo"),
 
-    background_image: z.string(),
+    // background_image: z.string(),
 })
-
 
 
 const hoursField = z.preprocess((val) => {
@@ -274,7 +267,6 @@ const hoursField = z.preprocess((val) => {
     if (typeof val === 'number') return val
     return 'Sem horas'
 }, z.union([z.literal('Sem horas'), z.number().positive()]))
-
 
 
 const yearSchema = z

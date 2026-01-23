@@ -18,18 +18,11 @@ import AddGameModalParaJogar from './modalAddJogoParaJogar';
 import CardComponentParaJogar from './cardComponentParaJogar';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/services/firebaseConfig';
+import { auth, firebaseConfig } from '@/services/firebaseConfig';
 
 export default function AppParaJogar() {
 
     const queryClient = useQueryClient()
-
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
-        authDomain: "my-game-list-6fd0f.firebaseapp.com",
-        projectId: "my-game-list-6fd0f",
-    };
 
     // Initialize Firebase
     const firebaseApp = initializeApp(firebaseConfig);
@@ -42,7 +35,6 @@ export default function AppParaJogar() {
         return;
     }
     // 2. Criar a referência da subcoleção
-    // const jogosParaJogarColeRef = collection(db, 'jogos-para-jogar') // referência à coleção 'jogos-para-jogar' no Firestore
     const userJogosParaJogarCollectionRef = collection(db, 'users', user.uid, 'jogos-para-jogar');
 
     // Função para buscar jogos usando React Query

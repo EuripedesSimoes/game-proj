@@ -40,7 +40,6 @@ export default function App() {
   }
 
   // 2. Criar a referência da subcoleção
-  // collection(db, 'users', user.uid, 'joojs') aponta para users/{uid}/joojs
   const userJogosCollectionRef = collection(db, 'users', user.uid, 'jogos');
 
   // Função para buscar jogos usando React Query

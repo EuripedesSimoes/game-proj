@@ -44,7 +44,7 @@ export default function CardComponent({ id, name, hours_played, hours_expected, 
                     </span>
                 </Button>
                 {/* COLOCAR AQUI A FUNÇÃO DE ABRIR O MODAL */}
-                <AttGameModal gameId={id} data={{ id, name, hours_played, hours_expected, platform, genre, release_year, status, replayed, priority, year_started, year_finished, background_image }} />
+                <AttGameModal gameId={id} data={{ id, name, hours_played, hours_expected, platform, genre, release_year, status, replayed, priority, year_started, year_finished }} />
             </div>
 
             <img
