@@ -1,0 +1,29 @@
+/* Light theme variables */
+:root {
+  --color-primary: 0 79 159;                    /* #004F9F */
+  --color-primary-variant: 25 118 210;          /* #1976d2 */
+  --color-secondary: 158 158 158;               /* #9E9E9E */
+  --color-secondary-variant: 194 194 194;       /* #C2C2C2 */
+  --color-tertiary: 97 97 97;                   /* #616161 */
+  --color-tertiary-variant: 117 117 117;        /* #757575 */
+  --color-text: 38 38 38;                       /* #262626 */
+  --color-text-variant: 38 38 38;               /* #262626 */
+  --color-background: 250 251 254;              /* #FAFBFE */
+  --color-background-variant: 250 251 254;      /* #FAFBFE */
+  --color-background-autofill: 245, 250, 254 ;  /* era #e8f0fe , agora é #dfe6ed*/
+}
+
+/* Dark theme variables */
+.dark {
+  --color-primary: 77 163 255;                  /* #4DA3FF */
+  --color-primary-variant: 25 118 210;          /* #1976D2 */
+  --color-secondary: 180 180 180;               /* #B4B4B4 */
+  --color-secondary-variant: 165 165 165;       /* #A5A5A5 */
+  --color-tertiary: 235 235 235;                /* #EBEBEB */
+  --color-tertiary-variant: 215 215 215;        /* #D7D7D7 */
+  --color-text: 158 158 158;                    /* #9E9E9E */
+  --color-text-variant: 250 251 254;            /* #FAFBFE */
+  --color-background: 45 45 45;                 /* #2B2B2B */
+  --color-background-variant: 38 38 38;         /* #262626 */
+  --color-background-autofill: 70 70 70;        /* #464646 */
+}

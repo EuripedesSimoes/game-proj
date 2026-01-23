@@ -22,7 +22,7 @@ import { gameSchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/gameF
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, firebaseConfig } from '@/services/firebaseConfig';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
+import '../../tailwindColors.css'
 
 export type FormData = z.infer<typeof gameSchema>;
 
@@ -166,6 +166,24 @@ export default function ZodAddGameModal() {
                                             '&:hover fieldset': { borderColor: '#64748b' }, // hover border
                                             '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
                                         },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     // autoFocus
                                     {...register('name')}
@@ -186,7 +204,29 @@ export default function ZodAddGameModal() {
                                     sx={{
                                         backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
                                         input: { color: '#3c3c3c', p: 1.2 }, // text-slate-100
-
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     {...register('hours_played', { valueAsNumber: true })}
                                     // error={!!errors.hours_played}
@@ -211,7 +251,29 @@ export default function ZodAddGameModal() {
                                     sx={{
                                         backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
                                         input: { color: '#3c3c3c', p: 1.2 }, // text-slate-100
-
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     {...register('hours_expected', { valueAsNumber: true })}
                                     // error={!!errors.hours_expected}
@@ -236,12 +298,13 @@ export default function ZodAddGameModal() {
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
                             <div className=' md:col-span-1'>
-                                <FormControl fullWidth variant="outlined" className='shadow-lg md:col-span-2' >
+                                <FormControl fullWidth variant="outlined" className='shadow-lg md:col-span-2 font-bold' >
                                     <InputLabel
                                         id="priority-label"
                                         sx={{
                                             '&.MuiInputLabel-shrink': {
-                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
                                             },
                                         }}
                                     >
@@ -249,18 +312,13 @@ export default function ZodAddGameModal() {
                                     </InputLabel>
                                     <Select
                                         {...register('priority')}
-                                        label="Prioridade"
+                                        label="Prioridade.."
                                         id="priority"
                                         name="priority"
                                         variant="outlined"
                                         // defaultValue={FieldValue}
-
-                                        // required
                                         sx={{
                                             p: 0.2,
-                                            "& .MuiSelect-icon": {
-                                                color: "black",
-                                            }
                                         }}
                                         MenuProps={{
                                             PaperProps: {
@@ -269,7 +327,7 @@ export default function ZodAddGameModal() {
                                                     "& .MuiMenuItem-root": {
                                                         opacity: '75%',
                                                         "&.Mui-selected": {
-                                                            backgroundColor: "#2e2e3e", // background do option selecionado
+                                                            backgroundColor: "#2e2e4e", // background do option selecionado
                                                             color: "white", //cor do texto do option selecionado
                                                             fontWeight: 'bold',
                                                             opacity: '100%',
@@ -298,11 +356,9 @@ export default function ZodAddGameModal() {
                                         )
                                         )}
                                     </Select>
-
                                 </FormControl>
 
                                 {errors.priority?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.priority?.message}</p>}
-                                {/* {pri === null && <p className='text-sm font-medium text-red-600 pt-1'>skibd</p>} */}
                             </div>
 
                             <div className=''>
@@ -312,7 +368,8 @@ export default function ZodAddGameModal() {
                                         id="replayed-label"
                                         sx={{
                                             '&.MuiInputLabel-shrink': {
-                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
                                             },
                                         }}
                                     >
@@ -320,16 +377,12 @@ export default function ZodAddGameModal() {
                                     </InputLabel>
                                     <Select
                                         {...register('replayed')}
-                                        label="Rejogado?"
+                                        label="Rejogado?.."
                                         id="replayed"
                                         name="replayed"
                                         variant="outlined"
-                                        // required
                                         sx={{
                                             p: 0.2,
-                                            "& .MuiSelect-icon": {
-                                                color: "black",
-                                            }
                                         }}
                                         MenuProps={{
                                             PaperProps: {
@@ -338,7 +391,7 @@ export default function ZodAddGameModal() {
                                                     "& .MuiMenuItem-root": {
                                                         opacity: '75%',
                                                         "&.Mui-selected": {
-                                                            backgroundColor: "#2e2e3e", // background do option selecionado
+                                                            backgroundColor: "#2e2e4e", // background do option selecionado
                                                             color: "white", //cor do texto do option selecionado
                                                             fontWeight: 'bold',
                                                             opacity: '100%',
@@ -368,6 +421,7 @@ export default function ZodAddGameModal() {
                                 </FormControl>
 
                                 {errors.replayed?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.replayed?.message}</p>}
+
                             </div>
 
                         </div>
@@ -380,7 +434,8 @@ export default function ZodAddGameModal() {
                                         id="plataforma-label"
                                         sx={{
                                             '&.MuiInputLabel-shrink': {
-                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
                                             },
                                         }}
                                     >
@@ -388,16 +443,15 @@ export default function ZodAddGameModal() {
                                     </InputLabel>
                                     <Select
                                         {...register('platform')}
-                                        label="Plataforma"
+                                        label="Plataforma.."
                                         id="platform"
                                         name="platform"
                                         variant="outlined"
                                         // className={`bg-yellow-200`}
                                         sx={{
-                                            // label:{ color: 'violet'},
-                                            "& .MuiSelect-icon": {
-                                                color: "black",
-                                            }
+                                            // "& .MuiSelect-icon": {
+                                            //     color: "black",
+                                            // },
                                         }}
                                         MenuProps={{
                                             PaperProps: {
@@ -408,7 +462,7 @@ export default function ZodAddGameModal() {
                                                         opacity: '75%',
                                                         //color: "white",  // já é branco por padrão
                                                         "&.Mui-selected": {
-                                                            backgroundColor: "#2e2e3e", // background do option selecionado
+                                                            backgroundColor: "#2e2e4e", // background do option selecionado
                                                             color: "white", //cor do texto do option selecionado
                                                             fontWeight: 'bold',
                                                             opacity: '100%',
@@ -418,7 +472,6 @@ export default function ZodAddGameModal() {
                                                             backgroundColor: "gray", // background do option ao passar mouse por cima
                                                             //color: "red", //cor do texto do option ao passar mouse por cima
                                                             fontWeight: 'bold',
-                                                            // opacity: '100%',
                                                         },
                                                     },
                                                 },
@@ -445,12 +498,12 @@ export default function ZodAddGameModal() {
 
                             <div>
                                 <FormControl fullWidth variant="outlined" className='shadow-lg' >
-
                                     <InputLabel
                                         id="genre-label"
                                         sx={{
                                             '&.MuiInputLabel-shrink': {
-                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
                                             },
                                         }}
                                     >
@@ -460,19 +513,37 @@ export default function ZodAddGameModal() {
                                         className='shadow-lg'
                                         sx={{
                                             backgroundColor: '#f1f5f9',
-                                            // p: 0.5,
                                             //input: { color: '#3c3c3c' }, // text-slate-100
                                             '& .MuiInputLabel-root': {
                                                 // color: '#2563eb',
                                             },
-                                            '& .MuiInputLabel-shrink': {
-                                                transform: 'translate(10px, -12px) scale(0.75)', // ajusta posição
-                                                //backgroundColor: '#fef08a', // mesma cor do fundo para não "cortar"
-                                                //padding: '0 4px', // cria espaço para a label não sobrepor a borda
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    backgroundColor: "#1c1c1c",
+                                                    // color: "red",  //muda nada
+                                                    "& .MuiMenuItem-root": {
+                                                        opacity: '75%',
+                                                        //color: "white",  // já é branco por padrão
+                                                        "&.Mui-selected": {
+                                                            backgroundColor: "#2e2e4e", // background do option selecionado
+                                                            color: "white", //cor do texto do option selecionado
+                                                            fontWeight: 'bold',
+                                                            opacity: '100%',
+                                                        },
+                                                        "&:hover": {
+                                                            // transform: "translateY(4px) time(0.9s)",  //muda nada
+                                                            backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                            //color: "red", //cor do texto do option ao passar mouse por cima
+                                                            fontWeight: 'bold',
+                                                        },
+                                                    },
+                                                },
                                             },
                                         }}
                                         {...register('genre')}
-                                        label="Gênero"
+                                        label="Gênero.."
                                         id="genre"
                                         name="genre"
                                         variant="outlined"
@@ -503,7 +574,8 @@ export default function ZodAddGameModal() {
                                         id="status-label"
                                         sx={{
                                             '&.MuiInputLabel-shrink': {
-                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
                                             },
                                         }}
                                     >
@@ -519,7 +591,7 @@ export default function ZodAddGameModal() {
                                         {...register('status')}
                                         id="status"
                                         name="status"
-                                        label="Status"
+                                        label="Status.."
                                         variant="outlined"
                                     >
                                         {allStatus.map((status) => (
@@ -537,13 +609,36 @@ export default function ZodAddGameModal() {
                         </div>
 
                         <div className='grid grid-cols-3 gap-4 mt-2 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+
                             <div>
                                 <TextField
                                     className='shadow-lg'
                                     sx={{
                                         backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
                                         input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     {...register('release_year', { valueAsNumber: true })}
                                     // autoFocus
@@ -565,7 +660,29 @@ export default function ZodAddGameModal() {
                                     sx={{
                                         backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
                                         input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     {...register('year_started', { valueAsNumber: true })}
                                     // autoFocus
@@ -587,7 +704,29 @@ export default function ZodAddGameModal() {
                                     sx={{
                                         backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
                                         input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     {...register("year_finished", {
                                         setValueAs: normalizeYear,
@@ -616,7 +755,6 @@ export default function ZodAddGameModal() {
 
                         <div>
                             <div className='flex flex-row items-center gap-3 text-xs '>
-
                                 <div className='w-[150px] h-[150px] rounded-xl bg-black/60 overflow-hidden'>
                                     {previewURL ? (
                                         <img src={previewURL} className='object-cover object-center' />)
@@ -630,102 +768,17 @@ export default function ZodAddGameModal() {
                                 </button>
                                 <input type="file" name="background_image" id="background_image" accept='image/*' className='hidden'
                                     onChange={((ev) => setProjectImage(handleImageInput(ev)))} />
-
                             </div>
                         </div>
 
-                        {/* <div>
-                            <TextField
-                                className='shadow-lg'
-                                sx={{
-                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-                                    '& .MuiOutlinedInput-root': {
-                                        '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                        '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                        '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                    },
-                                }}
-                                {...register('background_image')}
-                                margin="dense"
-                                fullWidth
-                                id="background_image"
-                                name="background_image"
-                                label="Foto da Capa (URL)"
-                                type="text"
-                                variant="standard"
-                            />
-
-                            {errors.background_image?.message && <p className='text-sm font-medium text-red-600'>{errors.background_image?.message}</p>}
-                        </div> */}
-
-
-                        {/* <div>
-                            <label htmlFor="background_image">
-                                <input
-                                    {...register('background_image')}
-                                    accept="image/*"
-                                    id="background_image"
-                                    type="file"
-                                    className="hidden" // Esconda o input padrão se quiser estilizar com botão
-                                />
-                                <Button variant="contained" component="span" fullWidth sx={{ mb: 1 }}>
-                                    Upload da Capa
-                                </Button>
-                            </label>
-
-                            {watch('background_image')?.[0] && (
-                                <p className="text-xs text-slate-500">{watch('background_image')[0].name}</p>
-                            )}
-
-                            {errors.background_image?.message && (
-                                <p className='text-sm font-medium text-red-600'>
-                                    {String(errors.background_image.message)}
-                                </p>
-                            )}
-                        </div> */}
-
-
-
-                        {/* {errors.background_image?.message && <p className='text-sm font-medium text-red-600'>{errors.background_image?.message}</p>} */}
-
-                        {/* <div className='flex flex-col items-center gap-3 text-xs '>
-                            <div className='w-[100px] h-[100px] rounded-xl bg-black/60 overflow-hidden'>
-                                <button type='button' className='w-full h-full' >{gameIMG || '100x100'}</button>
-                            </div>
-                            <TextField
-                                className='shadow-lg'
-                                sx={{
-                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-                                    '& .MuiOutlinedInput-root': {
-                                        '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                        '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                        '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                    },
-                                }}
-                                {...register('background_image')}
-                                margin="dense"
-                                fullWidth
-                                id="background_image"
-                                name="background_image"
-                                label="Foto da Capa (URL)"
-                                type="text"
-                                variant="standard"
-                            />
-                            <input {...register('background_image')} type="file" name="background_image" id="background_image" accept='image/*' className='' />
-
-                            {errors.background_image?.message && <p className='text-sm font-medium text-red-600'>{errors.background_image?.message}</p>}
-                        </div> */}
-
                         <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
                             {/* <Button className='max-[400px]:w-42 bg-red-500' onClick={resetarForm}>Resetar</Button> */}
-                            <Button className='max-[400px]:w-54' type="submit">+ ADD Jooj</Button>
+                            <Button className='max-[400px]:w-54' type="submit">+ Adicionar Jogo</Button>
                         </DialogActions>
 
                     </form>
                 </DialogContent>
             </Dialog>
-        </div>
+        </div >
     )
 }
