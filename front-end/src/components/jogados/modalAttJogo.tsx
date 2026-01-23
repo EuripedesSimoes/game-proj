@@ -12,7 +12,7 @@ import Select from '@mui/material/Select';
 import { allPlatforms, allStatus, allGenres, allPriorities, isReplayedList } from '@/services/listasParaFiltro';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { collection, doc, getFirestore, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getFirestore, updateDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 
 import { useForm } from 'react-hook-form'
@@ -22,7 +22,7 @@ import { gameAttSchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/ga
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, firebaseConfig } from '@/services/firebaseConfig';
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 
 type AttProps = {
     gameId: any;
@@ -39,7 +39,7 @@ type AttProps = {
         release_year: number | string | undefined;
         year_started: number | string | undefined;
         year_finished?: number | string | undefined;
-        // background_image?: string;
+        background_image?: string;
     };
 }
 
@@ -70,12 +70,74 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp)
-    //const jogosColeRef = collection(db, 'joojs') // referência à coleção 'joojs' no Firestore
 
     // 1. Obter o usuário logado
     const [user] = useAuthState(auth);; // Assume que useAuth() retorna o objeto de usuário
 
-    // onSubmit receberá dados já validados pelo Zod via react-hook-form
+    if (!user?.uid) {
+        alert("Você precisa estar logado para adicionar jogos!");
+        return;
+    }
+
+    // 1.1. Pegar o link da imagem atual do jogo
+    const gameDocRef = doc(db, 'users', user.uid, 'jogos', data?.id || gameId);
+    const [refreshImage, setRefreshImage] = useState(0);
+
+    // 1.1.2. Estado para armazenar a URL da imagem atual
+    const [currentBackgroundImage, setCurrentBackgroundImage] = useState<string | null>(null);
+
+    // 1.1.3. Função para buscar apenas o background_image do documento do jogo
+    const fetchImageFb = async () => {
+        try {
+            const docSnap = await getDoc(gameDocRef);
+            if (docSnap.exists()) {
+                const docData = docSnap.data();
+                return docData.background_image || null; // Retorna a URL ou null se não existir
+            }
+            return null;
+        } catch (err) {
+            console.error('Erro ao buscar imagem do Firebase:', err);
+            return null;
+        }
+    };
+
+    // 1.1.4. Adiciona refreshImage como dependência para forçar refetch
+    useEffect(() => {
+        const loadImage = async () => {
+            const imageUrl = await fetchImageFb();
+            setCurrentBackgroundImage(imageUrl);
+        };
+        loadImage();
+    }, [data?.id, refreshImage]);
+
+
+    // 1.1.5 No componente, criar um estado para o progresso, para a barra de progresso
+    const [progress, setProgress] = useState<number>(0);
+    const uploadImage = (file: File) => {
+        const storage = getStorage();
+        const storageRef = ref(storage, `users/${user.uid}/jogos/${Date.now()}_${file.name}`);
+
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        return new Promise<string>((resolve, reject) => {
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    // Cálculo da porcentagem
+                    const prog = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+                    setProgress(prog);
+                },
+                (error) => reject(error),
+                async () => {
+                    // Upload concluído, pega a URL final
+                    const url = await getDownloadURL(uploadTask.snapshot.ref);
+                    resolve(url);
+                }
+            );
+        });
+    };
+
+
+    // 2. onSubmit receberá dados já validados pelo Zod via react-hook-form
     const onSubmit = async (data: FormData) => {
 
         if (!user?.uid) {
@@ -84,8 +146,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
         }
         alert('Salvando jogo para o usuário: ' + user.uid + 'de nome: ' + user.displayName);
 
-        // 2. Criar a referência da subcoleção
-        // collection(db, 'users', user.uid, 'joojs') aponta para users/{uid}/joojs
+        // 2.1. Criar a referência da subcoleção
         const userJogosCollectionRef = collection(db, 'users', user.uid, 'jogos');
 
         try {
@@ -107,6 +168,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                 ...data,
                 background_image: finalImageUrl // Link que funciona em qualquer lugar
             });
+            setRefreshImage(prev => prev + 1);
             reset()
             setImageFile(null);
             setPreviewURL(null);
@@ -117,6 +179,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
             console.error('Erro ao salvar jogo:', err)
         }
     }
+
+    // useEffect que executa quando 'data' muda e recarrega a página ou após o reset() do onSubmit()
     useEffect(() => {
         reset({
             name: data?.name || '',
@@ -132,7 +196,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
             year_finished: typeof data?.year_finished === 'string' ? "Sem ano" : typeof data?.year_finished === 'number' ? Number(data.year_finished) : undefined,
             // background_image: data?.background_image || '',
         })
-    }, [data, reset]) // Executa quando 'data' muda
+    }, [data, reset]) // 
 
 
     const [open, setOpen] = useState(false);
@@ -152,7 +216,6 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
     const anoIniciado = watch('year_started')
     const anoFinalizado = watch('year_finished')
     // const imagemFundo = watch('background_image')
-
 
     useEffect(() => {
         if (statusJogo !== "Finalizado") {
@@ -188,11 +251,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
         return null
     }
 
-
     return (
         <>
-
-            {/* na vdd aqui tem que clicar para abrir o modal pleo handleOpen, e no fim do modal chamadr o AttJooj(game.id!) */}
             <Button className='bg-slate-500/60 m-2' onClick={handleClickOpen}>
                 <span>
                     <FaPencilAlt className="h-6.5 w-6.5 text-white/80" />
@@ -602,37 +662,59 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                             </div>
                         </div>
 
-                        <div>
-                            <div className='flex flex-row items-center gap-3 text-xs '>
+                        <div className='grid grid-cols-2 gap-2 pb-2 mb-2'>
+                            {/* <div className='flex flex-row items-center gap-3 text-xs '> */}
 
-                                <div className='w-[150px] h-[150px] rounded-xl bg-black/60 overflow-hidden'>
-                                    {previewURL ? (
-                                        <img src={previewURL} className='object-cover object-center' />)
-                                        :
-                                        (<button type='button' onClick={() => triggerImageInput('background_image')} className='w-full h-full' >150x150</button>)
-                                    }
+                            {currentBackgroundImage && currentBackgroundImage !== '' && (
+                                <div className='flex flex-col items-center border-r-4 border-[#b6b6b6]'>
+                                    <span className='w-full flex justify-center text-lg font-bold'>Imagem Atual</span>
+                                    <img src={currentBackgroundImage} className='object-cover object-center w-[150px] h-[150px] rounded-lg' alt="Imagem de fundo atual" />
                                 </div>
-                                <button type='button' onClick={() => triggerImageInput('background_image')}>
-                                    <span>↑</span>
-                                    <span>Add imagens</span>
-                                </button>
-                                <input type="file" name="background_image" id="background_image" accept='image/*' className='hidden'
-                                    onChange={((ev) => setProjectImage(handleImageInput(ev)))} />
+                            )}
 
+
+                            <div className={`grid grid-cols-4 items-center gap-3 text-xs ${currentBackgroundImage && currentBackgroundImage !== '' && 'border-l-4 border-[#b6b6b6]'}`}>
+
+                                <div className='col-span-3 flex flex-col items-center'>
+
+                                    <span className='w-full flex justify-center text-lg font-bold'>Nova Imagem</span>
+
+                                    <div className='w-[150px] h-[150px] rounded-lg bg-black/60 overflow-hidden'>
+                                        {previewURL ? (
+                                            <img src={previewURL} className='object-cover object-center' />)
+                                            :
+                                            (<button type='button' onClick={() => triggerImageInput('background_image')} className='w-full h-full' >150x150</button>)
+                                        }
+                                    </div>
+
+                                </div>
+
+                                <div className='col-span-1 flex flex-col items-center'>
+
+                                    <button type='button' onClick={() => triggerImageInput('background_image')}>
+                                        <span>↑</span>
+                                        <span>Add imagens</span>
+                                    </button>
+                                    <input type="file" name="background_image" id="background_image" accept='image/*' className='hidden'
+                                        onChange={((ev) => setProjectImage(handleImageInput(ev)))} />
+
+                                </div>
                             </div>
+
                         </div>
 
-                        <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
-                            <Button className='' type="submit" >+ ATT Jooj</Button>
-                        </DialogActions>
-
+                        <div>
+                            <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
+                                <Button className='' type="submit" >+ ATT Jooj</Button>
+                            </DialogActions>
+                        </div>
+                        {/* </div> */}
+                        <progress value={progress} max="100" />
                     </form>
                 </DialogContent>
             </Dialog>
         </>
     )
 }
-
-
 
 export default AttGameModal;
