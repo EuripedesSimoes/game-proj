@@ -7,10 +7,9 @@ import App from '@/App.tsx';
 import AppParaJogar from '@/components/para-jogar/AppParaJogar.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Button } from "@/components/ui/button"
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/services/firebaseConfig';
-
 
 
 export function Home() {
@@ -23,8 +22,7 @@ export function Home() {
         await signOut(auth);
         localStorage.removeItem('user');
         localStorage.removeItem('token');
-        navigate('/login')
-        // <Navigate to='/login' />
+        navigate('/auth/login')
     }
 
     const userAtual = auth.currentUser || null;
@@ -39,6 +37,7 @@ export function Home() {
                     {/* <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3> */}
                     <Tabs.Root defaultValue='Tudo'>
                         <Tabs.List className='flex flex-row gap-2 justify-center items-center p-2'>
+                            <Button><Link to='/home'>Home</Link></Button>
                             <Tabs.Trigger value='Jogos jogados' className='bg-amber-400 border-2 border-amber-900 text-black font-semibold rounded-lg'>
                                 Jogos Jogados
                             </Tabs.Trigger>

@@ -1,14 +1,11 @@
 
 import { useState } from "react";
-
 import { Link, useNavigate } from "react-router";
-
-// import { Button } from "@/components/ui/button"
-
 import { auth } from "@/services/firebaseConfig";
 import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 
 import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/ui/spinner";
 
 // import react_logo from 'src/assets/react.svg'
 
@@ -67,7 +64,7 @@ export function Login() {
     return (
         <>
             {loading ? <div className="w-screen h-screen flex flex-col items-center justify-center bg-slate-400/40">
-                <span className="text-2xl font-extrabold">Indo para Home.....</span>
+                <span className="flex items-center text-2xl font-bold"><Spinner className="m-2" /> Indo para Home.....</span>
             </div>
                 :
                 <div className="w-screen h-screen flex flex-col items-center justify-center bg-white gap-2">
@@ -117,7 +114,7 @@ export function Login() {
 
                     <div className="footer mt-2">
                         <p>Você não tem uma conta?</p>
-                        <Link to="/register">Crie a sua conta <span className="font-bold text-lg">aqui</span></Link>
+                        <Link to="/auth/register">Crie a sua conta <span className="font-bold text-lg">aqui</span></Link>
                     </div>
 
                     {/* <Button> Não tem uma conta? <Link to='/register' className='decoration-dashed'>Clique para ir para o página de Registro</Link> </Button>

@@ -1,34 +1,57 @@
-import { StrictMode, useState } from 'react'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 
-import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
 import { Home } from './pages/Home.tsx'
 import { ProtectedRoute } from './components/ProtectedRoute.tsx'
 import { Register } from './pages/Register.tsx';
 import { Login } from './pages/Login.tsx';
 import LoginOrRegister from './pages/LoginOrRegister.tsx';
+import { GamePage } from './pages/GamePage.tsx';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+
+
+const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
 
 
-  <StrictMode>
-    {/* <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3> */}
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<LoginOrRegister />} />
 
-        <Route path='/home' element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        } />
+  <QueryClientProvider client={queryClient}>
 
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
-        {/* Redireciona qualquer rota inexistente para o login */}
-        <Route path="*" element={<Navigate to="/login" />} />
-      </Routes>
-    </BrowserRouter>
-  </StrictMode>
+    <StrictMode>
+      {/* <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3> */}
+      <BrowserRouter>
+        <Routes>
+          <Route path='/'>
+            <Route path="" element={<LoginOrRegister />} />
+          </Route>
+
+          <Route path='/home' element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } />
+
+          <Route path='/home/:slug' element={<GamePage />} />
+
+          <Route path="/auth">
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+          </Route>
+
+
+          {/* antiga rota, foi adicionado um /auth */}
+          {/* <Route path='/login' element={<Login />} />
+        <Route path='/register' element={<Register />} /> */}
+
+          {/* Redireciona qualquer rota inexistente para o login */}
+          {/* <Route path="*" element={<Navigate to="/auth/login" />} /> */}
+          {/* <Route path="*" element={<NotFound />} /> */}
+        </Routes>
+      </BrowserRouter>
+    </StrictMode>
+  </QueryClientProvider>
 )

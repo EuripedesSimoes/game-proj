@@ -116,10 +116,7 @@ export default function App() {
 
   // const filterMyGames = (data ?? []).filter((game: myGamesApiInterface) =>
   //   game.name.toLowerCase().includes(filter.toLowerCase())
-  // || game.hours_played
-  // || setBtnFilter.toLowerCase().includes(filter.toLowerCase())
-  //   || game.released.toLowerCase().includes(filter.toLowerCase())
-  //   || game.released.substring(0, 4).toLowerCase().includes(filter.toLowerCase()),
+  // || game.hours_played,
   //   setTimeout(() => { }, 1000),
   // )
 
@@ -134,6 +131,8 @@ export default function App() {
     }
     return arr
   }, [filteredGames, sortBy])
+
+
 
   return (
     <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
@@ -159,7 +158,7 @@ export default function App() {
 
           <div className='grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 py-6 px-4 w-11/12 min-h-screen'>
             {sortedGames.map((game: myGamesApiInterface) => (
-              <>
+              <div>
                 <CardComponent
                   id={game.id}
                   name={game.name}
@@ -176,7 +175,7 @@ export default function App() {
                   background_image={game.background_image}
                   deletajooj={fbDeletajooj}
                 />
-              </>
+              </div>
 
             ))}
           </div>

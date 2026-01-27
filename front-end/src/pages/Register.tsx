@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from "@/services/firebaseConfig";
 import { updateProfile } from "firebase/auth";
+import { Spinner } from "@/components/ui/spinner";
 
 // import react_logo from 'src/assets/react.svg'
 
@@ -42,7 +43,7 @@ export function Register() {
                 localStorage.setItem('userName', JSON.stringify(userNameData));
 
                 console.log("Novo usuário registrado com sucesso!");
-                navigate('/login');
+                navigate('/auth/login');
             }
         } catch (err) {
             // O erro também é tratado pelo hook, mas aqui pegamos falhas críticas
@@ -66,7 +67,7 @@ export function Register() {
     return (
         <>
             {loading ? <div className="w-screen h-screen flex flex-col items-center justify-center bg-slate-400/40">
-                <span className=" text-2xl font-extrabold">Indo para Login.....</span>
+                <span className="flex items-center text-2xl font-bold"><Spinner className="m-2" /> Indo para Login.....</span>
             </div>
                 :
                 <div className="w-screen h-screen flex flex-col items-center justify-center bg-white">
@@ -131,7 +132,7 @@ export function Register() {
 
                     <div className="footer mt-2">
                         <p>Já tem uma conta?</p>
-                        <Link to="/login">Vá para a tela de <span className="font-bold text-lg">Login</span></Link>
+                        <Link to="/auth/login">Vá para a tela de <span className="font-bold text-lg">Login</span></Link>
                     </div>
                     {/* <Button> Já tem uma conta? <Link to='/login' className='decoration-dashed'>Clique para ir para o página de Login</Link> </Button>
                     <p className="text-white">Skibob</p> */}

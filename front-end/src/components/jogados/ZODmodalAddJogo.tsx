@@ -42,6 +42,7 @@ export default function ZodAddGameModal() {
 
     // onSubmit receberá dados já validados pelo Zod via react-hook-form
     const onSubmit = async (data: FormData) => {
+        // const ske = FormDataEvent.get('hours_played')
 
         if (!user?.uid) {
             alert("Você precisa estar logado para adicionar jogos!");
