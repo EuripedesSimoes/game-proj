@@ -38,14 +38,17 @@ export function Home() {
                     <Tabs.Root defaultValue='Tudo'>
                         <Tabs.List className='flex flex-row gap-2 justify-center items-center p-2'>
                             <Button><Link to='/home'>Home</Link></Button>
+
                             <Tabs.Trigger value='Jogos jogados' className='bg-amber-400 border-2 border-amber-900 text-black font-semibold rounded-lg'>
-                                Jogos Jogados
+                                <Link to='/home/jogos'>Jogos Jogados</Link>
                             </Tabs.Trigger>
+
                             <Tabs.Trigger value='Jogos p/ jogar' className='bg-amber-400 border-2 border-amber-900 text-black font-semibold rounded-lg'>
-                                Jogos p/ jogar
+                                <Link to='/home/jogos-para-jogar'>Jogos p/ jogar</Link>
                             </Tabs.Trigger>
+
                             <Tabs.Trigger value='Tudo' className='bg-amber-400 border-2 border-amber-900 text-black font-semibold rounded-lg'>
-                                Tudo
+                                <Link to='/home'>Tudo</Link>
                             </Tabs.Trigger>
 
                             <Button onClick={handleLogout} className='absolute right-0 bg-slate-800 hover:bg-gray-900'>

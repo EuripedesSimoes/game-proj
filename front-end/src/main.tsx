@@ -10,14 +10,13 @@ import { Login } from './pages/Login.tsx';
 import LoginOrRegister from './pages/LoginOrRegister.tsx';
 import { GamePage } from './pages/GamePage.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { GamePageParaJogar } from './pages/GamePageParaJogar.tsx';
 
 
 
 const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
-
-
 
   <QueryClientProvider client={queryClient}>
 
@@ -30,12 +29,14 @@ createRoot(document.getElementById('root')!).render(
           </Route>
 
           <Route path='/home' element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } />
+            <ProtectedRoute> <Home /> </ProtectedRoute>
+          }>
+            <Route path="jogos" element={<Home />} />
+            <Route path="jogos-para-jogar" element={<Home />} />
+          </Route>
 
-          <Route path='/home/:slug' element={<GamePage />} />
+          <Route path='/home/jogos/:slug' element={<GamePage />} />
+          <Route path='/home/jogos-para-jogar/:slug' element={<GamePageParaJogar />} />
 
           <Route path="/auth">
             <Route path="login" element={<Login />} />
@@ -54,4 +55,5 @@ createRoot(document.getElementById('root')!).render(
       </BrowserRouter>
     </StrictMode>
   </QueryClientProvider>
+  
 )

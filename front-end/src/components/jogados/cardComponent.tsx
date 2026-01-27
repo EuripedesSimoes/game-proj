@@ -1,18 +1,9 @@
 import { Button } from "@mui/material";
 import { FaEraser } from "react-icons/fa";
 
-import {
-    Card,
-    // CardAction,
-    CardContent,
-    CardDescription,
-    // CardFooter,
-    // CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card"
 import AttGameModal from "./modalAttJogo";
-import { Link, useNavigate, useParams } from "react-router";
-import { GamePage } from "@/pages/GamePage";
+import { Link, useNavigate } from "react-router";
 
 type dadosJogos = {
     id: string
@@ -24,7 +15,6 @@ type dadosJogos = {
     genre: string;
     status: string;
     replayed: string
-    // is_completed?: boolean;
     release_year: number | string;
     year_started?: number | string;
     year_finished?: number | string;
@@ -36,35 +26,30 @@ type dadosJogos = {
 export default function CardComponent({ id, name, hours_played, hours_expected, platform, genre, release_year, status, replayed, priority, year_started, year_finished, background_image, deletajooj }: dadosJogos) {
 
     const navigate = useNavigate();
-    function gerarSlug(titulo: string) {
-        return titulo
-            .toLowerCase()
-            .normalize('NFD').replace(/\p{Diacritic}/gu, '') // Remove acentuação
-            .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais
-            .trim() // Remove espaços do início e fim
-            .replace(/\s+/g, '-'); // Troca espaços por hífens
-    }
+    // function gerarSlug(titulo: string) {
+    //     return titulo
+    //         .toLowerCase()
+    //         .normalize('NFD').replace(/\p{Diacritic}/gu, '') // Remove acentuação
+    //         .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais
+    //         .trim() // Remove espaços do início e fim
+    //         .replace(/\s+/g, '-'); // Troca espaços por hífens
+    // }
 
-    const slugName = gerarSlug(name)
-    const { slug } = useParams()
-    console.log('paramentro para goz', slug)
-    // const post = params.slug === slugName ? true : false
-    // console.log('post', post)
-    console.log('slugName', slugName)
-    console.log('------------------------------')
-    // if (slug === slugName) {
+    // const slugName = gerarSlug(name)
+    // const { slug } = useParams()
+    // function MeuComponente() {
     //     return (
-    //         <GamePage/>
-    //     )
+    //         <Link to="/rota-destino" target="_blank" rel="noopener noreferrer">
+    //             Abrir em nova aba
+    //         </Link>
+    //     );
     // }
 
     return (
         <>
-            <Button onClick={() => navigate(`/home/${id}`)}> Ver página </Button>
+            {/* <Button onClick={() => navigate(`/home/jogos/${id}`)}> Ver página </Button> */}
             <Card className='w-full h-[300px] min-[450px]:h-[500px] gap-2 flex flex-col items-start cursor-pointer border-2 hover:border-4 border-white/50 hover:border-amber-500 transition-all bg-slate-900 shadow-4xl'
-                key={id}
-            >
-
+                key={id} >
 
                 <div className="absolute bg-white/20 z-50 rounded-lg shadow-lg  hover:bg-gray-600">
                     <Button className='bg-white/60 m-2' onClick={() => deletajooj(id)}>
@@ -72,12 +57,12 @@ export default function CardComponent({ id, name, hours_played, hours_expected, 
                             <FaEraser className="h-6.5 w-6.5 text-red-600/80" />
                         </span>
                     </Button>
-                    {/* COLOCAR AQUI A FUNÇÃO DE ABRIR O MODAL */}
+                    {/* FUNÇÃO DE ABRIR O MODAL */}
                     <AttGameModal gameId={id} data={{ id, name, hours_played, hours_expected, platform, genre, release_year, status, replayed, priority, year_started, year_finished }} />
                 </div>
 
                 <div className="w-full h-[60%] relative">
-                    <div className="absolute  w-full h-full rounded-lg shadow-lg  hover:bg-black/20" onClick={() => navigate(`/home/${id}`)}></div>
+                    <div className="absolute  w-full h-full rounded-lg shadow-lg  hover:bg-black/20" onClick={() => navigate(`/home/jogos/${id}`)}></div>
                     <img
                         src={background_image}
                         alt={name}
@@ -85,6 +70,7 @@ export default function CardComponent({ id, name, hours_played, hours_expected, 
 
                     />
                 </div>
+
 
                 <CardContent className='h-[40%] w-full p-2 flex flex-col justify-start items-start overflow-auto gap-3'>
 

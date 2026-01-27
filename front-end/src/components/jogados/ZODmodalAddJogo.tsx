@@ -752,6 +752,7 @@ export default function ZodAddGameModal() {
 
                                 {errors.year_finished?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.year_finished?.message}</p>}
                             </div>
+                            
                         </div>
 
                         <div>

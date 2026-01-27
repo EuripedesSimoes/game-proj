@@ -215,6 +215,24 @@ export default function AddGameModalParaJogar() {
                                             '&:hover fieldset': { borderColor: '#64748b' }, // hover border
                                             '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
                                         },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     // autoFocus
                                     {...register('name')}
@@ -233,9 +251,31 @@ export default function AddGameModalParaJogar() {
                                 <TextField
                                     className='shadow-lg my-1'
                                     sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                        input: { color: '#3c3c3c', p: 1.2 }, // text-slate-100
-
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
+                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     {...register('hours_expected', { valueAsNumber: true })}
                                     // error={!!errors.hours_expected}
@@ -259,9 +299,31 @@ export default function AddGameModalParaJogar() {
                                 <TextField
                                     className='shadow-lg'
                                     sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
+                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     {...register('release_year', { valueAsNumber: true })}
                                     // autoFocus
@@ -287,7 +349,8 @@ export default function AddGameModalParaJogar() {
                                         id="priority-label"
                                         sx={{
                                             '&.MuiInputLabel-shrink': {
-                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
                                             },
                                         }}
                                     >
@@ -295,18 +358,12 @@ export default function AddGameModalParaJogar() {
                                     </InputLabel>
                                     <Select
                                         {...register('priority')}
-                                        label="Prioridade"
+                                        label="Prioridade.."
                                         id="priority"
                                         name="priority"
                                         variant="outlined"
-                                        // defaultValue={FieldValue}
-
-                                        // required
                                         sx={{
                                             p: 0.2,
-                                            "& .MuiSelect-icon": {
-                                                color: "black",
-                                            }
                                         }}
                                         MenuProps={{
                                             PaperProps: {
@@ -358,7 +415,8 @@ export default function AddGameModalParaJogar() {
                                         id="replayed-label"
                                         sx={{
                                             '&.MuiInputLabel-shrink': {
-                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
                                             },
                                         }}
                                     >
@@ -366,16 +424,13 @@ export default function AddGameModalParaJogar() {
                                     </InputLabel>
                                     <Select
                                         {...register('replayed')}
-                                        label="Rejogado?"
+                                        label="Rejogado?.."
                                         id="replayed"
                                         name="replayed"
                                         variant="outlined"
                                         // required
                                         sx={{
                                             p: 0.2,
-                                            "& .MuiSelect-icon": {
-                                                color: "black",
-                                            }
                                         }}
                                         MenuProps={{
                                             PaperProps: {
@@ -415,6 +470,7 @@ export default function AddGameModalParaJogar() {
 
                                 {errors.replayed?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.replayed?.message}</p>}
                             </div>
+
                         </div>
 
                         <div className='grid md:grid-cols-2 gap-4 mt-2 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
@@ -425,7 +481,8 @@ export default function AddGameModalParaJogar() {
                                         id="plataforma-label"
                                         sx={{
                                             '&.MuiInputLabel-shrink': {
-                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
                                             },
                                         }}
                                     >
@@ -433,16 +490,13 @@ export default function AddGameModalParaJogar() {
                                     </InputLabel>
                                     <Select
                                         {...register('platform')}
-                                        label="Plataforma..."
+                                        label="Plataforma.."
                                         id="platform"
                                         name="platform"
                                         variant="outlined"
                                         // className={`bg-yellow-200`}
                                         sx={{
                                             // label:{ color: 'violet'},
-                                            "& .MuiSelect-icon": {
-                                                color: "black",
-                                            }
                                         }}
                                         MenuProps={{
                                             PaperProps: {
@@ -494,7 +548,8 @@ export default function AddGameModalParaJogar() {
                                         id="genre-label"
                                         sx={{
                                             '&.MuiInputLabel-shrink': {
-                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
                                             },
                                         }}
                                     >
@@ -502,16 +557,13 @@ export default function AddGameModalParaJogar() {
                                     </InputLabel>
                                     <Select
                                         {...register('genre')}
-                                        label="Gênero..."
+                                        label="Gênero.."
                                         id="genre"
                                         name="genre"
                                         variant="outlined"
                                         // className={`bg-yellow-200`}
                                         sx={{
                                             // label:{ color: 'violet'},
-                                            "& .MuiSelect-icon": {
-                                                color: "black",
-                                            }
                                         }}
                                         MenuProps={{
                                             PaperProps: {

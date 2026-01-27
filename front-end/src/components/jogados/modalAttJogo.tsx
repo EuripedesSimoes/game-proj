@@ -67,7 +67,6 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
     })
 
     const queryClient = useQueryClient() // <--- novo
-
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp)
 
@@ -136,7 +135,6 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
         });
     };
 
-
     // 2. onSubmit receberá dados já validados pelo Zod via react-hook-form
     const onSubmit = async (data: FormData) => {
 
@@ -198,7 +196,6 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
         })
     }, [data, reset]) // 
 
-
     const [open, setOpen] = useState(false);
     const handleClickOpen = () => setOpen(true)
     const handleClose = () => setOpen(false)
@@ -215,7 +212,6 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
     const anoLancado = watch('release_year')
     const anoIniciado = watch('year_started')
     const anoFinalizado = watch('year_finished')
-    // const imagemFundo = watch('background_image')
 
     useEffect(() => {
         if (statusJogo !== "Finalizado") {
@@ -274,7 +270,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
                         <div className='grid grid-cols-4 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
-                            <div className=' col-span-2'>
+                            <div className='col-span-2'>
                                 <TextField
                                     className='shadow-lg my-1 col-span-4'
                                     sx={{
@@ -284,6 +280,24 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                             // '& fieldset': { borderColor: '#334155' }, // border-slate-700
                                             '&:hover fieldset': { borderColor: '#64748b' }, // hover border
                                             '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
                                         },
                                     }}
                                     // autoFocus
@@ -308,9 +322,31 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                 <TextField
                                     className='shadow-lg col-span-2'
                                     sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
+                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     // autoFocus
                                     {...register('hours_played', {
@@ -336,9 +372,31 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                 <TextField
                                     className='shadow-lg col-span-2'
                                     sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
+                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     // autoFocus
                                     {...register('hours_expected', {
@@ -379,7 +437,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                         id="priority-label"
                                         sx={{
                                             '&.MuiInputLabel-shrink': {
-                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
                                             },
                                         }}
                                     >
@@ -387,15 +446,12 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                     </InputLabel>
                                     <Select
                                         {...register('priority')}
-                                        label="Prioridade"
+                                        label="Prioridade.."
                                         id="priority"
                                         name="priority"
                                         variant="outlined"
                                         sx={{
                                             p: 0.2,
-                                            "& .MuiSelect-icon": {
-                                                color: "black",
-                                            }
                                         }}
                                         MenuProps={{
                                             PaperProps: {
@@ -444,7 +500,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                         id="replayed-label"
                                         sx={{
                                             '&.MuiInputLabel-shrink': {
-                                                transform: 'translate(14px, -14px) scale(0.75)', // posição padrão do MUI
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
                                             },
                                         }}
                                     >
@@ -452,15 +509,12 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                     </InputLabel>
                                     <Select
                                         {...register('replayed')}
-                                        label="Rejogado"
+                                        label="Rejogado?."
                                         id="replayed"
                                         name="replayed"
                                         variant="outlined"
                                         sx={{
                                             p: 0.2,
-                                            "& .MuiSelect-icon": {
-                                                color: "black",
-                                            }
                                         }}
                                         MenuProps={{
                                             PaperProps: {
@@ -509,64 +563,193 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                         <div className='grid grid-cols-3 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
                             <div className=''>
-                                <select
-                                    className='shadow-lg h-14 w-full border-1 border-black/30 rounded-sm'
-                                    {...register('platform')}
-                                    id="platform"
-                                    name="platform"
-                                    value={plataforma}
-                                    onChange={(e) => setValue('platform', e.target.value)}
-                                >
-                                    {allPlatforms.map((plats) => (
-                                        <option key={plats.value} value={plats.value}>
-                                            {plats.label}
-                                        </option>
-                                    )
-                                    )}
-                                </select>
+                                <FormControl fullWidth variant="outlined" className='shadow-lg ' >
+                                    <InputLabel
+                                        id="replayed-label"
+                                        sx={{
+                                            '&.MuiInputLabel-shrink': {
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
+                                            },
+                                        }}
+                                    >
+                                        Plataforma
+                                    </InputLabel>
+                                    <Select
+                                        {...register('platform')}
+                                        label="Plataforma.."
+                                        id="platform"
+                                        name="platform"
+                                        variant="outlined"
+                                        sx={{
+                                            p: 0.2,
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    backgroundColor: "#1c1c1c",
+                                                    "& .MuiMenuItem-root": {
+                                                        opacity: '75%',
+                                                        "&.Mui-selected": {
+                                                            backgroundColor: "#2e2e3e", // background do option selecionado
+                                                            color: "white", //cor do texto do option selecionado
+                                                            fontWeight: 'bold',
+                                                            opacity: '100%',
+                                                        },
+                                                        "&:hover": {
+                                                            backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                            fontWeight: 'bold',
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        }}
+                                        value={plataforma}
+                                        onChange={(e) => setValue('platform', e.target.value)}
+                                    >
+                                        {allPlatforms.map((plats) => (
+                                            <MenuItem key={plats.value} value={plats.value}
+                                                sx={{
+                                                    backgroundColor: '#1c1c1c',
+                                                    color: '#f1f5f9',
+                                                    '&:hover': {
+                                                        backgroundColor: '#2b2b2b',
+                                                    },
+                                                }}>
+                                                {plats.label}
+                                            </MenuItem>
+                                        )
+                                        )}
+                                    </Select>
+                                </FormControl>
+
                                 {errors.platform?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.platform?.message}</p>}
                             </div>
 
                             <div>
-                                <select
-                                    className='shadow-lg h-14 w-full border-1 border-black/30 rounded-sm'
-                                    {...register('genre')}
-                                    // select
-                                    id="genre"
-                                    name="genre"
-                                    value={genero}
-                                    onChange={(e) => setValue('genre', e.target.value)}
-                                // label="Gênero"
-                                // type="text"
-                                // variant="outlined"
-                                >
-                                    {
-                                        allGenres.map((genre) => (
-                                            <option key={genre.value} value={genre.value}>
+                                <FormControl fullWidth variant="outlined" className='shadow-lg ' >
+                                    <InputLabel
+                                        id="replayed-label"
+                                        sx={{
+                                            '&.MuiInputLabel-shrink': {
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
+                                            },
+                                        }}
+                                    >
+                                        Gênero
+                                    </InputLabel>
+                                    <Select
+                                        {...register('genre')}
+                                        label="Gênero.."
+                                        id="genre"
+                                        name="genre"
+                                        variant="outlined"
+                                        sx={{
+                                            p: 0.2,
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    backgroundColor: "#1c1c1c",
+                                                    "& .MuiMenuItem-root": {
+                                                        opacity: '75%',
+                                                        "&.Mui-selected": {
+                                                            backgroundColor: "#2e2e3e", // background do option selecionado
+                                                            color: "white", //cor do texto do option selecionado
+                                                            fontWeight: 'bold',
+                                                            opacity: '100%',
+                                                        },
+                                                        "&:hover": {
+                                                            backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                            fontWeight: 'bold',
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        }}
+                                        value={genero}
+                                        onChange={(e) => setValue('genre', e.target.value)}
+                                    >
+                                        {allGenres.map((genre) => (
+                                            <MenuItem key={genre.value} value={genre.value}
+                                                sx={{
+                                                    backgroundColor: '#1c1c1c',
+                                                    color: '#f1f5f9',
+                                                    '&:hover': {
+                                                        backgroundColor: '#2b2b2b',
+                                                    },
+                                                }}>
                                                 {genre.label}
-                                            </option>
-                                        ))
-                                    }
-                                </select>
+                                            </MenuItem>
+                                        )
+                                        )}
+                                    </Select>
+                                </FormControl>
+
                                 {errors.genre?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.genre?.message}</p>}
                             </div>
 
                             <div>
-                                <select
-                                    className='shadow-lg h-14 w-full border-1 border-black/30 rounded-sm'
-                                    {...register('status')}
-                                    id="status"
-                                    name="status"
-                                    value={statusJogo}
-                                // onChange={(e) => {setValue('status', e.target.value); setFinalizado(statusJogo !== "Finalizado" ? false : true)}}
-                                >
-                                    {allStatus.map((status) => (
-                                        <option key={status.value} value={status.value}>
-                                            {status.label}
-                                        </option>
-                                    )
-                                    )}
-                                </select>
+                                <FormControl fullWidth variant="outlined" className='shadow-lg ' >
+                                    <InputLabel
+                                        id="replayed-label"
+                                        sx={{
+                                            '&.MuiInputLabel-shrink': {
+                                                transform: 'translate(10px, -15.5px) scale(0.75)', // posição padrão do MUI
+                                                fontWeight: '600',
+                                            },
+                                        }}
+                                    >
+                                        Status
+                                    </InputLabel>
+                                    <Select
+                                        {...register('status')}
+                                        label="Status.."
+                                        id="status"
+                                        name="status"
+                                        variant="outlined"
+                                        sx={{
+                                            p: 0.2,
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    backgroundColor: "#1c1c1c",
+                                                    "& .MuiMenuItem-root": {
+                                                        opacity: '75%',
+                                                        "&.Mui-selected": {
+                                                            backgroundColor: "#2e2e3e", // background do option selecionado
+                                                            color: "white", //cor do texto do option selecionado
+                                                            fontWeight: 'bold',
+                                                            opacity: '100%',
+                                                        },
+                                                        "&:hover": {
+                                                            backgroundColor: "gray", // background do option ao passar mouse por cima
+                                                            fontWeight: 'bold',
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        }}
+                                        value={statusJogo}
+                                        onChange={(e) => setValue('status', e.target.value)}
+                                    >
+                                        {allStatus.map((status) => (
+                                            <MenuItem key={status.value} value={status.value}
+                                                sx={{
+                                                    backgroundColor: '#1c1c1c',
+                                                    color: '#f1f5f9',
+                                                    '&:hover': {
+                                                        backgroundColor: '#2b2b2b',
+                                                    },
+                                                }}>
+                                                {status.label}
+                                            </MenuItem>
+                                        )
+                                        )}
+                                    </Select>
+                                </FormControl>
                                 {errors.status?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.status?.message}</p>}
                             </div>
 
@@ -578,8 +761,31 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                 <TextField
                                     className='shadow-lg'
                                     sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
+                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     // autoFocus
                                     {...register('release_year', {
@@ -606,9 +812,31 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                 <TextField
                                     className='shadow-lg'
                                     sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
+                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     // autoFocus
                                     {...register('year_started', {
@@ -635,9 +863,31 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                 <TextField
                                     className='shadow-lg'
                                     sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                        input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
+                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
+                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
+                                        '& .MuiOutlinedInput-root': {
+                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
+                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
+                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
+                                        },
+                                        "& .MuiInputBase-input": {
+                                            color: "rgb(var(--color-text-variant))", // text color
+                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
+                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+                                        },
+                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
+                                            WebkitTextFillColor: '#3c3c3c',
+                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
+                                        },
+                                        "& .MuiInputLabel-root": {
+                                            marginTop: '2px',
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            fontWeight: '600',
+                                        },
                                     }}
                                     {...register('year_finished', {
                                         setValueAs: normalizeYear,

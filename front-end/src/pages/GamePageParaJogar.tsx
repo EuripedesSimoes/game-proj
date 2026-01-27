@@ -4,48 +4,22 @@ import { useNavigate, useParams } from "react-router";
 
 import { useQuery } from '@tanstack/react-query';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
-// import { db } from '@/services/firebaseConfig'; // Ajuste o caminho se necessário
+import { db } from '@/services/firebaseConfig'; // Ajuste o caminho se necessário
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, firebaseApp } from '@/services/firebaseConfig';
 
 
-type dadosJogos = {
-    id: string
-    name: string;
-    hours_played?: number | string;
-    hours_expected?: number | string;
-    priority: string;
-    platform: string;
-    genre: string;
-    status: string;
-    replayed: string
-    // is_completed?: boolean;
-    release_year: number | string;
-    year_started?: number | string;
-    year_finished?: number | string;
-    background_image?: string;
-
-    // deletajooj: (id: string) => Promise<void>
-}
-// pegar o nome (name) e tranformar em slug
-// <Link to={`/home/${slugName}`}/>
-
-
-export const GamePage = () => {
+export const GamePageParaJogar = () => {
     const { slug } = useParams();
-
-    const db = getFirestore(firebaseApp)
-
-    // const { id } = useParams<{ id: string }>(); // Pega o id da URL
+    console.log('slug p jogar: ', slug)
     const [user] = useAuthState(auth);
-
     const navigate = useNavigate()
 
     const { data: game, isLoading } = useQuery({
         queryKey: ['jogo', slug],
         queryFn: async () => {
             if (!user?.uid) return null;
-            const docRef = doc(db, 'users', user.uid, 'jogos', slug!);
+            const docRef = doc(db, 'users', user.uid, 'jogos-para-jogar', slug!);
             const docSnap = await getDoc(docRef);
             return docSnap.exists() ? docSnap.data() : null;
         }
@@ -74,7 +48,7 @@ export const GamePage = () => {
             {/* OVERLAY EXTRA (Opcional - para garantir contraste) */}
             <div className="absolute inset-0 z-[-10] bg-black/40" />
             <div className="w-full h-28 bg-black/50">
-                <h3 className='text-4xl p-4 text-white font-bold'>Bem vindo à <span className='font-bold text-4xl text-green-400'>Página de jogo</span></h3>
+                <h3 className='text-4xl p-4 text-white font-bold'>Bem vindo à <span className='font-bold text-4xl text-green-400'>Página para jogar</span></h3>
 
                 {/* <span className="text-white">SSPan gamepasge</span> */}
                 <Button onClick={() => navigate('/home')}>← Voltar para home </Button>
@@ -273,34 +247,8 @@ export const GamePage = () => {
                             />
 
                         </div>
-
-
-
-                        {/* <div>
-                            <input type="text" value={game?.name} className="p-2 max-w-full h-6" />
-                            <input type="text" value={game?.release_year} className="p-2 max-w-full h-6" />
-                            <TextField
-                                className='shadow-lg rounded-sm'
-                                sx={{
-                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
-                                }}
-                                margin="dense"
-                                id="year_finished"
-                                name="year_finished"
-                                label="Ano Finalizado"
-                                type="text"
-                                variant="standard"
-                                disabled={true}
-                                value={game.year_finished}
-                            />
-                        </div> */}
-
                     </div>
                 </div>
-
-
             </div>
         </div>
     )
