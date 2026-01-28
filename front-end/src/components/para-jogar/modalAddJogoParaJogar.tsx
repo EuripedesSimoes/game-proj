@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 // import type { GamePayload2 } from '@/interfaces/gameDataTypes';
 // import { FaRegWindowClose } from 'react-icons/fa';
 import { RiCloseCircleLine } from "react-icons/ri";
-import { FaClock } from 'react-icons/fa';
+import { FaClock, FaDownload } from 'react-icons/fa';
 import Select from '@mui/material/Select';
 import { allPriorities, allPlatforms, allGenres, isReplayedList } from '@/services/listasParaFiltro';
 
@@ -615,7 +615,7 @@ export default function AddGameModalParaJogar() {
 
 
                         <div>
-                            <div className='flex flex-row items-center gap-3 text-xs '>
+                            <div className='flex flex-row items-center gap-2 text-xs '>
 
                                 <div className='w-[150px] h-[150px] rounded-xl bg-black/60 overflow-hidden'>
                                     {previewURL ? (
@@ -624,9 +624,10 @@ export default function AddGameModalParaJogar() {
                                         (<button type='button' onClick={() => triggerImageInput('background_image')} className='w-full h-full' >150x150</button>)
                                     }
                                 </div>
+
                                 <button type='button' onClick={() => triggerImageInput('background_image')}>
-                                    <span>↑</span>
-                                    <span>Add imagens</span>
+                                    <span className='flex justify-center px-2 py-0.5'><FaDownload className='size-6'/></span>
+                                    <span className='text-base flex justify-center px-2 py-0.5'>Adicionar imagem</span>
                                 </button>
                                 <input type="file" name="background_image" id="background_image" accept='image/*' className='hidden'
                                     onChange={((ev) => setProjectImage(handleImageInput(ev)))} />
@@ -636,7 +637,7 @@ export default function AddGameModalParaJogar() {
 
                         <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
                             {/* <Button className='max-[400px]:w-42 bg-red-500' onClick={resetarForm}>Resetar</Button> */}
-                            <Button className='max-[400px]:w-54' type="submit">+ ADD Jooj P/ Jogar</Button>
+                            <Button className='max-[400px]:w-54' type="submit">+ Adicionar jogo P/ Jogar</Button>
                         </DialogActions>
                     </form>
                 </DialogContent>

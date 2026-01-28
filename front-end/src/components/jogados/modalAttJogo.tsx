@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 // import type { GamePayload3 } from '@/interfaces/gameDataTypes';
 // import { FaRegWindowClose } from 'react-icons/fa';
 
-import { FaPencilAlt } from "react-icons/fa";
+import { FaDownload, FaPencilAlt } from "react-icons/fa";
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
 import { allPlatforms, allStatus, allGenres, allPriorities, isReplayedList } from '@/services/listasParaFiltro';
@@ -923,7 +923,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                             )}
 
 
-                            <div className={`grid grid-cols-4 items-center gap-3 text-xs ${currentBackgroundImage && currentBackgroundImage !== '' && 'border-l-4 border-[#b6b6b6]'}`}>
+                            <div className={`grid grid-cols-4 items-center gap-2 text-xs ${currentBackgroundImage && currentBackgroundImage !== '' && 'border-l-4 border-[#b6b6b6]'}`}>
 
                                 <div className='col-span-3 flex flex-col items-center'>
 
@@ -942,8 +942,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                 <div className='col-span-1 flex flex-col items-center'>
 
                                     <button type='button' onClick={() => triggerImageInput('background_image')}>
-                                        <span>↑</span>
-                                        <span>Add imagens</span>
+                                        <span className='flex justify-center px-2 py-0.5'><FaDownload className='size-6' /></span>
+                                        <span className='text-base flex justify-center px-2 py-0.5'>Adicionar imagem</span>
                                     </button>
                                     <input type="file" name="background_image" id="background_image" accept='image/*' className='hidden'
                                         onChange={((ev) => setProjectImage(handleImageInput(ev)))} />
@@ -955,7 +955,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
                         <div>
                             <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
-                                <Button className='' type="submit" >+ ATT Jooj</Button>
+                                <Button className='' type="submit" >+ Atualizar jogo</Button>
                             </DialogActions>
                         </div>
                         {/* </div> */}

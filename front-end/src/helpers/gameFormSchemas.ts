@@ -5,14 +5,15 @@ export const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_\-+
 export const noSpaceRegex = /^\S*$/;
 
 export const noAccentsRegex = /^[\x00-\x7F]*$/;
+const anoAtual: number = new Date().getFullYear();
 
 const msgErro = "Mínimo: 1 hora";
-const msgErro2 = "Ano mínimo: 2010-2026"
-const msgErro3 = "Ano mínimo: 1980-2026"
+const msgErro2 = `Ano mínimo: 2010-${anoAtual}`
+const msgErro3 = `Ano mínimo: 1980-${anoAtual}`
 
 export const finishedFieldValue = z.union([
     z.literal("Sem ano"),
-    z.number().min(2010, msgErro2).max(2026, "Máximo 2026").int(),
+    z.number().min(2010, msgErro2).max(anoAtual, `Máximo ${anoAtual}`).int(),
     z.undefined().transform((val) => (val === "" ? undefined : val)), // Se for "", vira undefined
     z.literal(0) // Para o estado inicial quando muda para Finalizado
 
@@ -65,7 +66,7 @@ export const gameSchema = z.object({
 
     // priority: z.union([z.string().min(1, "Defina a prioridade do jogo")]).nullable().optional(),
     priority: z.string().min(1, "Defina a prioridade do jogo").nullable(),
-    replayed: z.string().min(1, "Defina se está jogando pela 1ª vez ou não"),
+    replayed: z.string().min(1, "Está jogando pela 1ª vez ou rejogando?"),
     platform: z.string().min(1, "Escolha a plataforma do jogo"),
     genre: z.string().min(1, "Escolha o gênero do jogo"),
     status: z.string().min(1, "Defina o estado atual da gameplay"),
@@ -74,13 +75,13 @@ export const gameSchema = z.object({
         error: (issue) => issue.input === undefined
             ? "This field is required"
             : msgErro3
-    }).min(1980, msgErro3).max(2026, msgErro3),
+    }).min(1980, msgErro3).max(anoAtual, msgErro3),
 
     year_started: z.number({
         error: (issue) => issue.input === undefined
             ? "This field is requiresd"
             : msgErro2
-    }).min(2000, msgErro2).max(2026, msgErro2)
+    }).min(2000, msgErro2).max(anoAtual, msgErro2)
     // .refine((val) => { val >= data.y })
     ,
 
@@ -104,7 +105,7 @@ export const gameSchema = z.object({
     // gameImageInput: z.string().optional(),
 })
     .superRefine((data, ctx) => {
-        const hasFinished = typeof data.year_finished === 'number' && data.year_finished < 2026
+        const hasFinished = typeof data.year_finished === 'number' && data.year_finished < anoAtual
 
         // 1.1. Released_year precisa ser igual ou menor que os outros dois
         if (data.release_year > data.year_started)
@@ -170,18 +171,18 @@ export const gameAttSchema = z.object({
     }).min(1, msgErro).optional(),
 
     priority: z.string().min(1, "Defina a prioridade do jogo").optional(),
-    replayed: z.string().min(1, "Defina se está jogando pela 1ª vez ou não").optional(),
+    replayed: z.string().min(1, "Está jogando pela 1ª vez ou rejogando?").optional(),
     platform: z.string().min(1, "Escolha a plataforma do jogo").optional(),
     genre: z.string().min(1, "Escolha o gênero do jogo").optional(),
     status: z.enum(["Finalizado", "Jogando", "Pausado", "Abandonado", "Não iniciado"]).optional(),
 
-    release_year: z.number().min(1980, msgErro3).max(2026, msgErro3).optional(),
-    year_started: z.number().min(2000, msgErro2).max(2026, msgErro2).optional(),
+    release_year: z.number().min(1980, msgErro3).max(anoAtual, msgErro3).optional(),
+    year_started: z.number().min(2000, msgErro2).max(anoAtual, msgErro2).optional(),
     year_finished: finishedFieldValue.optional(),
     // background_image: z.string().optional(),
 })
     .superRefine((data, ctx) => {
-        const hasFinished = typeof data.year_finished === 'number' && data.year_finished < 2026
+        const hasFinished = typeof data.year_finished === 'number' && data.year_finished < anoAtual
         // const lancamentoNumber = typeof data.release_year === 'number'
 
         // 1.1. Released_year precisa ser igual ou menor que os outros dois
@@ -211,10 +212,10 @@ export const gameAttSchema = z.object({
                 path: ["year_finished"], // O erro aparecerá no campo released_year
             })
         }
-        if (Number(data.year_finished) > 2026) {
+        if (Number(data.year_finished) > anoAtual) {
             ctx.addIssue({
                 code: 'custom',
-                message: "Ano maior que 2026",
+                message: `Ano maior que ${anoAtual}`,
                 path: ["year_finished"], // O erro aparecerá no campo released_year
             })
         }
@@ -245,10 +246,10 @@ export const gameToPlaySchema = z.object({
         error: (issue) => issue.input === undefined
             ? "This field is required"
             : msgErro3
-    }).min(1980, msgErro3).max(2026, msgErro3),
+    }).min(1980, msgErro3).max(anoAtual, msgErro3),
 
     priority: z.string().min(1, "Defina a prioridade do jogo"),
-    replayed: z.string().min(1, "Defina se está jogando pela 1ª vez ou não"),
+    replayed: z.string().min(1, "Está jogando pela 1ª vez ou rejogando?"),
     platform: z.string().min(1, "Escolha a plataforma do jogo"),
     genre: z.string().min(1, "Escolha o gênero do jogo"),
 
@@ -281,7 +282,7 @@ const yearSchema = z
         z
             .number()
             .min(2000, "Ano mínimo é 2000")
-            .max(2026, "Ano máximo é 2026")
+            .max(anoAtual, `Ano máximo é ${anoAtual}`)
     );
 
 

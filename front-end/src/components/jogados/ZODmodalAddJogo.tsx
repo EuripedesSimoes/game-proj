@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 // import API from '@/services/gameApiServices';
 // import type { GamePayload2 } from '@/interfaces/gameDataTypes';
 import { RiCloseCircleLine } from "react-icons/ri";
-import { FaClock } from 'react-icons/fa';
+import { FaClock, FaDownload } from 'react-icons/fa';
 import Select from '@mui/material/Select';
 import { allPriorities, allPlatforms, allStatus, allGenres, isReplayedList } from '@/services/listasParaFiltro';
 
@@ -752,11 +752,11 @@ export default function ZodAddGameModal() {
 
                                 {errors.year_finished?.message && <p className='text-sm font-medium text-red-600 pt-1'>{errors.year_finished?.message}</p>}
                             </div>
-                            
+
                         </div>
 
                         <div>
-                            <div className='flex flex-row items-center gap-3 text-xs '>
+                            <div className='flex flex-row items-center gap-2 text-xs '>
                                 <div className='w-[150px] h-[150px] rounded-xl bg-black/60 overflow-hidden'>
                                     {previewURL ? (
                                         <img src={previewURL} className='object-cover object-center' />)
@@ -765,8 +765,8 @@ export default function ZodAddGameModal() {
                                     }
                                 </div>
                                 <button type='button' onClick={() => triggerImageInput('background_image')}>
-                                    <span>↑</span>
-                                    <span>Add imagens</span>
+                                    <span className='flex justify-center px-2 py-0.5'><FaDownload className='size-6' /></span>
+                                    <span className='text-base flex justify-center px-2 py-0.5'>Adicionar imagem</span>
                                 </button>
                                 <input type="file" name="background_image" id="background_image" accept='image/*' className='hidden'
                                     onChange={((ev) => setProjectImage(handleImageInput(ev)))} />
