@@ -1,12 +1,12 @@
 import { Button, TextField } from "@mui/material";
 
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 import { useQuery } from '@tanstack/react-query';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
-// import { db } from '@/services/firebaseConfig'; // Ajuste o caminho se necessário
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, firebaseApp } from '@/services/firebaseConfig';
+import { auth, db, firebaseApp } from '@/services/firebaseConfig';
+import { FaArrowLeft } from "react-icons/fa";
 
 
 type dadosJogos = {
@@ -33,13 +33,9 @@ type dadosJogos = {
 
 export const GamePage = () => {
     const { slug } = useParams();
-
-    const db = getFirestore(firebaseApp)
-
-    // const { id } = useParams<{ id: string }>(); // Pega o id da URL
     const [user] = useAuthState(auth);
-
     const navigate = useNavigate()
+    const location = useLocation();
 
     const { data: game, isLoading } = useQuery({
         queryKey: ['jogo', slug],
@@ -56,7 +52,7 @@ export const GamePage = () => {
 
     if (isLoading) return <div>Carregando...</div>;
     if (!game) return <div>Erro ao carregar jogo: {game}
-        <Button onClick={() => navigate('/home')}>← Voltar para home </Button></div>;
+        <Button onClick={() => navigate('/home')}><FaArrowLeft /> Voltar para home </Button></div>;
 
 
     return (
@@ -64,7 +60,7 @@ export const GamePage = () => {
 
             {/* CAMADA DE FUNDO (Apenas para a imagem e efeitos) */}
             <div
-                className="absolute inset-0 z-[-20] bg-cover bg-center bg-no-repeat transition-all duration-700"
+                className={`absolute inset-0 z-10 bg-cover bg-center bg-no-repeat transition-all duration-700 ${game?.background_image ? '' : 'bg-white/50'}`}
                 style={{
                     backgroundImage: `url(${game?.background_image})`,
                     filter: 'blur(8px) brightness(0.5)' // Blur e Escurecimento via Inline Style ou use classes abaixo
@@ -72,15 +68,18 @@ export const GamePage = () => {
             />
 
             {/* OVERLAY EXTRA (Opcional - para garantir contraste) */}
-            <div className="absolute inset-0 z-[-10] bg-black/40" />
-            <div className="w-full h-28 bg-black/50">
+            <div className="absolute inset-0 z-10 bg-black/40" />
+            <div className="w-full h-28 z-10 bg-black/50">
                 <h3 className='text-4xl p-4 text-white font-bold'>Bem vindo à <span className='font-bold text-4xl text-green-400'>Página de jogo</span></h3>
 
-                {/* <span className="text-white">SSPan gamepasge</span> */}
-                <Button onClick={() => navigate('/home')}>← Voltar para home </Button>
+                <Button onClick={() => navigate('/home/jogos', { state: { from: location } })}
+                    variant="contained"
+                    startIcon={<FaArrowLeft />}>
+                    Voltar
+                </Button>
             </div>
 
-            <div className="flex flex-row w-3/4 h-full bg-none gap-4">
+            <div className="flex flex-row z-10 w-3/4 h-full bg-none gap-4">
 
                 <div className="flex justify-center w-1/2 max-h-[600px] p-4 relative" >
 
@@ -97,9 +96,9 @@ export const GamePage = () => {
 
                     {/* CAMADA DE FUNDO (Apenas para a imagem e efeitos) */}
                     <div
-                        className="absolute inset-0 z-[-20] bg-cover bg-center bg-no-repeat transition-all duration-700"
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-700"
                         style={{
-                            backgroundImage: `url(${game?.background_image})`,
+                            // backgroundImage: `url(${game?.background_image})`,
                             filter: 'blur(8px) brightness(0.5)' // Blur e Escurecimento via Inline Style ou use classes abaixo
                         }}
                     />
@@ -273,29 +272,6 @@ export const GamePage = () => {
                             />
 
                         </div>
-
-
-
-                        {/* <div>
-                            <input type="text" value={game?.name} className="p-2 max-w-full h-6" />
-                            <input type="text" value={game?.release_year} className="p-2 max-w-full h-6" />
-                            <TextField
-                                className='shadow-lg rounded-sm'
-                                sx={{
-                                    backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800
-                                    input: { color: '#3c3c3c', p: 1 }, // text-slate-100
-
-                                }}
-                                margin="dense"
-                                id="year_finished"
-                                name="year_finished"
-                                label="Ano Finalizado"
-                                type="text"
-                                variant="standard"
-                                disabled={true}
-                                value={game.year_finished}
-                            />
-                        </div> */}
 
                     </div>
                 </div>
