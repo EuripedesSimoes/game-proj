@@ -2,15 +2,12 @@
 import { useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
 //getFirestore: olha a aplicação, olhas as chaves secretas do firebaseCoonfig e repassa pro Firestore se tem permissão de admin para acessar o banco de dados
-import { getFirestore, getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
+import { getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 import type { GamePayload2, myGamesApiInterface } from '@/interfaces/gameDataTypes';
-import AddGameModal from '../jogados/modalAddJogo.old';
 import FilterComponent from '../filtragem';
 import { Button } from "@/components/ui/button"
 import { Spinner } from '../ui/spinner';
@@ -18,50 +15,41 @@ import AddGameModalParaJogar from './modalAddJogoParaJogar';
 import CardComponentParaJogar from './cardComponentParaJogar';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, firebaseConfig } from '@/services/firebaseConfig';
+import { auth, db } from '@/services/firebaseConfig';
 
 export default function AppParaJogar() {
 
     const queryClient = useQueryClient()
-
-    // Initialize Firebase
-    const firebaseApp = initializeApp(firebaseConfig);
-    const db = getFirestore(firebaseApp)
-
     // 1. Obter o usuário logado
     const [user] = useAuthState(auth);; // Assume que useAuth() retorna o objeto de usuário
 
-    if (!user?.uid) {
-        return;
-    }
-    // 2. Criar a referência da subcoleção
-    const userJogosParaJogarCollectionRef = collection(db, 'users', user.uid, 'jogos-para-jogar');
+    // 1.2. Criar a referência da subcoleção APENAS se o user existir
+    const userJogosParaJogarCollectionRef = user?.uid
+        ? collection(db, 'users', user.uid, 'jogos-para-jogar')
+        : null;
 
     // Função para buscar jogos usando React Query
     const fetchJogosParaJogar = async () => {
-        try {
-            const data = await getDocs(userJogosParaJogarCollectionRef)
-            return data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-        } catch (err) {
-            console.error('Erro ao buscar jogos do Firebase:', err)
-            throw err
-        }
-    }
+        if (!userJogosParaJogarCollectionRef) return [];
+        const snapshot = await getDocs(userJogosParaJogarCollectionRef);
+        return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+    };
 
-    // useQuery para gerenciar o estado e cache dos jogos
-    const { data: users = [], isLoading: isFetching, isError } = useQuery({
-        queryKey: ['users', user.uid, 'jogos-para-jogar'],  // Atualizado para incluir o UID do usuário
+    // 3. O useQuery DEVE ser chamado no topo, sem condicionais antes dele.
+    // Usamos o 'enabled' para ele só rodar quando o user.uid estiver disponível.
+    const { data: data = [], isLoading: isFetching, isError } = useQuery({
+        queryKey: ['users', user?.uid, 'jogos-para-jogar'],
         queryFn: fetchJogosParaJogar,
-    })
+        enabled: !!user?.uid, // Importante: a query só "acorda" quando tem usuário
+    });
+
 
     async function fbDeletajooj(id: string) {
-        if (!user?.uid) {
-            return;
-        }
-        await deleteDoc(doc(userJogosParaJogarCollectionRef, id))
-        // Invalidar a query para forçar um refetch
-        queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos-para-jogar'] })  // Já consistente, mas agora a queryKey corresponde
-    }
+    if (!userJogosParaJogarCollectionRef) return;
+    await deleteDoc(doc(userJogosParaJogarCollectionRef, id));
+    // Invalidar a query para forçar um refetch
+    queryClient.invalidateQueries({ queryKey: ['users', user?.uid, 'jogos-para-jogar'] });
+  }
 
     const [filter, setFilter] = useState('')
     const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({}) // estado com filtros por categoria
@@ -76,7 +64,7 @@ export default function AppParaJogar() {
     }
 
     const filteredGames = useMemo(() => {
-        const list = (users ?? []) as myGamesApiInterface[]
+        const list = (data ?? []) as myGamesApiInterface[]
         const q = filter.trim().toLowerCase() // tira os espaços e depois deixa todas as letras em minusculo
 
         return list.filter(game => {
@@ -104,7 +92,7 @@ export default function AppParaJogar() {
 
             return true
         })
-    }, [users, filter, selectedFilters])
+    }, [data, filter, selectedFilters])
 
     // Ordena os jogos filtrados conforme sortBy
     const sortedGames = useMemo(() => {
@@ -120,6 +108,7 @@ export default function AppParaJogar() {
     return (
 
         <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
+
             <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
             <AddGameModalParaJogar />
             <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} isGameReplayed={false} />
@@ -158,6 +147,7 @@ export default function AppParaJogar() {
                     )}
 
             {/* <button onClick={fbAddjooj}>Adicionar no Firebase</button> */}
+
         </main>
     )
 }

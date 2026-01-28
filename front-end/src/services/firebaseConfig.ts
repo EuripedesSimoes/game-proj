@@ -22,7 +22,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 // import { getFirestore, getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
-import { collection, doc, getDoc, getFirestore, updateDoc } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 
 // Your web app's Firebase configuration
 export const firebaseConfig = {

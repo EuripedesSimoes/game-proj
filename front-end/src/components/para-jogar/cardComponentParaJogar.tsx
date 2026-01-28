@@ -27,7 +27,7 @@ export default function CardComponentParaJogar({ id, name, hours_expected, prior
     return (
 
         <div className="flex flex-col">
-            <Button onClick={() => navigate(`/home/jogos-para-jogar/${id}`)}> Ver página de jogo </Button>
+            {/* <Button onClick={() => navigate(`/home/jogos-para-jogar/${id}`)}> Ver página de jogo </Button> */}
             <Card className='w-full h-[300px] min-[450px]:h-[500px] gap-2 flex flex-col items-start cursor-pointer border-2 hover:border-4 border-white/50 hover:border-amber-500 transition-all bg-slate-900 shadow-4xl'
                 key={id} >
 

@@ -15,7 +15,7 @@ import AddGameModal from './components/jogados/modalAddJogo.old.tsx';
 import CardComponent from './components/jogados/cardComponent.tsx';
 import { getFirestore, getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
 import ZodAddGameModal from './components/jogados/ZODmodalAddJogo.tsx';
-import { firebaseApp } from './services/firebaseConfig.ts';
+import { db, firebaseApp } from './services/firebaseConfig.ts';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/services/firebaseConfig';
@@ -29,43 +29,35 @@ export default function App() {
 
 
   const queryClient = useQueryClient()
-  const db = getFirestore(firebaseApp)
   //const jogosColeRef = collection(db, 'joojs') // referência à coleção 'jogos-para-jogar' no Firestore
-
   // 1. Obter o usuário logado
   const [user] = useAuthState(auth);; // Assume que useAuth() retorna o objeto de usuário
 
-  if (!user?.uid) {
-    return;
-  }
-
-  // 2. Criar a referência da subcoleção
-  const userJogosCollectionRef = collection(db, 'users', user.uid, 'jogos');
+  // 1.2. Criar a referência da subcoleção APENAS se o user existir
+  const userJogosCollectionRef = user?.uid
+    ? collection(db, 'users', user.uid, 'jogos')
+    : null;
 
   // Função para buscar jogos usando React Query
   const fetchJogosFB = async () => {
-    try {
-      const data = await getDocs(userJogosCollectionRef)
-      return data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-    } catch (err) {
-      console.error('Erro ao buscar jogos do Firebase:', err)
-      throw err
-    }
-  }
+    if (!userJogosCollectionRef) return [];
+    const snapshot = await getDocs(userJogosCollectionRef);
+    return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+  };
 
-  // useQuery para gerenciar o estado e cache dos jogos
+  // 3. O useQuery DEVE ser chamado no topo, sem condicionais antes dele.
+  // Usamos o 'enabled' para ele só rodar quando o user.uid estiver disponível.
   const { data: data = [], isLoading: isFetching, isError } = useQuery({
-    queryKey: ['users', user.uid, 'jogos'],
+    queryKey: ['users', user?.uid, 'jogos'],
     queryFn: fetchJogosFB,
-  })
+    enabled: !!user?.uid, // Importante: a query só "acorda" quando tem usuário
+  });
 
+  // 4. Função de delete
   async function fbDeletajooj(id: string) {
-    if (!user?.uid) {
-      return;
-    }
-    await deleteDoc(doc(userJogosCollectionRef, id))
-    // Invalidar a query para forçar um refetch automático
-    queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos'] })
+    if (!userJogosCollectionRef) return;
+    await deleteDoc(doc(userJogosCollectionRef, id));
+    queryClient.invalidateQueries({ queryKey: ['users', user?.uid, 'jogos'] });
   }
 
   //   async function deletaJooj(id: string) {'users', user.uid, 'jogos'

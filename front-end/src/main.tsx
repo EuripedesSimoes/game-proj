@@ -11,6 +11,8 @@ import LoginOrRegister from './pages/LoginOrRegister.tsx';
 import { GamePage } from './pages/GamePage.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GamePageParaJogar } from './pages/GamePageParaJogar.tsx';
+import App from './App.tsx';
+import AppParaJogar from './components/para-jogar/AppParaJogar.tsx';
 
 
 
@@ -28,15 +30,21 @@ createRoot(document.getElementById('root')!).render(
             <Route path="" element={<LoginOrRegister />} />
           </Route>
 
-          <Route path='/home' element={
-            <ProtectedRoute> <Home /> </ProtectedRoute>
-          }>
-            <Route path="jogos" element={<Home />} />
-            <Route path="jogos-para-jogar" element={<Home />} />
+          <Route path='/home' element={<Home />} >
+
+            {/* Rotas de Jogos */}
+            <Route path='jogos' element={<App />} />
+            <Route path='jogos/:slug' element={<GamePage />} />
+
+            {/* Rotas de Jogos para Jogar */}
+            <Route path='jogos-para-jogar' element={<AppParaJogar />} />
+            <Route path='jogos-para-jogar/:slug' element={<GamePageParaJogar />} />
+
+
           </Route>
 
-          <Route path='/home/jogos/:slug' element={<GamePage />} />
-          <Route path='/home/jogos-para-jogar/:slug' element={<GamePageParaJogar />} />
+
+
 
           <Route path="/auth">
             <Route path="login" element={<Login />} />
@@ -55,5 +63,5 @@ createRoot(document.getElementById('root')!).render(
       </BrowserRouter>
     </StrictMode>
   </QueryClientProvider>
-  
+
 )
