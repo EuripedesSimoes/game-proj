@@ -10,6 +10,8 @@ export const MyCustomInput = styled(TextField)(({ theme }) => ({
     '& .MuiInputBase-input': {
         fontSize: '1.5rem', // Tamanho da letra
         padding: '16px 16px', // Ajusta a altura interna
+        fontFamily: 'Ubuntu, sans-serif',
+        fontWeight: '500'
     },
     // 2. Aumenta o tamanho da label (quando está dentro do campo)
     '& .MuiInputLabel-root': {

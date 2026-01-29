@@ -12,8 +12,7 @@ import Select from '@mui/material/Select';
 import { allPlatforms, allStatus, allGenres, allPriorities, isReplayedList } from '@/services/listasParaFiltro';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { collection, doc, getDoc, getFirestore, updateDoc } from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
+import { collection, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -21,7 +20,7 @@ import { z } from 'zod';
 import { gameAttSchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/gameFormSchemas'
 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, firebaseConfig } from '@/services/firebaseConfig';
+import { auth, db } from '@/services/firebaseConfig';
 import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 
 type AttProps = {
@@ -67,8 +66,6 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
     })
 
     const queryClient = useQueryClient() // <--- novo
-    const firebaseApp = initializeApp(firebaseConfig);
-    const db = getFirestore(firebaseApp)
 
     // 1. Obter o usuário logado
     const [user] = useAuthState(auth);; // Assume que useAuth() retorna o objeto de usuário
@@ -112,6 +109,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
     // 1.1.5 No componente, criar um estado para o progresso, para a barra de progresso
     const [progress, setProgress] = useState<number>(0);
+    const [isUploading, setIsUploading] = useState<boolean>(false)
     const uploadImage = (file: File) => {
         const storage = getStorage();
         const storageRef = ref(storage, `users/${user.uid}/jogos/${Date.now()}_${file.name}`);
@@ -147,8 +145,9 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
         // 2.1. Criar a referência da subcoleção
         const userJogosCollectionRef = collection(db, 'users', user.uid, 'jogos');
 
+        let finalImageUrl = "";
         try {
-            let finalImageUrl = "";
+            setIsUploading(true)
 
             // 1. Se o usuário escolheu uma imagem, fazemos o upload agora
             if (imageFile) {
@@ -160,17 +159,23 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
                 // PEGA o link permanente da imagem no Firebase
                 finalImageUrl = await getDownloadURL(snapshot.ref);
+            } else {
+                // 2. Se não escolheu nova imagem, manter a atual
+                finalImageUrl = currentBackgroundImage || "";
             }
 
             await updateDoc(doc(userJogosCollectionRef, gameId), {
                 ...data,
                 background_image: finalImageUrl // Link que funciona em qualquer lugar
             });
+            await uploadImage(imageFile || currentBackgroundImage as unknown as File)
             setRefreshImage(prev => prev + 1);
             reset()
             setImageFile(null);
             setPreviewURL(null);
             handleClose()
+            setProgress(0)
+            setIsUploading(false)
             queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos'] })
         }
         catch (err) {
@@ -931,7 +936,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
                                     <div className='w-[150px] h-[150px] rounded-lg bg-black/60 overflow-hidden'>
                                         {previewURL ? (
-                                            <img src={previewURL} className='object-cover object-center' />)
+                                            <img src={previewURL} className='object-cover object-center h-full w-full ' />)
                                             :
                                             (<button type='button' onClick={() => triggerImageInput('background_image')} className='w-full h-full' >150x150</button>)
                                         }
@@ -953,13 +958,19 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
                         </div>
 
-                        <div>
-                            <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
-                                <Button className='' type="submit" >+ Atualizar jogo</Button>
-                            </DialogActions>
+                        <div className='flex items-center w-full'>
+                            <div className={`w-40 flex flex-col  ${isUploading ? 'block' : 'hidden'}` }>
+                                <progress value={progress} max="100" className='' />
+                                <span className={`text-blue-500 text-lg`}>Enviando {isNaN(progress) ? 0 : progress}%</span>
+                            </div>
+
+                            <div className='w-full flex justify-end items-end' >
+                                <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
+                                    <Button className='' type="submit" >+ Atualizar jogo</Button>
+                                </DialogActions>
+                            </div>
                         </div>
                         {/* </div> */}
-                        <progress value={progress} max="100" />
                     </form>
                 </DialogContent>
             </Dialog>

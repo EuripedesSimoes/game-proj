@@ -15,27 +15,27 @@ export const GamePageParaJogar = () => {
 
 
     const inputStyles = {
-    backgroundColor: '#f1f5f9',
-    '& .MuiInputBase-input': { 
-        color: '#3c3c3c', 
-        fontSize: '1.2rem', // Letras maiores como você pediu
-        px: 1, 
-        py: 1.2 
-    },
-    // Estilos para o estado DISABLED (escurecido)
-    "& .MuiInputBase-input.Mui-disabled": {
-        WebkitTextFillColor: "#3c3c3c", 
-        color: "#3c3c3c",
-    },
-    "& .MuiInputLabel-root.Mui-disabled": {
-        color: "#1a1a1a",
-    },
-    // Autofill com sua variável CSS
-    "& .MuiInputBase-input-webkit-autofill": {
-        WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-    },
-    // ... adicione o restante dos estilos aqui
-};
+        backgroundColor: '#f1f5f9',
+        '& .MuiInputBase-input': {
+            color: '#3c3c3c',
+            fontSize: '1.2rem', // Letras maiores como você pediu
+            px: 1,
+            py: 1.2
+        },
+        // Estilos para o estado DISABLED (escurecido)
+        "& .MuiInputBase-input.Mui-disabled": {
+            WebkitTextFillColor: "#3c3c3c",
+            color: "#3c3c3c",
+        },
+        "& .MuiInputLabel-root.Mui-disabled": {
+            color: "#1a1a1a",
+        },
+        // Autofill com sua variável CSS
+        "& .MuiInputBase-input-webkit-autofill": {
+            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
+        },
+        // ... adicione o restante dos estilos aqui
+    };
     const { slug } = useParams();
     const [user] = useAuthState(auth);
     const navigate = useNavigate()
@@ -56,7 +56,10 @@ export const GamePageParaJogar = () => {
 
     if (isLoading) return <div>Carregando...</div>;
     if (!game) return <div>
-        <Button onClick={() => navigate('/home/jogos-para-jogar')}><FaArrowLeft /> Voltar </Button>
+        <Button onClick={() => navigate('/home/jogos-para-jogar')}
+            startIcon={<FaArrowLeft />}>
+            Voltar
+        </Button>
         <span className="text-white">Erro ao carregar jogo</span>
     </div>;
 
@@ -118,7 +121,7 @@ export const GamePageParaJogar = () => {
 
                             <div className=' col-span-2'>
                                 <MyCustomInput
-                                    className='shadow-lg col-span-2 rounded-sm'                                    
+                                    className='shadow-lg col-span-2 rounded-sm'
                                     fullWidth
                                     margin="dense"
                                     id="name"
@@ -127,7 +130,7 @@ export const GamePageParaJogar = () => {
                                     type="text"
                                     variant="standard"
                                     disabled={true}
-                                    value={game.name}
+                                    value={game.name.toUpperCase()}
                                 />
                             </div>
                             {/* <div className=' col-span-2'>
@@ -150,7 +153,7 @@ export const GamePageParaJogar = () => {
                                     type="text"
                                     variant="standard"
                                     disabled={true}
-                                    value={game.hours_expected}
+                                    value={`${game.hours_expected} ${game.hours_expected <= 1 ? 'hora' : 'horas'} `}
                                 />
                             </div>
                             <div>

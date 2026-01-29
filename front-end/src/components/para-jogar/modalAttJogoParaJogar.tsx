@@ -5,15 +5,14 @@ import TextField from '@mui/material/TextField';
 // import API from '@/services/gameApiServices';
 // import type { GamePayload3 } from '@/interfaces/gameDataTypes';
 // import { FaRegWindowClose } from 'react-icons/fa';
-// import { FaClock } from 'react-icons/fa';
+
 import { FaDownload, FaPencilAlt } from "react-icons/fa";
 import { RiCloseCircleLine } from "react-icons/ri";
 import Select from '@mui/material/Select';
 import { allPlatforms, allGenres, allPriorities, isReplayedList } from '@/services/listasParaFiltro';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { collection, doc, getDoc, getFirestore, updateDoc } from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
+import { collection, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -21,7 +20,7 @@ import { z } from 'zod';
 import { gameToPlaySchema, normalizeOnlyNumbers } from '@/helpers/gameFormSchemas'
 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, firebaseConfig } from '@/services/firebaseConfig';
+import { auth, db } from '@/services/firebaseConfig';
 import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 
 type AttProps = {
@@ -64,9 +63,6 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
     const [release_year, setRelease_year] = useState<number | string>(data?.release_year || '')
 
     const queryClient = useQueryClient() // <--- novo
-    const firebaseApp = initializeApp(firebaseConfig);
-    const db = getFirestore(firebaseApp)
-    // const storage = getStorage(firebaseApp);
     // const jogosParaJogarColeRef = collection(db, 'jogos-para-jogar') // referência à coleção 'jogos-para-jogar' no Firestore
 
     // 1. Obter o usuário logado
@@ -110,6 +106,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
 
     // 1.1.5 No componente, criar um estado para o progresso, para a barra de progresso
     const [progress, setProgress] = useState<number>(0);
+    const [isUploading, setIsUploading] = useState<boolean>(false)
     const uploadImage = (file: File) => {
         const storage = getStorage();
         const storageRef = ref(storage, `users/${user.uid}/jogos-para-jogar/${Date.now()}_${file.name}`);
@@ -146,8 +143,9 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
         // collection(db, 'users', user.uid, 'joojs') aponta para users/{uid}/jogos-para-jogar
         const userJogosParaJogarCollectionRef = collection(db, 'users', user.uid, 'jogos-para-jogar');
 
+        let finalImageUrl = "";
         try {
-            let finalImageUrl = "";
+            setIsUploading(true)
 
             // 1. Se o usuário escolheu uma imagem, fazemos o upload agora
             if (imageFile) {
@@ -159,18 +157,24 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
 
                 // PEGA o link permanente da imagem no Firebase
                 finalImageUrl = await getDownloadURL(snapshot.ref);
+            } else {
+                // 2. Se não escolheu nova imagem, manter a atual
+                finalImageUrl = currentBackgroundImage || "";
             }
 
-            queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos-para-jogar'] })
+            // queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos-para-jogar'] })
             await updateDoc(doc(userJogosParaJogarCollectionRef, gameId), {
                 ...data,
                 background_image: finalImageUrl // Link que funciona em qualquer lugar
             });
+            await uploadImage(imageFile || currentBackgroundImage as unknown as File)
             setRefreshImage(prev => prev + 1);
             reset()
             setImageFile(null);
             setPreviewURL(null);
             FBhandleClose()
+            setProgress(0)
+            setIsUploading(false)
             queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos-para-jogar'] })
         }
         catch (err) {
@@ -678,7 +682,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
 
                                     <div className='w-[150px] h-[150px] rounded-lg bg-black/60 overflow-hidden'>
                                         {previewURL ? (
-                                            <img src={previewURL} className='object-cover object-center' />)
+                                            <img src={previewURL} className='object-cover object-center h-full w-full '/>)
                                             :
                                             (<button type='button' onClick={() => triggerImageInput('background_image')} className='w-full h-full' >150x150</button>)
                                         }
@@ -700,10 +704,19 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
 
                         </div>
 
-                        <div>
-                            <DialogActions className='bg-teal-400/60 max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
-                                <Button className='' type="submit" >+ Atualizar jogo P/ jogar</Button>
-                            </DialogActions>
+                        <div className='flex justify-center items-center w-full'>
+
+                            <div className={`w-40 flex flex-col  ${isUploading ? 'block' : 'hidden'}`}>
+                                <progress value={progress} max="100"  />
+                                <span className='text-blue-500 text-lg'>Enviando {isNaN(progress) ? 0 : progress}%</span>
+                            </div>
+
+                            <div className='w-full flex justify-end items-end' >
+                                <DialogActions className=' max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60'>
+                                    <Button className='' type="submit" >+ Atualizar jogo P/ jogar</Button>
+                                </DialogActions>
+                            </div>
+
                         </div>
 
                     </form>

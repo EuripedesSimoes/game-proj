@@ -26,7 +26,7 @@ export function Home() {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <div className='w-full bg-black '>
+            <div className='w-full bg-black'>
 
                 {/* <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3> */}
                 <div className='flex flex-row gap-2 justify-center items-center p-2 z-[-30]'>

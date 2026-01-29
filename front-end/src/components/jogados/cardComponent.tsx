@@ -62,12 +62,11 @@ export default function CardComponent({ id, name, hours_played, hours_expected, 
                 </div>
 
                 <div className="w-full h-[60%] relative">
-                    <div className="absolute  w-full h-full rounded-lg shadow-lg  hover:bg-black/20" onClick={() => navigate(`/home/jogos/${id}`)}></div>
+                    <div className="absolute  w-full h-full rounded-lg shadow-lg  hover:bg-black/20" onClick={() => navigate(`/home/jogos/${id}`)}><Link to={`/home/jogos/${id}`} target="_blank">skibidddd</Link></div>
                     <img
                         src={background_image}
                         alt={name}
                         className='w-full h-full object-cover object-center rounded-t-lg border-b-3 border-emerald-800 hover:border-amber-500'
-
                     />
                 </div>
 
