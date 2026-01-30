@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
-import TextField from '@mui/material/TextField';
+// import TextField from '@mui/material/TextField';
+
 // import API from '@/services/gameApiServices';
 // import type { GamePayload2 } from '@/interfaces/gameDataTypes';
 // import { FaRegWindowClose } from 'react-icons/fa';
@@ -22,6 +23,7 @@ import { gameToPlaySchema } from '@/helpers/gameFormSchemas'
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, firebaseConfig } from '@/services/firebaseConfig';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { InputAddModal } from '@/helpers/sxConfigs';
 
 
 export type FormData = z.infer<typeof gameToPlaySchema>;
@@ -205,36 +207,8 @@ export default function AddGameModalParaJogar() {
                         <div className='grid grid-cols-4 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
                             <div className='col-span-2'>
-                                <TextField
+                                <InputAddModal
                                     className='shadow-lg my-1'
-                                    sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
-                                        '& .MuiOutlinedInput-root': {
-                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                        },
-                                        "& .MuiInputBase-input": {
-                                            color: "rgb(var(--color-text-variant))", // text color
-                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
-                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
-                                            WebkitTextFillColor: '#3c3c3c',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
-                                        },
-                                        "& .MuiInputLabel-root": {
-                                            marginTop: '2px',
-                                        },
-                                        "& .MuiInputLabel-root.Mui-focused": {
-                                            fontWeight: '600',
-                                        },
-                                    }}
-                                    // autoFocus
                                     {...register('name')}
                                     fullWidth
                                     margin="dense"
@@ -248,39 +222,9 @@ export default function AddGameModalParaJogar() {
                             </div>
 
                             <div className='col-span-1'>
-                                <TextField
+                                <InputAddModal
                                     className='shadow-lg my-1'
-                                    sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
-                                        '& .MuiOutlinedInput-root': {
-                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                        },
-                                        "& .MuiInputBase-input": {
-                                            color: "rgb(var(--color-text-variant))", // text color
-                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
-                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
-                                            WebkitTextFillColor: '#3c3c3c',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
-                                        },
-                                        "& .MuiInputLabel-root": {
-                                            marginTop: '2px',
-                                        },
-                                        "& .MuiInputLabel-root.Mui-focused": {
-                                            fontWeight: '600',
-                                        },
-                                    }}
                                     {...register('hours_expected', { valueAsNumber: true })}
-                                    // error={!!errors.hours_expected}
-                                    // helperText={errors.hours_expected?.message}
-                                    // autoFocus
                                     value={isNaN(horasEsperada) ? '' : horasEsperada}
 
                                     margin="dense"
@@ -296,37 +240,9 @@ export default function AddGameModalParaJogar() {
                             </div>
 
                             <div className='col-span-1'>
-                                <TextField
+                                <InputAddModal
                                     className='shadow-lg'
-                                    sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
-                                        '& .MuiOutlinedInput-root': {
-                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                        },
-                                        "& .MuiInputBase-input": {
-                                            color: "rgb(var(--color-text-variant))", // text color
-                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
-                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
-                                            WebkitTextFillColor: '#3c3c3c',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
-                                        },
-                                        "& .MuiInputLabel-root": {
-                                            marginTop: '2px',
-                                        },
-                                        "& .MuiInputLabel-root.Mui-focused": {
-                                            fontWeight: '600',
-                                        },
-                                    }}
                                     {...register('release_year', { valueAsNumber: true })}
-                                    // autoFocus
                                     value={isNaN(anoLancado) ? '' : anoLancado}
                                     margin="dense"
                                     id="release_year"
@@ -613,8 +529,8 @@ export default function AddGameModalParaJogar() {
 
                         </div>
 
-
                         <div>
+
                             <div className='flex flex-row items-center gap-2 text-xs '>
 
                                 <div className='w-[150px] h-[150px] rounded-xl bg-black/60 overflow-hidden'>
@@ -626,21 +542,24 @@ export default function AddGameModalParaJogar() {
                                 </div>
 
                                 <button type='button' onClick={() => triggerImageInput('background_image')}>
-                                    <span className='flex justify-center px-2 py-0.5'><FaDownload className='size-6'/></span>
+                                    <span className='flex justify-center px-2 py-0.5'><FaDownload className='size-6' /></span>
                                     <span className='text-base flex justify-center px-2 py-0.5'>Adicionar imagem</span>
                                 </button>
                                 <input type="file" name="background_image" id="background_image" accept='image/*' className='hidden'
                                     onChange={((ev) => setProjectImage(handleImageInput(ev)))} />
 
                             </div>
+
                         </div>
 
                         <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
                             {/* <Button className='max-[400px]:w-42 bg-red-500' onClick={resetarForm}>Resetar</Button> */}
                             <Button className='max-[400px]:w-54' type="submit">+ Adicionar jogo P/ Jogar</Button>
                         </DialogActions>
+
                     </form>
                 </DialogContent>
+
             </Dialog>
 
 

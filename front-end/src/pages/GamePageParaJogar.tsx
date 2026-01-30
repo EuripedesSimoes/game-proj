@@ -13,29 +13,6 @@ import { MyCustomInput, MyCustomInput_variant } from "@/helpers/sxConfigs";
 
 export const GamePageParaJogar = () => {
 
-
-    const inputStyles = {
-        backgroundColor: '#f1f5f9',
-        '& .MuiInputBase-input': {
-            color: '#3c3c3c',
-            fontSize: '1.2rem', // Letras maiores como você pediu
-            px: 1,
-            py: 1.2
-        },
-        // Estilos para o estado DISABLED (escurecido)
-        "& .MuiInputBase-input.Mui-disabled": {
-            WebkitTextFillColor: "#3c3c3c",
-            color: "#3c3c3c",
-        },
-        "& .MuiInputLabel-root.Mui-disabled": {
-            color: "#1a1a1a",
-        },
-        // Autofill com sua variável CSS
-        "& .MuiInputBase-input-webkit-autofill": {
-            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-        },
-        // ... adicione o restante dos estilos aqui
-    };
     const { slug } = useParams();
     const [user] = useAuthState(auth);
     const navigate = useNavigate()
@@ -133,15 +110,11 @@ export const GamePageParaJogar = () => {
                                     value={game.name.toUpperCase()}
                                 />
                             </div>
-                            {/* <div className=' col-span-2'>
-                                <span className="border-b-[6px] border-green-400 flex w-full items-center justify-center text-white text-4xl">{game.name}</span>
-                            </div> */}
-
-
-
+                            
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 mb-2 py-2 border-b-4 border-[#c7c7c7]">
+
                             <div className=''>
                                 <MyCustomInput_variant
                                     className='shadow-lg rounded-sm'
@@ -156,6 +129,7 @@ export const GamePageParaJogar = () => {
                                     value={`${game.hours_expected} ${game.hours_expected <= 1 ? 'hora' : 'horas'} `}
                                 />
                             </div>
+
                             <div>
                                 <MyCustomInput_variant
                                     className='shadow-lg rounded-sm'
@@ -170,6 +144,7 @@ export const GamePageParaJogar = () => {
                                     value={game.release_year}
                                 />
                             </div>
+
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 mb-2 py-2 border-b-4 border-[#c7c7c7]">
@@ -197,8 +172,8 @@ export const GamePageParaJogar = () => {
                                 disabled={true}
                                 value={game.genre}
                             />
-
                         </div>
+
                     </div>
                 </div>
 

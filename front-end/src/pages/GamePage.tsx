@@ -134,6 +134,7 @@ export const GamePage = () => {
                         </div>
 
                         <div className="grid grid-cols-3 gap-4 mb-2 py-2  border-b-4 border-[#b6b6b6]">
+                            
                             <div className=' col-span-1 '>
                                 <MyCustomInput_variant
                                     className='shadow-lg rounded-sm'
@@ -175,21 +176,9 @@ export const GamePage = () => {
                                             padding: '12px 16px', // Ajusta a altura interna
                                             fontWeight: `${game.status === "Finalizado" ? 'bold' : "500"}`,
                                         },
-                                        // 2. Aumenta o tamanho da label (quando está dentro do campo)
-                                        '& .MuiInputLabel-root': {
-                                            fontSize: '1rem',
-                                        },
-                                        // 3. Ajusta a posição da label quando ela "sobe" ao focar
-                                        '& .MuiInputLabel-shrink': {
-                                            transform: 'translate(4px, -3px) scale(0.85)', // Ajuste fino da escala
-                                        },
                                         // 4. Escurece o texto digitado (Input)
                                         "& .MuiInputBase-input.Mui-disabled": {
                                             WebkitTextFillColor: `${game.status === "Finalizado" ? '#1d8d1d' : "#4f4f4f"}`, // Para navegadores Webkit (Chrome/Safari)
-                                        },
-                                        // 5. Escurece a Label (Rótulo)
-                                        "& .MuiInputLabel-root.Mui-disabled": {
-                                            color: "#6c6c6c", // Cor da label mais escura
                                         },
                                     }}
                                     className='shadow-lg rounded-sm'
@@ -204,9 +193,11 @@ export const GamePage = () => {
                                     value={game.status}
                                 />
                             </div>
+
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 mb-2 py-2 border-b-4 border-[#b6b6b6]">
+
                             <div>
                                 <MyCustomInput_variant
                                     className='shadow-lg rounded-sm'
@@ -236,9 +227,11 @@ export const GamePage = () => {
                                     value={game.genre}
                                 />
                             </div>
+
                         </div>
 
                         <div className="grid grid-cols-3 gap-4 mb-2 py-2 border-b-4 border-[#b6b6b6]">
+
                             <MyCustomInput_variant
                                 className='shadow-lg rounded-sm'
                                 fullWidth

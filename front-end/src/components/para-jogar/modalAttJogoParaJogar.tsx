@@ -22,6 +22,7 @@ import { gameToPlaySchema, normalizeOnlyNumbers } from '@/helpers/gameFormSchema
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '@/services/firebaseConfig';
 import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable, deleteObject } from "firebase/storage";
+import { InputAttModal } from '@/helpers/sxConfigs';
 
 type AttProps = {
     gameId: any;
@@ -133,7 +134,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
     // Função para deletar imagem do Storage
     const fbDeletaImagemStorage = async (imageUrl: string) => {
         if (!imageUrl) return;
-        
+
         try {
             const storage = getStorage();
             const imagemRef = ref(storage, imageUrl);
@@ -255,36 +256,8 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
 
                             {/* nome do jogo*/}
                             <div className=' col-span-2'>
-                                <TextField
+                                <InputAttModal
                                     className='shadow-lg my-1 col-span-4'
-                                    sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
-                                        '& .MuiOutlinedInput-root': {
-                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                        },
-                                        "& .MuiInputBase-input": {
-                                            color: "rgb(var(--color-text-variant))", // text color
-                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
-                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
-                                            WebkitTextFillColor: '#3c3c3c',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
-                                        },
-                                        "& .MuiInputLabel-root": {
-                                            marginTop: '2px',
-                                        },
-                                        "& .MuiInputLabel-root.Mui-focused": {
-                                            fontWeight: '600',
-                                        },
-                                    }}
-                                    // autoFocus
                                     {...register('name')}
                                     fullWidth
                                     margin="dense"
@@ -300,36 +273,8 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                             </div>
                             {/* horas esperadas */}
                             <div className=' col-span-1'>
-                                <TextField
+                                <InputAttModal
                                     className='shadow-lg col-span-2'
-                                    sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
-                                        '& .MuiOutlinedInput-root': {
-                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                        },
-                                        "& .MuiInputBase-input": {
-                                            color: "rgb(var(--color-text-variant))", // text color
-                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
-                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
-                                            WebkitTextFillColor: '#3c3c3c',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
-                                        },
-                                        "& .MuiInputLabel-root": {
-                                            marginTop: '2px',
-                                        },
-                                        "& .MuiInputLabel-root.Mui-focused": {
-                                            fontWeight: '600',
-                                        },
-                                    }}
-                                    // autoFocus
                                     {...register('hours_expected', {
                                         // Garante que o valor final seja sempre um número antes de validar
                                         setValueAs: normalizeOnlyNumbers,
@@ -351,35 +296,8 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                             </div>
                             {/* ano de lançamento */}
                             <div className=' col-span-1'>
-                                <TextField
+                                <InputAttModal
                                     className='shadow-lg'
-                                    sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
-                                        '& .MuiOutlinedInput-root': {
-                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                        },
-                                        "& .MuiInputBase-input": {
-                                            color: "rgb(var(--color-text-variant))", // text color
-                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
-                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
-                                            WebkitTextFillColor: '#3c3c3c',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
-                                        },
-                                        "& .MuiInputLabel-root": {
-                                            marginTop: '2px',
-                                        },
-                                        "& .MuiInputLabel-root.Mui-focused": {
-                                            fontWeight: '600',
-                                        },
-                                    }}
                                     // autoFocus
                                     {...register('release_year', { valueAsNumber: true })}
                                     margin="dense"
@@ -682,7 +600,6 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                         </div>
 
                         <div className='grid grid-cols-2 gap-2 pb-2 mb-2'>
-                            {/* <div className='flex flex-row items-center gap-3 text-xs '> */}
 
                             {currentBackgroundImage && currentBackgroundImage !== '' && (
                                 <div className='flex flex-col items-center border-r-4 border-[#b6b6b6]'>
@@ -691,50 +608,42 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                                 </div>
                             )}
 
-
                             <div className={`grid grid-cols-4 items-center gap-2 text-xs ${currentBackgroundImage && currentBackgroundImage !== '' && 'border-l-4 border-[#b6b6b6]'}`}>
-
                                 <div className='col-span-3 flex flex-col items-center'>
-
                                     <span className='w-full flex justify-center text-lg font-bold'>Nova Imagem</span>
-
                                     <div className='w-[150px] h-[150px] rounded-lg bg-black/60 overflow-hidden'>
                                         {previewURL ? (
-                                            <img src={previewURL} className='object-cover object-center h-full w-full '/>)
+                                            <img src={previewURL} className='object-cover object-center h-full w-full ' />)
                                             :
                                             (<button type='button' onClick={() => triggerImageInput('background_image')} className='w-full h-full' >150x150</button>)
                                         }
                                     </div>
-
                                 </div>
 
                                 <div className='col-span-1 flex flex-col items-center'>
-
                                     <button type='button' onClick={() => triggerImageInput('background_image')}>
                                         <span className='flex justify-center px-2 py-0.5'><FaDownload className='size-6' /></span>
                                         <span className='text-base flex justify-center px-2 py-0.5'>Adicionar imagem</span>
                                     </button>
+                                    
                                     <input type="file" name="background_image" id="background_image" accept='image/*' className='hidden'
                                         onChange={((ev) => setProjectImage(handleImageInput(ev)))} />
-
                                 </div>
                             </div>
 
                         </div>
 
                         <div className='flex justify-center items-center w-full'>
-
                             <div className={`w-40 flex flex-col  ${isUploading ? 'block' : 'hidden'}`}>
-                                <progress value={progress} max="100"  />
+                                <progress value={progress} max="100" />
                                 <span className='text-blue-500 text-lg'>Enviando {isNaN(progress) ? 0 : progress}%</span>
                             </div>
 
                             <div className='w-full flex justify-end items-end' >
                                 <DialogActions className=' max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60'>
-                                    <Button className='' type="submit" >+ Atualizar jogo P/ jogar</Button>
+                                    <Button className='' type="submit" >+ Atualizar jogo p/ jogar</Button>
                                 </DialogActions>
                             </div>
-
                         </div>
 
                     </form>
@@ -743,7 +652,5 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
         </>
     )
 }
-
-
 
 export default AttGameModalParaJogar;

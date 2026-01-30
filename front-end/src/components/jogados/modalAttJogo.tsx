@@ -22,6 +22,7 @@ import { gameAttSchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/ga
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '@/services/firebaseConfig';
 import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable, deleteObject } from "firebase/storage";
+import { InputAttModal } from '@/helpers/sxConfigs';
 
 type AttProps = {
     gameId: any;
@@ -136,7 +137,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
     // Função para deletar imagem do Storage
     const fbDeletaImagemStorage = async (imageUrl: string) => {
         if (!imageUrl) return;
-        
+
         try {
             const storage = getStorage();
             const imagemRef = ref(storage, imageUrl);
@@ -154,7 +155,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
             alert("Você precisa estar logado para adicionar jogos!");
             return;
         }
-        alert('Salvando jogo para o usuário: ' + user.uid + 'de nome: ' + user.displayName);
+        // alert('Salvando jogo para o usuário: ' + user.uid + 'de nome: ' + user.displayName);
 
         // 2.1. Criar a referência da subcoleção
         const userJogosCollectionRef = collection(db, 'users', user.uid, 'jogos');
@@ -162,6 +163,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
         let finalImageUrl = "";
         try {
             setIsUploading(true)
+            uploadHandleOpen()
 
             // 1. Se o usuário escolheu uma imagem, fazemos o upload agora
             if (imageFile) {
@@ -178,6 +180,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
                 // PEGA o link permanente da imagem no Firebase
                 finalImageUrl = await getDownloadURL(snapshot.ref);
+
             } else {
                 // 2. Se não escolheu nova imagem, manter a atual
                 finalImageUrl = currentBackgroundImage || "";
@@ -192,6 +195,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
             setImageFile(null);
             setPreviewURL(null);
             handleClose()
+            uploadHandleClose()
             setProgress(0)
             setIsUploading(false)
             queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos'] })
@@ -220,8 +224,12 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
     }, [data, reset]) // 
 
     const [open, setOpen] = useState(false);
-    const handleClickOpen = () => setOpen(true)
+    const handleOpen = () => setOpen(true)
     const handleClose = () => setOpen(false)
+
+    const [uploadOpen, setUploadOpen] = useState(false)
+    const uploadHandleOpen = () => setUploadOpen(true)
+    const uploadHandleClose = () => setUploadOpen(false)
 
     // Usando o watch() para ler os valores:
     const nomeJogo = watch('name')
@@ -272,13 +280,13 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
     return (
         <>
-            <Button className='bg-slate-500/60 m-2' onClick={handleClickOpen}>
+            <Button className='bg-slate-500/60 m-2' onClick={handleOpen}>
                 <span>
                     <FaPencilAlt className="h-6.5 w-6.5 text-white/80" />
                 </span>
             </Button>
 
-            <Dialog open={open} onClose={handleClose} className='bg-slate-500/95'>
+            <Dialog open={open} onClose={handleClose} className='bg-black/15'>
                 <DialogTitle sx={{ m: 0, p: 1.5, fontWeight: "bold" }} >
                     <div className='flex justify-between items-center'>
                         Atualizar Jogo
@@ -294,36 +302,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                         <div className='grid grid-cols-4 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
 
                             <div className='col-span-2'>
-                                <TextField
+                                <InputAttModal
                                     className='shadow-lg my-1 col-span-4'
-                                    sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
-                                        '& .MuiOutlinedInput-root': {
-                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                        },
-                                        "& .MuiInputBase-input": {
-                                            color: "rgb(var(--color-text-variant))", // text color
-                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
-                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
-                                            WebkitTextFillColor: '#3c3c3c',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
-                                        },
-                                        "& .MuiInputLabel-root": {
-                                            marginTop: '2px',
-                                        },
-                                        "& .MuiInputLabel-root.Mui-focused": {
-                                            fontWeight: '600',
-                                        },
-                                    }}
-                                    // autoFocus
                                     {...register('name')}
                                     fullWidth
                                     margin="dense"
@@ -342,36 +322,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                             </div>
 
                             <div className=' col-span-1'>
-                                <TextField
+                                <InputAttModal
                                     className='shadow-lg col-span-2'
-                                    sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
-                                        '& .MuiOutlinedInput-root': {
-                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                        },
-                                        "& .MuiInputBase-input": {
-                                            color: "rgb(var(--color-text-variant))", // text color
-                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
-                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
-                                            WebkitTextFillColor: '#3c3c3c',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
-                                        },
-                                        "& .MuiInputLabel-root": {
-                                            marginTop: '2px',
-                                        },
-                                        "& .MuiInputLabel-root.Mui-focused": {
-                                            fontWeight: '600',
-                                        },
-                                    }}
-                                    // autoFocus
                                     {...register('hours_played', {
                                         // Garante que o valor final seja sempre um número antes de validar
                                         setValueAs: normalizeOnlyNumbers,
@@ -392,36 +344,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                             </div>
 
                             <div className=' col-span-1'>
-                                <TextField
+                                <InputAttModal
                                     className='shadow-lg col-span-2'
-                                    sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
-                                        '& .MuiOutlinedInput-root': {
-                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                        },
-                                        "& .MuiInputBase-input": {
-                                            color: "rgb(var(--color-text-variant))", // text color
-                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
-                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
-                                            WebkitTextFillColor: '#3c3c3c',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
-                                        },
-                                        "& .MuiInputLabel-root": {
-                                            marginTop: '2px',
-                                        },
-                                        "& .MuiInputLabel-root.Mui-focused": {
-                                            fontWeight: '600',
-                                        },
-                                    }}
-                                    // autoFocus
                                     {...register('hours_expected', {
                                         // Garante que o valor final seja sempre um número antes de validar
                                         setValueAs: normalizeOnlyNumbers,
@@ -781,36 +705,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                         <div className='grid grid-cols-3 gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
                             {/* ano de lançamento */}
                             <div>
-                                <TextField
+                                <InputAttModal
                                     className='shadow-lg'
-                                    sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
-                                        '& .MuiOutlinedInput-root': {
-                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                        },
-                                        "& .MuiInputBase-input": {
-                                            color: "rgb(var(--color-text-variant))", // text color
-                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
-                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
-                                            WebkitTextFillColor: '#3c3c3c',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
-                                        },
-                                        "& .MuiInputLabel-root": {
-                                            marginTop: '2px',
-                                        },
-                                        "& .MuiInputLabel-root.Mui-focused": {
-                                            fontWeight: '600',
-                                        },
-                                    }}
-                                    // autoFocus
                                     {...register('release_year', {
                                         // Garante que o valor final seja sempre um número antes de validar
                                         setValueAs: normalizeOnlyNumbers,
@@ -832,36 +728,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                             </div>
                             {/* ano iniciado */}
                             <div>
-                                <TextField
+                                <InputAttModal
                                     className='shadow-lg'
-                                    sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
-                                        '& .MuiOutlinedInput-root': {
-                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                        },
-                                        "& .MuiInputBase-input": {
-                                            color: "rgb(var(--color-text-variant))", // text color
-                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
-                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
-                                            WebkitTextFillColor: '#3c3c3c',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
-                                        },
-                                        "& .MuiInputLabel-root": {
-                                            marginTop: '2px',
-                                        },
-                                        "& .MuiInputLabel-root.Mui-focused": {
-                                            fontWeight: '600',
-                                        },
-                                    }}
-                                    // autoFocus
                                     {...register('year_started', {
                                         // Garante que o valor final seja sempre um número antes de validar
                                         setValueAs: normalizeOnlyNumbers,
@@ -883,35 +751,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                             </div>
                             {/* ano finalizado */}
                             <div>
-                                <TextField
+                                <InputAttModal
                                     className='shadow-lg'
-                                    sx={{
-                                        backgroundColor: '#f1f5f9', // equivalente ao bg-slate-800 2c2c2c
-                                        input: { color: '#3c3c3c', px: 1, py: 1.2 }, // text-slate-100 #cecbce
-                                        '& .MuiOutlinedInput-root': {
-                                            // '& fieldset': { borderColor: '#334155' }, // border-slate-700
-                                            '&:hover fieldset': { borderColor: '#64748b' }, // hover border
-                                            '&.Mui-focused fieldset': { borderColor: '#6366f1' }, // focus border-indigo-500
-                                        },
-                                        "& .MuiInputBase-input": {
-                                            color: "rgb(var(--color-text-variant))", // text color
-                                            // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {
-                                            WebkitTextFillColor: 'rgb(var(--color-text-variant))',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.5) inset',
-                                        },
-                                        "& .MuiInputBase-input-webkit-autofill, & input:-webkit-autofill": {
-                                            WebkitTextFillColor: '#3c3c3c',
-                                            WebkitBoxShadow: '0 0 0px 1000px rgba(var(--color-background-autofill), 0.7) inset',
-                                        },
-                                        "& .MuiInputLabel-root": {
-                                            marginTop: '2px',
-                                        },
-                                        "& .MuiInputLabel-root.Mui-focused": {
-                                            fontWeight: '600',
-                                        },
-                                    }}
                                     {...register('year_finished', {
                                         setValueAs: normalizeYear,
                                     })}
@@ -965,8 +806,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                 <div className='col-span-1 flex flex-col items-center'>
 
                                     <button type='button' onClick={() => triggerImageInput('background_image')}>
-                                        <span className='flex justify-center px-2 py-0.5'><FaDownload className='size-6' /></span>
-                                        <span className='text-base flex justify-center px-2 py-0.5'>Adicionar imagem</span>
+                                        <span className='flex justify-center py-0.5'><FaDownload className='size-6' /></span>
+                                        <span className='text-base flex justify-center py-0.5'>Adicionar imagem</span>
                                     </button>
                                     <input type="file" name="background_image" id="background_image" accept='image/*' className='hidden'
                                         onChange={((ev) => setProjectImage(handleImageInput(ev)))} />
@@ -977,10 +818,6 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                         </div>
 
                         <div className='flex items-center w-full'>
-                            <div className={`w-40 flex flex-col  ${isUploading ? 'block' : 'hidden'}` }>
-                                <progress value={progress} max="100" className='' />
-                                <span className={`text-blue-500 text-lg`}>Enviando {isNaN(progress) ? 0 : progress}%</span>
-                            </div>
 
                             <div className='w-full flex justify-end items-end' >
                                 <DialogActions className='max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60 gap-2'>
@@ -990,6 +827,25 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                         </div>
                         {/* </div> */}
                     </form>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={uploadOpen} onClose={uploadHandleClose} className='bg-black/30'>
+                <DialogTitle sx={{ m: 0, p: 1.5, fontWeight: "bold" }} >
+                    Fazendo Alterações no jogo: {data.name}
+                </DialogTitle>
+                <DialogContent>
+                    <div className={`w-[400px] h-[200px] flex flex-col`}>
+                        <div className='w-full h-1/3 flex gap-2 justify-center items-center'>
+                            <progress value={progress} max="100" className='h-6 w-3/5 rounded-2xl' />
+                            <span className={`text-blue-500 text-lg`}>Enviando {isNaN(progress) ? 0 : progress}%</span>
+                        </div>
+
+                        <div className='grid grid-cols-1 h-1/4'>
+                            <span className='w-full items-center justify-center flex text-lg'>Atualizando jogo para o usuário de nome: </span>
+                            <span className='w-full items-center justify-center flex text-xl font-bold '>{user.displayName} </span>
+                        </div>
+                    </div>
                 </DialogContent>
             </Dialog>
         </>
