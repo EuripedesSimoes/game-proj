@@ -16,6 +16,7 @@ import CardComponentParaJogar from './cardComponentParaJogar';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '@/services/firebaseConfig';
+import { getStorage, ref, deleteObject } from 'firebase/storage';
 
 export default function AppParaJogar() {
 
@@ -44,12 +45,29 @@ export default function AppParaJogar() {
     });
 
 
-    async function fbDeletajooj(id: string) {
-    if (!userJogosParaJogarCollectionRef) return;
-    await deleteDoc(doc(userJogosParaJogarCollectionRef, id));
-    // Invalidar a query para forçar um refetch
-    queryClient.invalidateQueries({ queryKey: ['users', user?.uid, 'jogos-para-jogar'] });
-  }
+    async function fbDeletaImagemStorage(imageUrl: string) {
+        if (!imageUrl) return;
+        
+        try {
+            const storage = getStorage();
+            const imagemRef = ref(storage, imageUrl);
+            await deleteObject(imagemRef);
+            console.log('Imagem deletada com sucesso');
+        } catch (error) {
+            console.error('Erro ao deletar imagem do Storage:', error);
+        }
+    }
+
+    async function fbDeletajooj(id: string, backgroundImage?: string) {
+        if (!userJogosParaJogarCollectionRef) return;
+        
+        if (backgroundImage) {
+            await fbDeletaImagemStorage(backgroundImage);
+        }
+        
+        await deleteDoc(doc(userJogosParaJogarCollectionRef, id));
+        queryClient.invalidateQueries({ queryKey: ['users', user?.uid, 'jogos-para-jogar'] });
+    }
 
     const [filter, setFilter] = useState('')
     const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({}) // estado com filtros por categoria

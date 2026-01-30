@@ -20,7 +20,7 @@ type dadosJogos = {
     year_finished?: number | string;
     background_image?: string;
 
-    deletajooj: (id: string) => Promise<void>
+    deletajooj: (id: string, backgroundImage?: string) => Promise<void>
 }
 
 export default function CardComponent({ id, name, hours_played, hours_expected, platform, genre, release_year, status, replayed, priority, year_started, year_finished, background_image, deletajooj }: dadosJogos) {
@@ -52,7 +52,7 @@ export default function CardComponent({ id, name, hours_played, hours_expected, 
                 key={id} >
 
                 <div className="absolute bg-white/20 z-50 rounded-lg shadow-lg  hover:bg-gray-600">
-                    <Button className='bg-white/60 m-2' onClick={() => deletajooj(id)}>
+                    <Button className='bg-white/60 m-2' onClick={() => deletajooj(id, background_image)}>
                         <span>
                             <FaEraser className="h-6.5 w-6.5 text-red-600/80" />
                         </span>

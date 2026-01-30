@@ -21,7 +21,7 @@ import { gameAttSchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/ga
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '@/services/firebaseConfig';
-import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable, deleteObject } from "firebase/storage";
 
 type AttProps = {
     gameId: any;
@@ -133,6 +133,20 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
         });
     };
 
+    // Função para deletar imagem do Storage
+    const fbDeletaImagemStorage = async (imageUrl: string) => {
+        if (!imageUrl) return;
+        
+        try {
+            const storage = getStorage();
+            const imagemRef = ref(storage, imageUrl);
+            await deleteObject(imagemRef);
+            console.log('Imagem antiga deletada com sucesso');
+        } catch (error) {
+            console.error('Erro ao deletar imagem antiga do Storage:', error);
+        }
+    }
+
     // 2. onSubmit receberá dados já validados pelo Zod via react-hook-form
     const onSubmit = async (data: FormData) => {
 
@@ -151,6 +165,11 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
             // 1. Se o usuário escolheu uma imagem, fazemos o upload agora
             if (imageFile) {
+                // Deletar imagem antiga se existir
+                if (currentBackgroundImage) {
+                    await fbDeletaImagemStorage(currentBackgroundImage);
+                }
+
                 const storage = getStorage();
                 const storageRef = ref(storage, `users/${user.uid}/jogos/${Date.now()}_${imageFile.name}`);
 
@@ -168,7 +187,6 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                 ...data,
                 background_image: finalImageUrl // Link que funciona em qualquer lugar
             });
-            await uploadImage(imageFile || currentBackgroundImage as unknown as File)
             setRefreshImage(prev => prev + 1);
             reset()
             setImageFile(null);
