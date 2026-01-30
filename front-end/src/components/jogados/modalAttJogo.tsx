@@ -172,14 +172,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                     await fbDeletaImagemStorage(currentBackgroundImage);
                 }
 
-                const storage = getStorage();
-                const storageRef = ref(storage, `users/${user.uid}/jogos/${Date.now()}_${imageFile.name}`);
-
-                // AGUARDA o upload terminar
-                const snapshot = await uploadBytes(storageRef, imageFile);
-
-                // PEGA o link permanente da imagem no Firebase
-                finalImageUrl = await getDownloadURL(snapshot.ref);
+                // Faz o upload usando uploadImage() que atualiza o progresso
+                finalImageUrl = await uploadImage(imageFile);
 
             } else {
                 // 2. Se não escolheu nova imagem, manter a atual
@@ -777,7 +771,6 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                         </div>
 
                         <div className='grid grid-cols-2 gap-2 pb-2 mb-2'>
-                            {/* <div className='flex flex-row items-center gap-3 text-xs '> */}
 
                             {currentBackgroundImage && currentBackgroundImage !== '' && (
                                 <div className='flex flex-col items-center border-r-4 border-[#b6b6b6]'>
@@ -824,9 +817,11 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                                     <Button className='' type="submit" >+ Atualizar jogo</Button>
                                 </DialogActions>
                             </div>
+
                         </div>
-                        {/* </div> */}
+
                     </form>
+                    
                 </DialogContent>
             </Dialog>
 

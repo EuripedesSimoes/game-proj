@@ -152,7 +152,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
             alert("Você precisa estar logado para adicionar jogos!");
             return;
         }
-        alert('Alterando informações de jogo para jogar no futuro para o usuário: ' + user.displayName + '\n' + 'de nome: ' + user.displayName);
+        // alert('Alterando informações de jogo para jogar no futuro para o usuário: ' + user.displayName + '\n' + 'de nome: ' + user.displayName);
 
         // 2.1. Criar a referência da subcoleção
         // collection(db, 'users', user.uid, 'joojs') aponta para users/{uid}/jogos-para-jogar
@@ -161,6 +161,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
         let finalImageUrl = "";
         try {
             setIsUploading(true)
+            FBuploadHandleOpen()
 
             // 1. Se o usuário escolheu uma imagem, fazemos o upload agora
             if (imageFile) {
@@ -169,14 +170,8 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                     await fbDeletaImagemStorage(currentBackgroundImage);
                 }
 
-                const storage = getStorage();
-                const storageRef = ref(storage, `users/${user.uid}/jogos-para-jogar/${Date.now()}_${imageFile.name}`);
-
-                // AGUARDA o upload terminar
-                const snapshot = await uploadBytes(storageRef, imageFile);
-
-                // PEGA o link permanente da imagem no Firebase
-                finalImageUrl = await getDownloadURL(snapshot.ref);
+                // Faz o upload usando uploadImage() que atualiza o progresso
+                finalImageUrl = await uploadImage(imageFile);
             } else {
                 // 2. Se não escolheu nova imagem, manter a atual
                 finalImageUrl = currentBackgroundImage || "";
@@ -192,6 +187,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
             setImageFile(null);
             setPreviewURL(null);
             FBhandleClose()
+            FBuploadHandleClose()
             setProgress(0)
             setIsUploading(false)
             queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos-para-jogar'] })
@@ -209,6 +205,10 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
     const [open, setOpen] = useState(false);
     const FBhandleClickOpen = () => setOpen(true)
     const FBhandleClose = () => setOpen(false)
+
+    const [FBuploadOpen, setFBUploadOpen] = useState(false)
+    const FBuploadHandleOpen = () => setFBUploadOpen(true)
+    const FBuploadHandleClose = () => setFBUploadOpen(false)
 
     // Usando o watch() para ler o valor:
     const horasEsperadas = watch('hours_expected')
@@ -625,7 +625,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                                         <span className='flex justify-center px-2 py-0.5'><FaDownload className='size-6' /></span>
                                         <span className='text-base flex justify-center px-2 py-0.5'>Adicionar imagem</span>
                                     </button>
-                                    
+
                                     <input type="file" name="background_image" id="background_image" accept='image/*' className='hidden'
                                         onChange={((ev) => setProjectImage(handleImageInput(ev)))} />
                                 </div>
@@ -634,11 +634,6 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                         </div>
 
                         <div className='flex justify-center items-center w-full'>
-                            <div className={`w-40 flex flex-col  ${isUploading ? 'block' : 'hidden'}`}>
-                                <progress value={progress} max="100" />
-                                <span className='text-blue-500 text-lg'>Enviando {isNaN(progress) ? 0 : progress}%</span>
-                            </div>
-
                             <div className='w-full flex justify-end items-end' >
                                 <DialogActions className=' max-[400px]:flex max-[400px]:flex-col max-[400px]:mt-4 max-[400px]:border-t-3 border-black/60'>
                                     <Button className='' type="submit" >+ Atualizar jogo p/ jogar</Button>
@@ -647,6 +642,25 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                         </div>
 
                     </form>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={FBuploadOpen} onClose={FBuploadHandleClose} className='bg-black/30'>
+                <DialogTitle sx={{ m: 0, p: 1.5, fontWeight: "bold" }} >
+                    Fazendo Alterações no jogo: <span className='text-xl font-bold text-blue-500' >{data.name}</span>
+                </DialogTitle>
+                <DialogContent>
+                    <div className={`w-[400px] h-[200px] flex flex-col`}>
+                        <div className='w-full h-1/3 flex gap-2 justify-center items-center'>
+                            <progress value={progress} max="100" className='h-6 w-3/5 rounded-2xl' />
+                            <span className={`text-blue-500 text-lg`}>Enviando {isNaN(progress) ? 0 : progress}%</span>
+                        </div>
+
+                        <div className='grid grid-cols-1 h-1/4'>
+                            <span className='w-full items-center justify-center flex text-lg'>Atualizando jogo para o usuário de nome: </span>
+                            <span className='w-full items-center justify-center flex text-xl font-bold text-green-800 '>{user.displayName} </span>
+                        </div>
+                    </div>
                 </DialogContent>
             </Dialog>
         </>
