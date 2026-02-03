@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 // import API from '@/services/gameApiServices';
 // import type { GamePayload2 } from '@/interfaces/gameDataTypes';
 import { RiCloseCircleLine } from "react-icons/ri";
-import { FaClock, FaDownload } from 'react-icons/fa';
+import { FaClock, FaDownload, FaFolderPlus, FaPlus, FaPlusCircle, FaPlusSquare } from 'react-icons/fa';
 import Select from '@mui/material/Select';
 import { allPriorities, allPlatforms, allStatus, allGenres, isReplayedList } from '@/services/listasParaFiltro';
 
@@ -133,7 +133,7 @@ export default function ZodAddGameModal() {
 
     return (
         <div className='w-full h-full flex flex-col justify-center items-center'>
-            <Button onClick={handleClickOpen}>Adicionar Jogo</Button>
+            <Button onClick={handleClickOpen}> <FaPlus className='size-5'/> Adicionar Jogo </Button>
 
             {/* Adicionar backdropblur-md */}
             <Dialog open={open} onClose={handleClose} className='bg-slate-700'

@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 //getFirestore: olha a aplicação, olhas as chaves secretas do firebaseCoonfig e repassa pro Firestore se tem permissão de admin para acessar o banco de dados
@@ -17,8 +17,29 @@ import CardComponentParaJogar from './cardComponentParaJogar';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '@/services/firebaseConfig';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
+import { FaBorderStyle } from 'react-icons/fa';
 
 export default function AppParaJogar() {
+
+    // Persistir preferência do tipo de card no localStorage (evita reset ao recarregar a página)
+    const [steamCardPJ, setSteamCardPJ] = useState<boolean>(() => {
+        try {
+            const stored = localStorage.getItem('steamCardPJ')
+            return stored ? JSON.parse(stored) : true
+        } catch (e) {
+            return true
+        }
+    })
+
+    useEffect(() => {
+        try {
+            localStorage.setItem('steamCardPJ', JSON.stringify(steamCardPJ))
+        } catch (e) {
+            // ignore
+        }
+    }, [steamCardPJ])
+
+    const [cardsKey, setCardsKey] = useState(0)
 
     const queryClient = useQueryClient()
     // 1. Obter o usuário logado
@@ -38,19 +59,25 @@ export default function AppParaJogar() {
 
     // 3. O useQuery DEVE ser chamado no topo, sem condicionais antes dele.
     // Usamos o 'enabled' para ele só rodar quando o user.uid estiver disponível.
-    const { data: data = [], isLoading: isFetching, isError } = useQuery({
+    // Opções para evitar refetchs automáticos indesejados e peguei a função `refetch` para recarregar manualmente quando necessário.
+    const { data: data = [], isLoading: isFetching, isError, refetch } = useQuery({
         queryKey: ['users', user?.uid, 'jogos-para-jogar'],
         queryFn: fetchJogosParaJogar,
         enabled: !!user?.uid, // Importante: a query só "acorda" quando tem usuário
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        staleTime: 60 * 1000,
     });
 
-
+    // 4. Função para deletar imagem do Storage
     async function fbDeletaImagemStorage(imageUrl: string) {
         if (!imageUrl) return;
-        
+
         try {
+            // Converte a URL em uma referência do Storage
             const storage = getStorage();
             const imagemRef = ref(storage, imageUrl);
+            // Deleta a imagem
             await deleteObject(imagemRef);
             console.log('Imagem deletada com sucesso');
         } catch (error) {
@@ -58,20 +85,22 @@ export default function AppParaJogar() {
         }
     }
 
+    // 5. Função de delete modificada para deletar jogo e imagem
     async function fbDeletajooj(id: string, backgroundImage?: string) {
         if (!userJogosParaJogarCollectionRef) return;
-        
+
+        // Deleta a imagem do Storage se existir
         if (backgroundImage) {
             await fbDeletaImagemStorage(backgroundImage);
         }
-        
+
         await deleteDoc(doc(userJogosParaJogarCollectionRef, id));
         queryClient.invalidateQueries({ queryKey: ['users', user?.uid, 'jogos-para-jogar'] });
     }
 
     const [filter, setFilter] = useState('')
     const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({}) // estado com filtros por categoria
-    const [sortBy, setSortBy] = useState<'name' | 'hours_played'>('name') // novo estado
+    const [sortBy, setSortBy] = useState<'name' | 'hours_played'>('name')
 
     const categoryToField: Record<string, string> = {
         'Plataforma': 'platform',   // ajustar se no db.json o campo for outro
@@ -128,7 +157,13 @@ export default function AppParaJogar() {
         <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
 
             <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
-            <AddGameModalParaJogar />
+
+            <div className='flex gap-4'>
+                <Button onClick={() => setSteamCardPJ(!steamCardPJ)} className='bg-blue-500'> <FaBorderStyle/> Estilo do Card  </Button>
+                <Button type="button" onClick={() => { refetch(); setCardsKey(k => k + 1); }}>Recarregar cartas</Button>
+                <AddGameModalParaJogar />
+            </div>
+
             <FilterComponent value={filter} onChange={setFilter} onFiltersChange={setSelectedFilters} onSortChange={setSortBy} isGameReplayed={false} />
 
 
@@ -143,7 +178,8 @@ export default function AppParaJogar() {
                     <p className='text-white'>Serviço não pegou os jogos para jogar</p>
                 ) :
                     (
-                        <div className='grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 min-[1720px]:grid-cols-5 gap-8 py-6 px-4 w-11/12 min-h-screen'>
+                        <div key={cardsKey} className={` flex flex-col  ${steamCardPJ ? '  min-[520px]:grid min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 '
+                            : ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 '} gap-8 py-6 px-4 w-11/12 min-h-screen`}>
                             {sortedGames.map((game: myGamesApiInterface) => {
                                 return (
                                     <CardComponentParaJogar
@@ -158,6 +194,7 @@ export default function AppParaJogar() {
                                         release_year={game.release_year}
                                         background_image={game.background_image}
                                         deletajooj={fbDeletajooj}
+                                        steamCardPJ={steamCardPJ}
                                     />
                                 )
                             })}

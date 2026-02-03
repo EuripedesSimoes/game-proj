@@ -274,9 +274,9 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
     return (
         <>
-            <Button className='bg-slate-500/60 m-2' onClick={handleOpen}>
+            <Button className='bg-slate-500/60 m-1' onClick={handleOpen}>
                 <span>
-                    <FaPencilAlt className="h-6.5 w-6.5 text-white/80" />
+                    <FaPencilAlt className="  text-white/80" />
                 </span>
             </Button>
 

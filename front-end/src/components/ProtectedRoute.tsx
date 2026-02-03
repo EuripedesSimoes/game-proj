@@ -31,7 +31,7 @@ export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 
     if (loading) return <div className='h-screen w-full bg-black text-2xl text-white/80 flex flex-col items-center justify-center'>
         <span className="flex items-center text-2xl font-bold">
-            <Spinner className="m-2" /> Carregando verificação...
+            <Spinner className="m-2 text-white" /> Carregando verificação...
         </span>
     </div>;
 

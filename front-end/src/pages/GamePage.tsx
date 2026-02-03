@@ -1,14 +1,13 @@
-import { Button, TextField } from "@mui/material";
+import { Button } from "@mui/material";
 
 import { useLocation, useNavigate, useParams } from "react-router";
 
 import { useQuery } from '@tanstack/react-query';
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, db, firebaseApp } from '@/services/firebaseConfig';
+import { auth, db } from '@/services/firebaseConfig';
 import { FaArrowLeft } from "react-icons/fa";
 import { MyCustomInput, MyCustomInput_variant } from "@/helpers/sxConfigs";
-import { toUpperCase } from "zod";
 
 
 type dadosJogos = {

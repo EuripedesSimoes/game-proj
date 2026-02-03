@@ -1,8 +1,8 @@
-import { StrictMode } from 'react'
+import { StrictMode, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { Home } from './pages/Home.tsx'
 import { ProtectedRoute } from './components/ProtectedRoute.tsx'
 import { Register } from './pages/Register.tsx';
@@ -33,18 +33,14 @@ createRoot(document.getElementById('root')!).render(
           <Route path='/home' element={<Home />} >
 
             {/* Rotas de Jogos */}
-            <Route path='jogos' element={<App />} />
+            <Route path='jogos' element={<App/>} />
             <Route path='jogos/:slug' element={<GamePage />} />
 
             {/* Rotas de Jogos para Jogar */}
             <Route path='jogos-para-jogar' element={<AppParaJogar />} />
             <Route path='jogos-para-jogar/:slug' element={<GamePageParaJogar />} />
 
-
           </Route>
-
-
-
 
           <Route path="/auth">
             <Route path="login" element={<Login />} />
@@ -57,7 +53,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path='/register' element={<Register />} /> */}
 
           {/* Redireciona qualquer rota inexistente para o login */}
-          {/* <Route path="*" element={<Navigate to="/auth/login" />} /> */}
+          <Route path="*" element={<Navigate to="/auth/login" />} />
           {/* <Route path="*" element={<NotFound />} /> */}
         </Routes>
       </BrowserRouter>

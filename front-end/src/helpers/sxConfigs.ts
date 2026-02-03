@@ -95,6 +95,7 @@ export const InputAttModal = styled(TextField)(({ theme }) => ({
     },
     "& .MuiInputBase-input": {
         color: "rgb(var(--color-text-variant))", // text color
+        padding: '4px 8px', // Ajusta a altura interna
         // backgroundColor: "rgb(var(--color-background-variant))", // background color branco
     },
     "& .MuiInputBase-input-webkit-autofill,  & input:-webkit-autofill:focus, & textarea:-webkit-autofill, & textarea:-webkit-autofill:hover, & textarea:-webkit-autofill:focus, & select:-webkit-autofill, & select:-webkit-autofill:hover, & select:-webkit-autofill:focus": {

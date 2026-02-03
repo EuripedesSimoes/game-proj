@@ -7,7 +7,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, F
 // import type { GamePayload2 } from '@/interfaces/gameDataTypes';
 // import { FaRegWindowClose } from 'react-icons/fa';
 import { RiCloseCircleLine } from "react-icons/ri";
-import { FaClock, FaDownload } from 'react-icons/fa';
+import { FaClock, FaDownload, FaPlus } from 'react-icons/fa';
 import Select from '@mui/material/Select';
 import { allPriorities, allPlatforms, allGenres, isReplayedList } from '@/services/listasParaFiltro';
 
@@ -184,7 +184,7 @@ export default function AddGameModalParaJogar() {
 
     return (
         <div className='w-full h-full flex flex-col justify-center items-center'>
-            <Button onClick={FBhandleClickOpen}>Adicionar Jogo Para Jogar</Button>
+            <Button onClick={FBhandleClickOpen}> <FaPlus className='size-5'/> Adicionar Jogo Para Jogar</Button>
 
             <Dialog open={open} onClose={FBhandleClose} className='bg-slate-700'
                 sx={{

@@ -6,22 +6,10 @@
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // import { cert,  getApps, initializeApp,  } from 'firebase-admin/app'
-// Your web app's Firebase configuration
-
-// const firebaseConfig = {
-//   apiKey: "AIzaSyD3O9HMlYZVdpcsVXzLpZHFMNeXoFpGbto",
-//   authDomain: "my-game-list-6fd0f.firebaseapp.com",
-//   projectId: "my-game-list-6fd0f",
-//   storageBucket: "my-game-list-6fd0f.firebasestorage.app",
-//   messagingSenderId: "982341506588",
-//   appId: "1:982341506588:web:ac89acb8295ac1c78531d9"
-// };
-
 
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
-// import { getFirestore, getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
 import { getFirestore } from 'firebase/firestore';
 
 // Your web app's Firebase configuration
