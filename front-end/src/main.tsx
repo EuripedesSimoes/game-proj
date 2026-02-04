@@ -14,8 +14,6 @@ import { GamePageParaJogar } from './pages/GamePageParaJogar.tsx';
 import App from './App.tsx';
 import AppParaJogar from './components/para-jogar/AppParaJogar.tsx';
 
-
-
 const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
