@@ -64,7 +64,7 @@ export default function CardComponentParaJogar({ id, name, hours_expected, prior
                         <img
                             src={background_image}
                             alt={name}
-                            className='w-full h-full object-cover object-center rounded-r-[12px] md:rounded-br-lg md:rounded-l-[12px] '
+                            className='p-1 w-full h-full object-cover object-center rounded-r-[12px] md:rounded-br-lg md:rounded-l-[12px] '
                         />
                     </div>
 

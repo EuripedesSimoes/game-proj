@@ -55,6 +55,7 @@ export const GamePageParaJogar = () => {
 
             {/* OVERLAY EXTRA (Opcional - para garantir contraste) */}
             <div className="absolute inset-0 z-10 bg-black/40" />
+
             <div className="w-full h-28 z-10 bg-black/50">
                 <h3 className='text-4xl p-4 text-white font-bold'>Bem vindo à <span className='font-bold text-4xl text-green-400'>Página para jogar</span></h3>
 
@@ -94,23 +95,19 @@ export const GamePageParaJogar = () => {
 
                     <div className="flex flex-col">
 
-                        <div className='flex flex-col gap-4 mt-4 mb-2 py-2 border-b-4 border-[#c7c7c7]'>
-
-                            <div className=' col-span-2'>
-                                <MyCustomInput
-                                    className='shadow-lg col-span-2 rounded-sm'
-                                    fullWidth
-                                    margin="dense"
-                                    id="name"
-                                    name="name"
-                                    label="Nome do Jogo"
-                                    type="text"
-                                    variant="standard"
-                                    disabled={true}
-                                    value={game.name.toUpperCase()}
-                                />
-                            </div>
-                            
+                        <div className=' mb-2 py-2 border-b-4 border-[#c7c7c7]'>
+                            <MyCustomInput
+                                className='shadow-lg col-span-2 rounded-sm'
+                                fullWidth
+                                margin="dense"
+                                id="name"
+                                name="name"
+                                label="Nome do Jogo"
+                                type="text"
+                                variant="standard"
+                                disabled={true}
+                                value={game.name.toUpperCase()}
+                            />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 mb-2 py-2 border-b-4 border-[#c7c7c7]">

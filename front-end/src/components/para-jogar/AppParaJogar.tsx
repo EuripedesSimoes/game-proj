@@ -159,7 +159,7 @@ export default function AppParaJogar() {
             <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
 
             <div className='flex gap-4'>
-                <Button onClick={() => setSteamCardPJ(!steamCardPJ)} className='bg-blue-500'> <FaBorderStyle/> Estilo do Card  </Button>
+                <Button onClick={() => setSteamCardPJ(!steamCardPJ)} className='bg-blue-500'> <FaBorderStyle /> Estilo do Card  </Button>
                 <Button type="button" onClick={() => { refetch(); setCardsKey(k => k + 1); }}>Recarregar cartas</Button>
                 <AddGameModalParaJogar />
             </div>

@@ -53,7 +53,7 @@ export const GamePage = () => {
 
     if (isLoading) return <div>Carregando...</div>;
     if (!game) return <div>
-        <Button onClick={() => navigate('/home/jogos-para-jogar')}
+        <Button onClick={() => navigate('/home/jogos')}
             startIcon={<FaArrowLeft />}>
             Voltar
         </Button>
@@ -113,27 +113,23 @@ export const GamePage = () => {
 
                     <div className="flex flex-col">
 
-                        <div className='flex flex-col gap-4 mt-4 mb-2 py-2 border-b-4 border-[#b6b6b6]'>
-
-                            <div className=''>
-                                <MyCustomInput
-                                    className='font-Ubuntu shadow-lg col-span-2 rounded-sm'
-                                    fullWidth
-                                    margin="dense"
-                                    id="name"
-                                    name="name"
-                                    label="Nome do Jogo"
-                                    type="text"
-                                    variant="standard"
-                                    disabled={true}
-                                    value={game.name.toUpperCase()}
-                                />
-                            </div>
-
+                        <div className=' mb-2 py-2 border-b-4 border-[#b6b6b6]'>
+                            <MyCustomInput
+                                className='font-Ubuntu shadow-lg col-span-2 rounded-sm'
+                                fullWidth
+                                margin="dense"
+                                id="name"
+                                name="name"
+                                label="Nome do Jogo"
+                                type="text"
+                                variant="standard"
+                                disabled={true}
+                                value={game.name.toUpperCase()}
+                            />
                         </div>
 
                         <div className="grid grid-cols-3 gap-4 mb-2 py-2  border-b-4 border-[#b6b6b6]">
-                            
+
                             <div className=' col-span-1 '>
                                 <MyCustomInput_variant
                                     className='shadow-lg rounded-sm'

@@ -6,6 +6,7 @@ import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner";
+import { CampoTexto } from "@/components/Campo-Texto/CampoTexto";
 
 // import react_logo from 'src/assets/react.svg'
 
@@ -50,7 +51,7 @@ export function Login() {
         // The user object has basic properties such as display name, email, etc.
         const email = userAtual.email;
         const photoURL = userAtual.photoURL;
-        const token =  userAtual.getIdToken()
+        const token = userAtual.getIdToken()
         const uid = userAtual.uid;
         console.log(
             ` email: ${email}` + "\n" +
@@ -102,6 +103,10 @@ export function Login() {
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
                             </div>
+
+                            {/* <div>
+                                <CampoTexto tipo='date' label='Data:'/>
+                            </div> */}
 
                             <Button className="m-3 bg-black/80" onClick={handleLogin} disabled={loading}>
                                 Logar
