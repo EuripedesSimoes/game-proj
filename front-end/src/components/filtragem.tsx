@@ -57,15 +57,15 @@ export default function FilterComponent({ classnameFilter, value, onChange, clas
     // .map cria um array de pares: [ [categoria, ''], [categoria, ''], ... ]
     // Object.fromEntries converte esses pares para objeto.(EX:2)
 
-    console.log('1-selecionados: ', selecionados)
+    // console.log('1-selecionados: ', selecionados)
 
     // log formatado quando houver mudanças (mostra apenas categorias com valor)
     useEffect(() => {
         //Object.entries converte um objeto{} em um array[], no caso o 'selecionados'{} em 'preenchidos'[]
         const preenchidos = Object.entries(selecionados).filter(([, v]) => v);
         const ativos = Object.fromEntries(preenchidos)
-        console.log('2-preenchidos: ', preenchidos)
-        console.log('3-ativos: ', ativos)
+        // console.log('2-preenchidos: ', preenchidos)
+        // console.log('3-ativos: ', ativos)
 
         // avisa o pai sobre as seleções ativas
         if (onFiltersChange) onFiltersChange(ativos);

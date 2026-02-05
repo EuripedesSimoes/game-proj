@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
-import TextField from '@mui/material/TextField';
+import { Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
 // import API from '@/services/gameApiServices';
 // import type { GamePayload3 } from '@/interfaces/gameDataTypes';
 // import { FaRegWindowClose } from 'react-icons/fa';
@@ -21,7 +20,7 @@ import { gameAttSchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/ga
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '@/services/firebaseConfig';
-import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable, deleteObject } from "firebase/storage";
+import { getStorage, ref, getDownloadURL, uploadBytesResumable, deleteObject } from "firebase/storage";
 import { InputAttModal } from '@/helpers/sxConfigs';
 
 type AttProps = {
@@ -76,8 +75,9 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
         return;
     }
 
+    const uid = user.uid === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? '9bq3f6a85uOLefSCso61qtc4Hi33' : user.uid;
     // 1.1. Pegar o link da imagem atual do jogo
-    const gameDocRef = doc(db, 'users', user.uid, 'jogos', data?.id || gameId);
+    const gameDocRef = doc(db, 'users', uid, 'jogos', data?.id || gameId);
     const [refreshImage, setRefreshImage] = useState(0);
 
     // 1.1.2. Estado para armazenar a URL da imagem atual
@@ -110,10 +110,10 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
     // 1.1.5 No componente, criar um estado para o progresso, para a barra de progresso
     const [progress, setProgress] = useState<number>(0);
-    const [isUploading, setIsUploading] = useState<boolean>(false)
+    // const [isUploading, setIsUploading] = useState<boolean>(false)
     const uploadImage = (file: File) => {
         const storage = getStorage();
-        const storageRef = ref(storage, `users/${user.uid}/jogos/${Date.now()}_${file.name}`);
+        const storageRef = ref(storage, `users/${uid}/jogos/${Date.now()}_${file.name}`);
 
         const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -155,14 +155,14 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
             alert("Você precisa estar logado para adicionar jogos!");
             return;
         }
-        // alert('Salvando jogo para o usuário: ' + user.uid + 'de nome: ' + user.displayName);
+        // alert('Salvando jogo para o usuário: ' + uid + 'de nome: ' + user.displayName);
 
         // 2.1. Criar a referência da subcoleção
-        const userJogosCollectionRef = collection(db, 'users', user.uid, 'jogos');
+        const userJogosCollectionRef = collection(db, 'users', uid, 'jogos');
 
         let finalImageUrl = "";
         try {
-            setIsUploading(true)
+            // setIsUploading(true)
             uploadHandleOpen()
 
             // 1. Se o usuário escolheu uma imagem, fazemos o upload agora
@@ -191,8 +191,8 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
             handleClose()
             uploadHandleClose()
             setProgress(0)
-            setIsUploading(false)
-            queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos'] })
+            // setIsUploading(false)
+            queryClient.invalidateQueries({ queryKey: ['users', uid, 'jogos'] })
         }
         catch (err) {
             console.error('Erro ao salvar jogo:', err)
@@ -274,7 +274,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
 
     return (
         <>
-            <Button className='bg-slate-500/60 m-1' onClick={handleOpen}>
+            <Button className='bg-slate-500/60 m-1' onClick={handleOpen} hidden={user.uid === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? true : false}>
                 <span>
                     <FaPencilAlt className="  text-white/80" />
                 </span>
@@ -821,7 +821,7 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
                         </div>
 
                     </form>
-                    
+
                 </DialogContent>
             </Dialog>
 

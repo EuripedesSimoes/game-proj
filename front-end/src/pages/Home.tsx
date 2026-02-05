@@ -7,21 +7,44 @@ import { useNavigate } from 'react-router';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/services/firebaseConfig';
 import { Outlet } from 'react-router';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { useEffect } from 'react';
 
 export function Home() {
     const queryClient = new QueryClient()
-
     const navigate = useNavigate();
+
+    // Usar useAuthState para pegar o usuário com suporte a loading state
+    const [userAtual, loading] = useAuthState(auth);
 
     const handleLogout = async () => {
         await signOut(auth);
         localStorage.removeItem('user');
         localStorage.removeItem('token');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('steamCard');
+        localStorage.removeItem('steamCardPJ');
         navigate('/auth/login')
     }
 
-    const userAtual = auth.currentUser || null;
-    // userAtual !== null 
+    // Redirecionar se o usuário não está logado (após o Firebase carregar o estado)
+    useEffect(() => {
+        if (!loading && !userAtual) {
+            navigate('/auth/login');
+        }
+    }, [loading, userAtual, navigate]);
+
+    if (loading) {
+        return (
+            <div className='w-full h-screen bg-black flex items-center justify-center'>
+                <div className='text-white text-2xl font-bold'>Carregando...</div>
+            </div>
+        )
+    }
+
+    if (!userAtual) {
+        return null; // useEffect vai redirecionar
+    }
 
     return (
         <QueryClientProvider client={queryClient}>

@@ -52,7 +52,7 @@ export function Home() {
                             </Tabs.Trigger>
 
                             <Button onClick={handleLogout} className='absolute right-0 bg-slate-800 hover:bg-gray-900'>
-                                Bem vindo, <span className='text-blue-300 font-bold'> {`${userAtual !== null ? userAtual.displayName : ''}`} </span>.
+                                {/* Bem vindo, <span className='text-blue-300 font-bold'> {`${userAtual !== null ? userAtual.displayName : ''}`} </span>. */}
                                 Você está <span className='text-green-300 font-bold'>LOGADO</span>, Clique para  <span className='text-red-500 font-bold'>DESLOGAR</span>
                             </Button>
                         </Tabs.List>

@@ -42,7 +42,8 @@ export const GamePage = () => {
         queryKey: ['jogo', slug],
         queryFn: async () => {
             if (!user?.uid) return null;
-            const docRef = doc(db, 'users', user.uid, 'jogos', slug!);
+            const uid = user.uid === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? '9bq3f6a85uOLefSCso61qtc4Hi33' : user.uid;
+            const docRef = doc(db, 'users', uid, 'jogos', slug!);
             const docSnap = await getDoc(docRef);
             return docSnap.exists() ? docSnap.data() : null;
         }

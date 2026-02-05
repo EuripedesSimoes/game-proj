@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
-import TextField from '@mui/material/TextField';
+import { Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
 // import API from '@/services/gameApiServices';
 // import type { GamePayload3 } from '@/interfaces/gameDataTypes';
 // import { FaRegWindowClose } from 'react-icons/fa';
@@ -21,7 +20,7 @@ import { gameToPlaySchema, normalizeOnlyNumbers } from '@/helpers/gameFormSchema
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '@/services/firebaseConfig';
-import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable, deleteObject } from "firebase/storage";
+import { getStorage, ref, getDownloadURL, uploadBytesResumable, deleteObject } from "firebase/storage";
 import { InputAttModal } from '@/helpers/sxConfigs';
 
 type AttProps = {
@@ -75,7 +74,9 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
     }
 
     // 1.1. Pegar o link da imagem atual do jogo
-    const gameDocRef = doc(db, 'users', user.uid, 'jogos-para-jogar', data?.id || gameId);
+
+    const uid = user.uid === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? '9bq3f6a85uOLefSCso61qtc4Hi33' : user.uid;
+    const gameDocRef = doc(db, 'users', uid, 'jogos-para-jogar', data?.id || gameId);
     const [refreshImage, setRefreshImage] = useState(0);
 
     // 1.1.2. Estado para armazenar a URL da imagem atual
@@ -107,10 +108,10 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
 
     // 1.1.5 No componente, criar um estado para o progresso, para a barra de progresso
     const [progress, setProgress] = useState<number>(0);
-    const [isUploading, setIsUploading] = useState<boolean>(false)
+    // const [isUploading, setIsUploading] = useState<boolean>(false)
     const uploadImage = (file: File) => {
         const storage = getStorage();
-        const storageRef = ref(storage, `users/${user.uid}/jogos-para-jogar/${Date.now()}_${file.name}`);
+        const storageRef = ref(storage, `users/${uid}/jogos-para-jogar/${Date.now()}_${file.name}`);
 
         const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -155,12 +156,12 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
         // alert('Alterando informações de jogo para jogar no futuro para o usuário: ' + user.displayName + '\n' + 'de nome: ' + user.displayName);
 
         // 2.1. Criar a referência da subcoleção
-        // collection(db, 'users', user.uid, 'joojs') aponta para users/{uid}/jogos-para-jogar
-        const userJogosParaJogarCollectionRef = collection(db, 'users', user.uid, 'jogos-para-jogar');
+        // collection(db, 'users', uid, 'joojs') aponta para users/{uid}/jogos-para-jogar
+        const userJogosParaJogarCollectionRef = collection(db, 'users', uid, 'jogos-para-jogar');
 
         let finalImageUrl = "";
         try {
-            setIsUploading(true)
+            // setIsUploading(true)
             FBuploadHandleOpen()
 
             // 1. Se o usuário escolheu uma imagem, fazemos o upload agora
@@ -177,7 +178,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
                 finalImageUrl = currentBackgroundImage || "";
             }
 
-            // queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos-para-jogar'] })
+            // queryClient.invalidateQueries({ queryKey: ['users', uid, 'jogos-para-jogar'] })
             await updateDoc(doc(userJogosParaJogarCollectionRef, gameId), {
                 ...data,
                 background_image: finalImageUrl // Link que funciona em qualquer lugar
@@ -189,8 +190,8 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
             FBhandleClose()
             FBuploadHandleClose()
             setProgress(0)
-            setIsUploading(false)
-            queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos-para-jogar'] })
+            // setIsUploading(false)
+            queryClient.invalidateQueries({ queryKey: ['users', uid, 'jogos-para-jogar'] })
         }
         catch (err) {
             console.error('Erro ao salvar jogo:', err)
@@ -233,7 +234,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
     return (
         <>
             {/* na vdd aqui tem que clicar para abrir o modal pleo handleOpen, e no fim do modal chamadr o AttJooj(game.id!) */}
-            <Button className='bg-slate-500/60 m-2' onClick={FBhandleClickOpen}>
+            <Button className='bg-slate-500/60 m-2' onClick={FBhandleClickOpen} hidden={user.uid === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? true : false}>
                 <span>
                     <FaPencilAlt className="h-6.5 w-6.5 text-white/80" />
                 </span>

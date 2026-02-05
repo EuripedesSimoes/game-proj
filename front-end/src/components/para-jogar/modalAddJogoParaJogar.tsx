@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
 // import TextField from '@mui/material/TextField';
 
 // import API from '@/services/gameApiServices';
@@ -122,11 +122,13 @@ export default function AddGameModalParaJogar() {
             alert("Você precisa estar logado para adicionar jogos!");
             return;
         }
-        alert('Adicionando jogo para jogar no futuro para o usuário: ' + user.displayName + '\n' + 'de nome: ' + user.displayName);
+
+        const uid = user.uid === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? '9bq3f6a85uOLefSCso61qtc4Hi33' : user.uid;
+        // alert('Adicionando jogo para jogar no futuro para o usuário: ' + user.displayName + '\n' + 'de nome: ' + user.displayName);
 
         // 2. Criar a referência da subcoleção
-        // collection(db, 'users', user.uid, 'joojs') aponta para users/{uid}/jogos-para-jogar
-        const userJogosParaJogarCollectionRef = collection(db, 'users', user.uid, 'jogos-para-jogar');
+        // collection(db, 'users', user.uid, 'jogos-para-jogar') aponta para users/{uid}/jogos-para-jogar
+        const userJogosParaJogarCollectionRef = collection(db, 'users', uid, 'jogos-para-jogar');
 
         try {
             let finalImageUrl = "";
@@ -134,7 +136,7 @@ export default function AddGameModalParaJogar() {
             // 1. Se o usuário escolheu uma imagem, fazemos o upload agora
             if (imageFile) {
                 const storage = getStorage();
-                const storageRef = ref(storage, `users/${user.uid}/jogos-para-jogar/${Date.now()}_${imageFile.name}`);
+                const storageRef = ref(storage, `users/${uid}/jogos-para-jogar/${Date.now()}_${imageFile.name}`);
 
                 // AGUARDA o upload terminar
                 const snapshot = await uploadBytes(storageRef, imageFile);
@@ -151,7 +153,7 @@ export default function AddGameModalParaJogar() {
             setImageFile(null);
             setPreviewURL(null);
             FBhandleClose()
-            queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos-para-jogar'] })
+            queryClient.invalidateQueries({ queryKey: ['users', uid, 'jogos-para-jogar'] })
         }
         catch (err) {
             console.error('Erro ao salvar jogo:', err)
@@ -184,7 +186,7 @@ export default function AddGameModalParaJogar() {
 
     return (
         <div className='w-full h-full flex flex-col justify-center items-center'>
-            <Button onClick={FBhandleClickOpen}> <FaPlus className='size-5'/> Adicionar Jogo Para Jogar</Button>
+            <Button onClick={FBhandleClickOpen}> <FaPlus className='size-5' /> Adicionar Jogo Para Jogar</Button>
 
             <Dialog open={open} onClose={FBhandleClose} className='bg-slate-700'
                 sx={{

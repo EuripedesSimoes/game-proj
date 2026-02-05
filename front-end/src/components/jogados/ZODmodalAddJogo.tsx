@@ -49,11 +49,12 @@ export default function ZodAddGameModal() {
             alert("Você precisa estar logado para adicionar jogos!");
             return;
         }
-        alert('Salvando jogo para o usuário: ' + user.displayName + '\n' + 'de nome: ' + user.displayName);
+        const uid = user.uid === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? '9bq3f6a85uOLefSCso61qtc4Hi33' : user.uid;
+        // alert('Salvando jogo para o usuário: ' + user.displayName + '\n' + 'de nome: ' + user.displayName);
 
         // 2. Criar a referência da subcoleção
         // collection(db, 'users', user.uid, 'joojs') aponta para users/{uid}/joojs
-        const userJogosCollectionRef = collection(db, 'users', user.uid, 'jogos');
+        const userJogosCollectionRef = collection(db, 'users', uid, 'jogos');
 
         try {
             let finalImageUrl = "";
@@ -61,7 +62,7 @@ export default function ZodAddGameModal() {
             // 1. Se o usuário escolheu uma imagem, fazemos o upload agora
             if (imageFile) {
                 const storage = getStorage();
-                const storageRef = ref(storage, `users/${user.uid}/jogos/${Date.now()}_${imageFile.name}`);
+                const storageRef = ref(storage, `users/${uid}/jogos/${Date.now()}_${imageFile.name}`);
 
                 // AGUARDA o upload terminar
                 const snapshot = await uploadBytes(storageRef, imageFile);
@@ -78,7 +79,7 @@ export default function ZodAddGameModal() {
             setImageFile(null);
             setPreviewURL(null);
             handleClose()
-            queryClient.invalidateQueries({ queryKey: ['users', user.uid, 'jogos'] })
+            queryClient.invalidateQueries({ queryKey: ['users', uid, 'jogos'] })
         }
         catch (err) {
             console.error('Erro ao salvar jogo:', err)

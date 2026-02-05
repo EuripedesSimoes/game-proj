@@ -27,10 +27,12 @@ export function Login() {
             // 1. Extrai as informações atualizadas
             const token = await res.user.getIdToken();
             const userData = { email: res.user.email, uid: res.user.uid };
+            const usernombre = res.user.displayName
 
             // 2. Pega do localStorage
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(userData));
+            localStorage.setItem('userAtuaal', JSON.stringify(usernombre));
 
             console.log("Login efetuado com sucesso!");
             navigate('/home');
