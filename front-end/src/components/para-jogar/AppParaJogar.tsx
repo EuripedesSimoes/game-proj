@@ -7,7 +7,8 @@ import { getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-import type { GamePayload2, myGamesApiInterface } from '@/interfaces/gameDataTypes';
+// import type { GamePayload2, myGamesApiInterface } from '@/interfaces/gameDataTypes';
+import type { myGamesApiInterface } from '@/interfaces/gameDataTypes';
 import FilterComponent from '../filtragem';
 import { Button } from "@/components/ui/button"
 import { Spinner } from '../ui/spinner';
@@ -43,13 +44,13 @@ export default function AppParaJogar() {
 
     const queryClient = useQueryClient()
     // 1. Obter o usuário logado
-    const [user] = useAuthState(auth);; // Assume que useAuth() retorna o objeto de usuário
+    const [user] = useAuthState(auth); // Assume que useAuth() retorna o objeto de usuário
+    const uid = user?.uid === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? '9bq3f6a85uOLefSCso61qtc4Hi33' : user?.uid;
 
     // 1.2. Criar a referência da subcoleção APENAS se o user existir
-    const userJogosParaJogarCollectionRef = user?.uid
-        ? collection(db, 'users', user.uid, 'jogos-para-jogar')
+    const userJogosParaJogarCollectionRef = uid
+        ? collection(db, 'users', uid, 'jogos-para-jogar')
         : null;
-
     // Função para buscar jogos usando React Query
     const fetchJogosParaJogar = async () => {
         if (!userJogosParaJogarCollectionRef) return [];
@@ -61,9 +62,9 @@ export default function AppParaJogar() {
     // Usamos o 'enabled' para ele só rodar quando o user.uid estiver disponível.
     // Opções para evitar refetchs automáticos indesejados e peguei a função `refetch` para recarregar manualmente quando necessário.
     const { data: data = [], isLoading: isFetching, isError, refetch } = useQuery({
-        queryKey: ['users', user?.uid, 'jogos-para-jogar'],
+        queryKey: ['users', uid, 'jogos-para-jogar'],
         queryFn: fetchJogosParaJogar,
-        enabled: !!user?.uid, // Importante: a query só "acorda" quando tem usuário
+        enabled: !!uid, // Importante: a query só "acorda" quando tem usuário
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
         staleTime: 60 * 1000,
@@ -195,6 +196,7 @@ export default function AppParaJogar() {
                                         background_image={game.background_image}
                                         deletajooj={fbDeletajooj}
                                         steamCardPJ={steamCardPJ}
+                                        uidValidator={user?.uid!}
                                     />
                                 )
                             })}

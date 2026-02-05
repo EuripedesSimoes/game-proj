@@ -23,11 +23,13 @@ type dadosJogos = {
 
     deletajooj: (id: string, backgroundImage?: string) => Promise<void>
     steamCard?: boolean
+    uidValidator: string;
 }
 
-const CardComponent = ({ id, name, hours_played, hours_expected, platform, genre, release_year, status, replayed, priority, year_started, year_finished, background_image, deletajooj, steamCard }: dadosJogos) => {
+const CardComponent = ({ id, name, hours_played, hours_expected, platform, genre, release_year, status, replayed, priority, year_started, year_finished, background_image, deletajooj, steamCard, uidValidator }: dadosJogos) => {
 
     const navigate = useNavigate();
+
     // function gerarSlug(titulo: string) {
     //     return titulo
     //         .toLowerCase()
@@ -48,27 +50,27 @@ const CardComponent = ({ id, name, hours_played, hours_expected, platform, genre
     // }
 
     return (
-        <>
-            {/* <Button onClick={() => navigate(`/home/jogos/${id}`)}> Ver página </Button> */}
+        <div className="flex flex-col">
             {steamCard ? (
-                <Card className={`w-full min-[150px]:h-[180px] gap-2 flex flex-row-reverse md:flex-row items-start cursor-pointer border-2 hover:border-4 border-white/50
-              hover:border-amber-500 transition-all bg-slate-900 shadow-4xl`}
+                <Card className={`w-full min-[150px]:h-[150px] gap-2 flex flex-row-reverse md:flex-row items-start cursor-pointer border-2 hover:border-3 border-white/30 hover:border-gray-500
+                     bg-slate-900 shadow-4xl`}
                     key={id} >
 
-                    <div className="w-full h-full relative rounded-r-[12px] md:rounded-br-lg md:rounded-l-[12px] md:border-r-3 border-emerald-800 hover:border-amber-500">
+                    <div className="w-full h-full relative rounded-r-[12px] md:rounded-br-lg md:rounded-l-[12px] md:border-r-3 border-emerald-800 ">
 
-                        <div className="flex flex-col absolute w-full h-full justify-between items-end" onClick={() => navigate(`/home/jogos/${id}`)}>
+                        <div className="flex flex-col absolute w-full h-full justify-between items-end">
 
                             <div className="absolute z-10 w-full h-full rounded-lg shadow-lg  hover:bg-black/20" onClick={() => navigate(`/home/jogos/${id}`)} />
-                       
+
                             {/* CARD FILTRO NOME */}
-                            <div className=" flex justify-center items-center w-full rounded-tr-[12px] md:rounded-tl-[12px] bg-white/70">
+                            <div className=" z-25  flex justify-center items-center w-full rounded-tr-[12px] md:rounded-tl-[12px] bg-white/70">
                                 <CardTitle className='text-black font-bold text-[11px] md:text-base lg:text-lg border-b-2 w-full'>
                                     {`${name} (${release_year})`}
                                 </CardTitle>
                             </div>
 
-                            <div className=" flex z-20 justify-around items-center w-full rounded-br-[12px] md:rounded-b-[12px] shadow-lg hover:bg-white/40">
+                            <div className={` z-25 justify-around items-center w-full rounded-br-[12px] md:rounded-b-[12px] shadow-lg hover:bg-white/40 
+                            ${uidValidator === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? 'hidden' : 'flex'}`}>
                                 <Button className='bg-white/60 m-2' onClick={() => deletajooj(id, background_image)}>
                                     <span>
                                         <FaEraser className="h-5 w-5 md:h-6.5 md:w-6.5 text-red-600/80" />
@@ -78,14 +80,21 @@ const CardComponent = ({ id, name, hours_played, hours_expected, platform, genre
                                 <AttGameModal gameId={id} data={{ id, name, hours_played, hours_expected, platform, genre, release_year, status, replayed, priority, year_started, year_finished }} />
                             </div>
 
+                            <div className="w-full h-full z-20 absolute">
+                                <Link to={`/home/jogos/${id}`} >
+                                    <div className="absolute w-full h-full rounded-lg shadow-lg  hover:bg-black/20" />
+
+                                    {/* CARD FILTRO IMAGEM */}
+                                    <img
+                                        src={background_image}
+                                        alt={name}
+                                        className='p-1 w-full h-full object-cover object-center rounded-r-[12px] md:rounded-br-lg md:rounded-l-[12px] '
+                                    />
+                                </Link>
+                            </div>
+
                         </div>
 
-                        {/* CARD FILTRO IMAGEM */}
-                        <img
-                            src={background_image}
-                            alt={name}
-                            className='p-1 w-full h-full object-cover object-center rounded-r-[12px] md:rounded-br-lg md:rounded-l-[12px] '
-                        />
                     </div>
 
                     <CardContent className='h-full w-full p-2 flex flex-col justify-start items-start overflow-auto gap-3'>
@@ -150,7 +159,8 @@ const CardComponent = ({ id, name, hours_played, hours_expected, platform, genre
 
                         <div className="flex flex-col absolute w-full h-full justify-between items-end"  >
 
-                            <div className=" flex z-20 w-full justify-around items-center md:rounded-t-[12px] shadow-lg hover:bg-white/40">
+                            <div className={`z-25 w-full justify-around items-center md:rounded-t-[12px] shadow-lg hover:bg-white/40
+                                 ${uidValidator === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? 'hidden' : 'flex'}`}>
                                 <Button className='bg-white/60 m-2' onClick={() => deletajooj(id, background_image)}>
                                     <span>
                                         <FaEraser className="h-5 w-5 md:h-6.5 md:w-6.5 text-red-600/80" />
@@ -161,20 +171,27 @@ const CardComponent = ({ id, name, hours_played, hours_expected, platform, genre
                             </div>
 
                             {/* CARD FILTRO NOME */}
-                            <div className=" flex justify-center items-center w-full rounded-tr-[12px] md:rounded-tl-[12px] bg-white/70">
+                            <div className="z-25   flex justify-center items-center w-full rounded-tr-[12px] md:rounded-tl-[12px] bg-white/70">
                                 <CardTitle className='text-black font-bold text-[11px] md:text-base lg:text-xl border-b-2 w-full'>
                                     {`${name} (${release_year})`}
                                 </CardTitle>
                             </div>
 
-                            <div className="absolute z-10 w-full h-full rounded-lg shadow-lg  hover:bg-black/20" onClick={() => navigate(`/home/jogos/${id}`)} />
                         </div>
 
-                        <img
-                            src={background_image}
-                            alt={name}
-                            className='w-full h-full object-cover object-center rounded-t-lg border-b-3 border-emerald-800 hover:border-amber-500'
-                        />
+                        <div className="w-full h-full z-20 absolute">
+                            <Link to={`/home/jogos/${id}`} >
+                                <div className="absolute  w-full h-full rounded-lg shadow-lg  hover:bg-black/20" />
+
+                                {/* CARD FILTRO IMAGEM */}
+                                <img
+                                    src={background_image}
+                                    alt={name}
+                                    className='w-full h-full object-cover object-center rounded-t-lg border-b-3 border-emerald-800 hover:border-amber-500'
+                                />
+                            </Link>
+                        </div>
+
                     </div>
 
                     <CardContent className='h-2/5 w-full p-2 flex flex-col justify-start items-start overflow-auto gap-3'>
@@ -225,7 +242,7 @@ const CardComponent = ({ id, name, hours_played, hours_expected, platform, genre
                 </Card>
 
             )}
-        </>
+        </div >
     )
 }
 

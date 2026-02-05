@@ -56,9 +56,10 @@ export default function App() {
   // 1. Obter o usuário logado
   const [user] = useAuthState(auth);; // Assume que useAuth() retorna o objeto de usuário
 
+  const uid = user?.uid === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? '9bq3f6a85uOLefSCso61qtc4Hi33' : user?.uid;
   // 1.2. Criar a referência da subcoleção APENAS se o user existir
-  const userJogosCollectionRef = user?.uid
-    ? collection(db, 'users', user.uid, 'jogos')
+  const userJogosCollectionRef = uid
+    ? collection(db, 'users', uid, 'jogos')
     : null;
 
   // Função para buscar jogos usando React Query
@@ -69,12 +70,12 @@ export default function App() {
   };
 
   // 3. O useQuery DEVE ser chamado no topo, sem condicionais antes dele.
-  // Usamos o 'enabled' para ele só rodar quando o user.uid estiver disponível.
+  // Usamos o 'enabled' para ele só rodar quando o uid estiver disponível.
   // Opções para evitar refetchs automáticos indesejados e peguei a função `refetch` para recarregar manualmente quando necessário.
   const { data: data = [], isLoading: isFetching, isError, refetch } = useQuery({
-    queryKey: ['users', user?.uid, 'jogos'],
+    queryKey: ['users', uid, 'jogos'],
     queryFn: fetchJogosFB,
-    enabled: !!user?.uid, // Importante: a query só "acorda" quando tem usuário
+    enabled: !!uid, // Importante: a query só "acorda" quando tem usuário
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     staleTime: 60 * 1000,
@@ -109,10 +110,10 @@ export default function App() {
 
     // Deleta o documento do Firestore
     await deleteDoc(doc(userJogosCollectionRef, id));
-    queryClient.invalidateQueries({ queryKey: ['users', user?.uid, 'jogos'] });
+    queryClient.invalidateQueries({ queryKey: ['users', uid, 'jogos'] });
   }
 
-  //   async function deletaJooj(id: string) {'users', user.uid, 'jogos'
+  //   async function deletaJooj(id: string) {'users', uid, 'jogos'
   //   // const deleted = await API.deletarJogo(id)
   //   // <--- invalida a query e força refetch automático
   //   queryClient.invalidateQueries({ queryKey: ['joojs'] })
@@ -126,6 +127,7 @@ export default function App() {
     'Prioridade': 'priority',
     'Rejoga(n)do?': 'replayed',
   }
+  // console.log('uid', user?.uid)
 
   const filteredGames = useMemo(() => {
     const list = (data ?? []) as myGamesApiInterface[]
@@ -184,7 +186,7 @@ export default function App() {
       {/* <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3> */}
 
       <div className='flex gap-4 m-1'>
-        <Button type="button" onClick={() => setSteamCard(prev => !prev)} className='bg-blue-500'> <FaBorderStyle/> Estilo do Card </Button>
+        <Button type="button" onClick={() => setSteamCard(prev => !prev)} className='bg-blue-500'> <FaBorderStyle /> Estilo do Card </Button>
         <Button type="button" onClick={() => { refetch(); setCardsKey(k => k + 1); }} >Recarregar cartas</Button>
         <ZodAddGameModal />
       </div>
@@ -226,6 +228,8 @@ export default function App() {
                   background_image={game.background_image}
                   deletajooj={fbDeletajooj}
                   steamCard={steamCard}
+                  // uidValidator={'uid' in game ? uid! : 'sem-uid'} // Passa o uid para o card, ou um valor padrão se não existir
+                  uidValidator={user?.uid!}
                 />
               </div>
 
