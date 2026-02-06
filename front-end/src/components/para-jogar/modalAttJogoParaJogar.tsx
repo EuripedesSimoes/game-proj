@@ -236,7 +236,7 @@ const AttGameModalParaJogar = ({ gameId, data }: AttProps) => {
             {/* na vdd aqui tem que clicar para abrir o modal pleo handleOpen, e no fim do modal chamadr o AttJooj(game.id!) */}
             <Button className='bg-slate-500/60 m-2' onClick={FBhandleClickOpen} hidden={user.uid === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? true : false}>
                 <span>
-                    <FaPencilAlt className="h-6.5 w-6.5 text-white/80" />
+                    <FaPencilAlt className="h-6.5 w-6.5 text-white/80 " />
                 </span>
             </Button>
             <Dialog open={open} onClose={FBhandleClose} className='bg-slate-500/95'>
