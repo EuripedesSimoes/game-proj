@@ -186,7 +186,7 @@ export default function AddGameModalParaJogar() {
 
     return (
         <div className='w-full h-full flex flex-col justify-center items-center'>
-            <Button onClick={FBhandleClickOpen}> <FaPlus className='size-5' /> Adicionar Jogo Para Jogar</Button>
+            <Button onClick={FBhandleClickOpen}  className={`${user?.uid === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? 'hidden' : 'flex'}`}> <FaPlus className='size-5' /> Adicionar Jogo Para Jogar</Button>
 
             <Dialog open={open} onClose={FBhandleClose} className='bg-slate-700'
                 sx={{

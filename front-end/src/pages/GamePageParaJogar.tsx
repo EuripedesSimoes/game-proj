@@ -1,14 +1,13 @@
-import { Button, TextField } from "@mui/material";
+import { Button } from "@mui/material";
+import { MyCustomInput, MyCustomInput_variant } from "@/helpers/sxConfigs";
 
 import { useLocation, useNavigate, useParams } from "react-router";
 
 import { useQuery } from '@tanstack/react-query';
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
-import { db } from '@/services/firebaseConfig'; // Ajuste o caminho se necessário
+import { doc, getDoc } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, firebaseApp } from '@/services/firebaseConfig';
+import { auth, db } from '@/services/firebaseConfig';
 import { FaArrowLeft } from "react-icons/fa";
-import { MyCustomInput, MyCustomInput_variant } from "@/helpers/sxConfigs";
 
 
 export const GamePageParaJogar = () => {
@@ -30,16 +29,13 @@ export const GamePageParaJogar = () => {
         }
     });
 
-    console.log('game na page do jogo', game)
-    // const allInputs = [game?.id, game?.name, game?.hours_played, game?.hours_expected, game?.platform, game?.genre, game?.release_year, game?.status, game?.replayed, game?.priority, game?.year_started, game?.year_finished, game?.background_image]
-
     if (isLoading) return <div>Carregando...</div>;
     if (!game) return <div>
         <Button onClick={() => navigate('/home/jogos-para-jogar')}
             startIcon={<FaArrowLeft />}>
             Voltar
         </Button>
-        <span className="text-white">Erro ao carregar jogo</span>
+        <span className="text-white">Erro ao carregar página de jogo</span>
     </div>;
 
 

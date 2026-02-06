@@ -1,36 +1,42 @@
-
-import { useEffect, useMemo, useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-
-//getFirestore: olha a aplicação, olhas as chaves secretas do firebaseCoonfig e repassa pro Firestore se tem permissão de admin para acessar o banco de dados
-import { getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// import type { GamePayload2, myGamesApiInterface } from '@/interfaces/gameDataTypes';
 import type { myGamesApiInterface } from '@/interfaces/gameDataTypes';
+
 import FilterComponent from '../filtragem';
 import { Button } from "@/components/ui/button"
 import { Spinner } from '../ui/spinner';
+
+import { useEffect, useMemo, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
+
 import AddGameModalParaJogar from './modalAddJogoParaJogar';
 import CardComponentParaJogar from './cardComponentParaJogar';
 
-import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '@/services/firebaseConfig';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
 import { FaBorderStyle } from 'react-icons/fa';
 
+type CardSize = 'grande' | 'médio' | 'pequeno';
+
 export default function AppParaJogar() {
 
-    // Persistir preferência do tipo de card no localStorage (evita reset ao recarregar a página)
-    const [steamCardPJ, setSteamCardPJ] = useState<boolean>(() => {
+    const [steamCardPJ, setSteamCardPJ] = useState<CardSize>(() => {
         try {
-            const stored = localStorage.getItem('steamCardPJ')
-            return stored ? JSON.parse(stored) : true
+            const stored = localStorage.getItem('steamCardPJ');
+
+            // Verificamos se o valor existe e se é uma das opções válidas
+            if (stored) {
+                const parsed = JSON.parse(stored) as CardSize;
+                const validSizes: CardSize[] = ['grande', 'médio', 'pequeno'];
+
+                return validSizes.includes(parsed) ? parsed : 'médio';
+            }
+
+            return 'médio'; // Valor padrão inicial
         } catch (e) {
-            return true
+            return 'médio';
         }
-    })
+    });
 
     useEffect(() => {
         try {
@@ -39,6 +45,18 @@ export default function AppParaJogar() {
             // ignore
         }
     }, [steamCardPJ])
+
+    const alterarTamanhoCard = () => {
+        // Mapeamos: "se for atual, o próximo é X"
+        const proximos: Record<CardSize, CardSize> = {
+            pequeno: 'médio',
+            médio: 'grande',
+            grande: 'pequeno'
+        };
+
+        // Pegamos o próximo baseado no valor atual
+        setSteamCardPJ(prev => proximos[prev]);
+    }
 
     const [cardsKey, setCardsKey] = useState(0)
 
@@ -149,18 +167,20 @@ export default function AppParaJogar() {
             arr.sort((a, b) => a.name.localeCompare(b.name))
         } else if (sortBy === 'hours_played') {
             arr.sort((a, b) => Number(b.hours_played) - Number(a.hours_played))
+        } else if (sortBy === 'release_year') {
+            arr.sort((a, b) => Number(b.release_year) - Number(a.release_year))
         }
         return arr
     }, [filteredGames, sortBy])
 
     return (
 
-        <main className='w-full min-h-screen flex flex-col items-center bg-gray-800'>
+        <main className='flex flex-col w-full pt-4 min-h-screen items-center bg-gray-800'>
 
-            <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3>
+            {/* <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3> */}
 
-            <div className='flex gap-4'>
-                <Button onClick={() => setSteamCardPJ(!steamCardPJ)} className='bg-blue-500'> <FaBorderStyle /> Estilo do Card  </Button>
+            <div className='flex gap-4 m-1'>
+                <Button onClick={alterarTamanhoCard} className='bg-blue-500'> <FaBorderStyle /> Estilo do Card: <span className='font-bold'> {steamCardPJ.toUpperCase()} </span> </Button>
                 <Button type="button" onClick={() => { refetch(); setCardsKey(k => k + 1); }}>Recarregar cartas</Button>
                 <AddGameModalParaJogar />
             </div>
@@ -179,8 +199,11 @@ export default function AppParaJogar() {
                     <p className='text-white'>Serviço não pegou os jogos para jogar</p>
                 ) :
                     (
-                        <div key={cardsKey} className={` flex flex-col  ${steamCardPJ ? '  min-[520px]:grid min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 '
-                            : ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 '} gap-8 py-6 px-4 w-11/12 min-h-screen`}>
+                        <div key={cardsKey} className={` flex flex-col
+                            ${steamCardPJ === 'pequeno' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 min-[112rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
+                                : steamCardPJ === 'médio' ? ' min-[520px]:grid min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 min-[112rem]:grid-cols-4 '
+                                    : steamCardPJ === 'grande' && ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
+                            } gap-8 py-6 px-4 w-11/12 min-h-screen`}>
                             {sortedGames.map((game: myGamesApiInterface) => {
                                 return (
                                     <CardComponentParaJogar

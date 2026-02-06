@@ -3,42 +3,51 @@ import './App.css'
 // import API from './services/gameApiServices.ts'
 
 // import type { gameDataInterface, myGamesApiInterface } from './interfaces/gameDataTypes.ts'
-// import AddGameModal from './components/jogados/modalAddJogo.old.tsx';
 import type { myGamesApiInterface } from './interfaces/gameDataTypes.ts'
 
 import FilterComponent from './components/filtragem.tsx'
-import { useEffect, useMemo, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 
-
+import { useEffect, useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import CardComponent from './components/jogados/cardComponent.tsx';
 import { getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
-import ZodAddGameModal from './components/jogados/ZODmodalAddJogo.tsx';
-import { db } from './services/firebaseConfig.ts';
 
+import ZodAddGameModal from './components/jogados/ZODmodalAddJogo.tsx';
+import CardComponent from './components/jogados/cardComponent.tsx';
+
+import { auth, db } from './services/firebaseConfig.ts';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/services/firebaseConfig';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
 import { FaBorderStyle } from 'react-icons/fa'
 
+type CardSize = 'grande' | 'médio' | 'pequeno';
+
 export default function App() {
+
   // const { data, isError, isFetching } = useExternaGameData()
-  // const { data, isError, isFetching } = myGames() db.json
   const [filter, setFilter] = useState('')
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({}) // estado com filtros por categoria
   const [sortBy, setSortBy] = useState<'name' | 'hours_played'>('name')
 
-  // Persistir preferência do tipo de card no localStorage (evita reset ao recarregar a página)
-  const [steamCard, setSteamCard] = useState<boolean>(() => {
+
+  const [steamCard, setSteamCard] = useState<CardSize>(() => {
     try {
-      const stored = localStorage.getItem('steamCard')
-      return stored ? JSON.parse(stored) : true
+      const stored = localStorage.getItem('steamCard');
+
+      // Verificamos se o valor existe e se é uma das opções válidas
+      if (stored) {
+        const parsed = JSON.parse(stored) as CardSize;
+        const validSizes: CardSize[] = ['grande', 'médio', 'pequeno'];
+
+        return validSizes.includes(parsed) ? parsed : 'médio';
+      }
+
+      return 'médio'; // Valor padrão inicial
     } catch (e) {
-      return true
+      return 'médio';
     }
-  })
+  });
 
   useEffect(() => {
     try {
@@ -47,6 +56,18 @@ export default function App() {
       // ignore
     }
   }, [steamCard])
+
+  const alterarTamanhoCard = () => {
+    // Mapeamos: "se for atual, o próximo é X"
+    const proximos: Record<CardSize, CardSize> = {
+      pequeno: 'médio',
+      médio: 'grande',
+      grande: 'pequeno'
+    };
+
+    // Pegamos o próximo baseado no valor atual
+    setSteamCard(prev => proximos[prev]);
+  }
 
   // chave para forçar um remount dos cards quando o usuário pedir
   const [cardsKey, setCardsKey] = useState(0)
@@ -179,14 +200,13 @@ export default function App() {
   }, [filteredGames, sortBy])
 
 
-
   return (
     <main className='flex flex-col w-full pt-4 min-h-screen items-center bg-gray-800'>
 
       {/* <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3> */}
 
       <div className='flex gap-4 m-1'>
-        <Button type="button" onClick={() => setSteamCard(prev => !prev)} className='bg-blue-500'> <FaBorderStyle /> Estilo do Card </Button>
+        <Button type="button" onClick={alterarTamanhoCard} className='bg-blue-500'> <FaBorderStyle /> Estilo do Card: <span className='font-bold'> {steamCard.toUpperCase()} </span> </Button>
         <Button type="button" onClick={() => { refetch(); setCardsKey(k => k + 1); }} >Recarregar cartas</Button>
         <ZodAddGameModal />
       </div>
@@ -208,8 +228,12 @@ export default function App() {
         <>
           {/* <div className='flex flex-col justify-start min-h-screen w-full'> */}
 
-          <div key={cardsKey} className={` flex flex-col  ${steamCard ? '  min-[520px]:grid min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 '
-            : ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 '} gap-8 py-6 px-4 w-11/12 min-h-screen`}>
+          <div key={cardsKey} className={` flex flex-col  
+          ${steamCard === 'pequeno' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 min-[112rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
+              : steamCard === 'médio' ? ' min-[520px]:grid min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 min-[112rem]:grid-cols-4 '
+                : steamCard === 'grande' && ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
+            }
+             gap-8 py-6 px-4 w-11/12 min-h-screen`}>
             {sortedGames.map((game: myGamesApiInterface) => (
               <div key={game.id}>
                 <CardComponent

@@ -33,7 +33,7 @@ type Props = {
 // Prioridade: '1ª Prioridade - Goats','2ª Prioridade - Alta', '3ª Prioridade - Média', '4ª Prioridade - Baixa, talvez algum dia', '5ª Prioridade - pelo nome, talvez'
 
 export default function FilterComponent({ classnameFilter, value, onChange, className, onFiltersChange, onSortChange, isGameReplayed }: Props) {
-    const filtros = ['Nome', 'Quant. Horas',]
+    // const filtros = ['Nome', 'Quant. Horas',]
 
     const filtrosSelect = [
         { categoria: 'Plataforma', opcoes: ['PC', 'Switch', 'PsVita', '3DS-Emulado', 'PSP-Emulado'] },
@@ -101,6 +101,12 @@ export default function FilterComponent({ classnameFilter, value, onChange, clas
                     >
                         Quant. Horas
                     </button>
+                    {/* <button
+                        onClick={() => onSortChange && onSortChange('year_finished')}
+                        className='bg-[#1a1a1a] text-white rounded-xl hover:bg-gray-700/60 transition-colors'
+                    >
+                        Ano finalizado
+                    </button> */}
 
                     {filtrosSelect.map(({ categoria, opcoes }) => (
                         <div key={categoria}>

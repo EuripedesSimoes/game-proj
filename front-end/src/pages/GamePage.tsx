@@ -1,4 +1,5 @@
 import { Button } from "@mui/material";
+import { MyCustomInput, MyCustomInput_variant } from "@/helpers/sxConfigs";
 
 import { useLocation, useNavigate, useParams } from "react-router";
 
@@ -7,34 +8,13 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '@/services/firebaseConfig';
 import { FaArrowLeft } from "react-icons/fa";
-import { MyCustomInput, MyCustomInput_variant } from "@/helpers/sxConfigs";
-
-
-type dadosJogos = {
-    id: string
-    name: string;
-    hours_played?: number | string;
-    hours_expected?: number | string;
-    priority: string;
-    platform: string;
-    genre: string;
-    status: string;
-    replayed: string
-    // is_completed?: boolean;
-    release_year: number | string;
-    year_started?: number | string;
-    year_finished?: number | string;
-    background_image?: string;
-
-    // deletajooj: (id: string) => Promise<void>
-}
-// pegar o nome (name) e tranformar em slug
-// <Link to={`/home/${slugName}`}/>
 
 
 export const GamePage = () => {
+
     const { slug } = useParams();
     const [user] = useAuthState(auth);
+
     const navigate = useNavigate()
     const location = useLocation();
 
@@ -58,7 +38,7 @@ export const GamePage = () => {
             startIcon={<FaArrowLeft />}>
             Voltar
         </Button>
-        <span className="text-white">Erro ao carregar jogo</span>
+        <span className="text-white">Erro ao carregar página de jogo</span>
     </div>;
 
     return (

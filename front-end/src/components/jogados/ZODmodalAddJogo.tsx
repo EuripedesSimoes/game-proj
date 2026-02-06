@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
-import TextField from '@mui/material/TextField';
+import { Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem } from '@mui/material';
 // import API from '@/services/gameApiServices';
 // import type { GamePayload2 } from '@/interfaces/gameDataTypes';
 import { RiCloseCircleLine } from "react-icons/ri";
-import { FaClock, FaDownload, FaFolderPlus, FaPlus, FaPlusCircle, FaPlusSquare } from 'react-icons/fa';
+import { FaClock, FaDownload, FaPlus } from 'react-icons/fa';
 import Select from '@mui/material/Select';
 import { allPriorities, allPlatforms, allStatus, allGenres, isReplayedList } from '@/services/listasParaFiltro';
 
@@ -94,10 +93,7 @@ export default function ZodAddGameModal() {
     const horasEsperada = watch("hours_expected");
     const anoLancado = watch("release_year");
     const anoStartado = watch("year_started");
-    // const anoFin = watch("year_finished");
-    // const pri = watch('priority')
     const statusWatch = watch('status')
-    // const gameIMG = watch('background_image')
     const anoFinalizado = watch('year_finished')
 
     useEffect(() => {
@@ -134,14 +130,11 @@ export default function ZodAddGameModal() {
 
     return (
         <div className='w-full h-full flex flex-col justify-center items-center'>
-            <Button onClick={handleClickOpen}> <FaPlus className='size-5'/> Adicionar Jogo </Button>
+            <Button onClick={handleClickOpen} className={`${user?.uid === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? 'hidden' : 'flex'}`}> <FaPlus className='size-5'/> Adicionar Jogo </Button>
 
             {/* Adicionar backdropblur-md */}
             <Dialog open={open} onClose={handleClose} className='bg-slate-700'
-                sx={{
-                    input: { color: '#f1f5f9' },
-                    label: { color: '#3c3c3c' }
-                }}
+                sx={{ input: { color: '#f1f5f9' }, label: { color: '#3c3c3c' } }}
             >
                 <DialogTitle sx={{ m: 0, p: 1.5, fontWeight: "bold" }} >
                     <div className='flex justify-between items-center'>
