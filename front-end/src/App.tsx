@@ -15,13 +15,14 @@ import { getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
 
 import ZodAddGameModal from './components/jogados/ZODmodalAddJogo.tsx';
 import CardComponent from './components/jogados/cardComponent.tsx';
+import SteamHoverCard from './components/SteamHoverCard';
 
 import { auth, db } from './services/firebaseConfig.ts';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
 import { FaBorderStyle } from 'react-icons/fa'
 
-type CardSize = 'grande' | 'médio' | 'pequeno';
+type CardSize = 'grande' | 'médio' | 'pequeno' | 'steam';
 
 export default function App() {
 
@@ -38,7 +39,7 @@ export default function App() {
       // Verificamos se o valor existe e se é uma das opções válidas
       if (stored) {
         const parsed = JSON.parse(stored) as CardSize;
-        const validSizes: CardSize[] = ['grande', 'médio', 'pequeno'];
+        const validSizes: CardSize[] = ['grande', 'médio', 'pequeno', 'steam'];
 
         return validSizes.includes(parsed) ? parsed : 'médio';
       }
@@ -62,7 +63,8 @@ export default function App() {
     const proximos: Record<CardSize, CardSize> = {
       pequeno: 'médio',
       médio: 'grande',
-      grande: 'pequeno'
+      grande: 'steam',
+      steam: 'pequeno'
     };
 
     // Pegamos o próximo baseado no valor atual
@@ -231,30 +233,49 @@ export default function App() {
           <div key={cardsKey} className={` flex flex-col  
           ${steamCard === 'pequeno' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 min-[112rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
               : steamCard === 'médio' ? ' min-[520px]:grid min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 min-[112rem]:grid-cols-4 '
-                : steamCard === 'grande' && ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
+                : steamCard === 'grande' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
+                  : steamCard === 'steam' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
+                    : ''
             }
              gap-8 py-6 px-4 w-11/12 min-h-screen`}>
             {sortedGames.map((game: myGamesApiInterface) => (
               <div key={game.id}>
-                <CardComponent
-                  id={game.id}
-                  name={game.name}
-                  hours_played={game.hours_played !== '' ? game.hours_played : '0'}
-                  hours_expected={game.hours_expected !== '' ? game.hours_expected : '0'}
-                  priority={game.priority}
-                  platform={game.platform}
-                  genre={game.genre}
-                  status={game.status}
-                  replayed={game.replayed}
-                  release_year={game.release_year}
-                  year_started={game.year_started !== '' ? game.year_started : '0'}
-                  year_finished={game.year_finished !== '' ? game.year_finished : '0'}
-                  background_image={game.background_image}
-                  deletajooj={fbDeletajooj}
-                  steamCard={steamCard}
-                  // uidValidator={'uid' in game ? uid! : 'sem-uid'} // Passa o uid para o card, ou um valor padrão se não existir
-                  uidValidator={user?.uid!}
-                />
+                {steamCard === 'steam' ? (
+                  <SteamHoverCard game={{
+                    id: game.id,
+                    name: game.name,
+                    hours_played: game.hours_played,
+                    hours_expected: game.hours_expected,
+                    priority: game.priority,
+                    platform: game.platform,
+                    genre: game.genre,
+                    status: game.status,
+                    replayed: game.replayed,
+                    release_year: game.release_year,
+                    year_started: game.year_started,
+                    year_finished: game.year_finished,
+                    background_image: game.background_image,
+                  }} deletajooj={fbDeletajooj} uidValidator={user?.uid!} />
+                ) : (
+                  <CardComponent
+                    id={game.id}
+                    name={game.name}
+                    hours_played={game.hours_played !== '' ? game.hours_played : '0'}
+                    hours_expected={game.hours_expected !== '' ? game.hours_expected : '0'}
+                    priority={game.priority}
+                    platform={game.platform}
+                    genre={game.genre}
+                    status={game.status}
+                    replayed={game.replayed}
+                    release_year={game.release_year}
+                    year_started={game.year_started !== '' ? game.year_started : '0'}
+                    year_finished={game.year_finished !== '' ? game.year_finished : '0'}
+                    background_image={game.background_image}
+                    deletajooj={fbDeletajooj}
+                    steamCard={steamCard}
+                    uidValidator={user?.uid!}
+                  />
+                )}
               </div>
 
             ))}
