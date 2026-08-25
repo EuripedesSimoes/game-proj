@@ -19,8 +19,8 @@ import { z } from 'zod';
 import { gameAttSchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/gameFormSchemas'
 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, db } from '@/services/firebaseConfig';
-import { getStorage, ref, getDownloadURL, uploadBytesResumable, deleteObject } from "firebase/storage";
+import { auth, db, storage } from '@/services/firebaseConfig';
+import { ref, getDownloadURL, uploadBytesResumable, deleteObject } from "firebase/storage";
 import { InputAttModal } from '@/helpers/sxConfigs';
 
 type AttProps = {
@@ -112,7 +112,6 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
     const [progress, setProgress] = useState<number>(0);
     // const [isUploading, setIsUploading] = useState<boolean>(false)
     const uploadImage = (file: File) => {
-        const storage = getStorage();
         const storageRef = ref(storage, `users/${uid}/jogos/${Date.now()}_${file.name}`);
 
         const uploadTask = uploadBytesResumable(storageRef, file);
@@ -139,7 +138,6 @@ const AttGameModal = ({ gameId, data }: AttProps) => {
         if (!imageUrl) return;
 
         try {
-            const storage = getStorage();
             const imagemRef = ref(storage, imageUrl);
             await deleteObject(imagemRef);
             console.log('Imagem antiga deletada com sucesso');

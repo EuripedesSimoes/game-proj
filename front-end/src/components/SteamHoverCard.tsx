@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 import type { myGamesApiInterface } from "@/interfaces/gameDataTypes";
 import { Button } from "@mui/material";
@@ -15,6 +15,9 @@ interface Props {
 export default function SteamHoverCard({ game, deletajooj, uidValidator }: Props) {
   const [hovered, setHovered] = useState(false);
   const [selected, setSelected] = useState(false);
+  const imageUrl = typeof game.background_image === 'string'
+    ? game.background_image.trim()
+    : '';
 
   const isOpen = hovered || selected;
   // console.log(hovered, selected)
@@ -49,7 +52,7 @@ export default function SteamHoverCard({ game, deletajooj, uidValidator }: Props
         onHoverEnd={() => setHovered(false)}
         className={`
           relative
-          w-auto
+          w-full
           ${selected ? 'cursor-zoom-out' : 'cursor-zoom-in'}
           z-50
         `}
@@ -63,19 +66,19 @@ export default function SteamHoverCard({ game, deletajooj, uidValidator }: Props
           duration: 0.25,
         }}
       >
-        <div className="h-64 relative">
-          <Link to={`/home/jogos/${game.id}`}>
-            <img
-              src={game.background_image ?? ''}
-              alt={game.name ?? 'cover'}
-              className="
-                w-full
-                h-full
-                object-center
-                object-cover
-                rounded-xl
-              "
-            />
+        <div className="relative h-64 w-full overflow-hidden rounded-xl">
+          <Link to={`/home/jogos/${game.id}`} className="block h-full w-full">
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={game.name}
+                className="h-full w-full object-cover object-center"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-slate-700 px-4 text-center text-sm text-white/70">
+                Sem imagem de capa
+              </div>
+            )}
           </Link>
 
           {/* Fade branco */}
@@ -136,7 +139,7 @@ export default function SteamHoverCard({ game, deletajooj, uidValidator }: Props
 
                   <div className={`${uidValidator === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? 'hidden' : 'flex'} gap-2`}> 
                     {deletajooj && (
-                      <Button className='bg-white/60' onClick={() => deletajooj(game.id, game.background_image)}>
+                      <Button className='bg-white/60' onClick={() => deletajooj(game.id, imageUrl)}>
                         <FaEraser className="h-5 w-5 text-red-600/80" />
                       </Button>
                     )}

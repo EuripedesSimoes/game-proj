@@ -75,7 +75,14 @@ export default function AppParaJogar() {
     const fetchJogosParaJogar = async () => {
         if (!userJogosParaJogarCollectionRef) return [];
         const snapshot = await getDocs(userJogosParaJogarCollectionRef);
-        return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+        return snapshot.docs.map((doc) => {
+            const game = doc.data();
+            return {
+                ...game,
+                id: doc.id,
+                background_image: game.background_image ?? '',
+            };
+        });
     };
 
     // 3. O useQuery DEVE ser chamado no topo, sem condicionais antes dele.

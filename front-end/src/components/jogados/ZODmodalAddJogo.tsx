@@ -9,8 +9,7 @@ import Select from '@mui/material/Select';
 import { allPriorities, allPlatforms, allStatus, allGenres, isReplayedList } from '@/services/listasParaFiltro';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { addDoc, collection, getFirestore } from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
+import { addDoc, collection } from 'firebase/firestore';
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -19,8 +18,8 @@ import { gameSchema, normalizeOnlyNumbers, normalizeYear } from '@/helpers/gameF
 // import { ms } from 'zod/v4/locales';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, firebaseConfig } from '@/services/firebaseConfig';
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { auth, db, storage } from '@/services/firebaseConfig';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import '../../tailwindColors.css'
 import { InputAddModal, InputYears } from '@/helpers/sxConfigs';
 
@@ -33,8 +32,6 @@ export default function ZodAddGameModal() {
     })
 
     const queryClient = useQueryClient() // <--- novo
-    const firebaseApp = initializeApp(firebaseConfig);
-    const db = getFirestore(firebaseApp)
     // const jogosParaJogar = collection(db, 'joojs') // referência à coleção 'jogos-para-jogar' no Firestore
 
     // 1. Obter o usuário logado
@@ -60,7 +57,6 @@ export default function ZodAddGameModal() {
 
             // 1. Se o usuário escolheu uma imagem, fazemos o upload agora
             if (imageFile) {
-                const storage = getStorage();
                 const storageRef = ref(storage, `users/${uid}/jogos/${Date.now()}_${imageFile.name}`);
 
                 // AGUARDA o upload terminar
@@ -68,6 +64,10 @@ export default function ZodAddGameModal() {
 
                 // PEGA o link permanente da imagem no Firebase
                 finalImageUrl = await getDownloadURL(snapshot.ref);
+            }
+
+            if (imageFile && !finalImageUrl) {
+                throw new Error('O Firebase não retornou a URL da imagem após o upload.');
             }
 
             await addDoc(userJogosCollectionRef, {
@@ -111,11 +111,10 @@ export default function ZodAddGameModal() {
         }
     }, [statusWatch, setValue, anoFinalizado]);
 
-    const [projectImage, setProjectImage] = useState<string | null>(null)
     const [imageFile, setImageFile] = useState<File | null>(null); // Guardamos o ARQUIVO real
     const [previewURL, setPreviewURL] = useState<string | null>(null); // Guardamos o PREVIEW (blob)
 
-    function triggerImageInput(id: string) {
+    function triggerImageInput() {
         document.getElementById('background_image')?.click();
     }
 
@@ -125,7 +124,6 @@ export default function ZodAddGameModal() {
             setImageFile(file); // Salva o arquivo para usar no onSubmit
             setPreviewURL(URL.createObjectURL(file)); // Gera o preview visual
         }
-        return null
     }
 
     return (
@@ -590,15 +588,15 @@ export default function ZodAddGameModal() {
                                     {previewURL ? (
                                         <img src={previewURL} className='object-cover object-center' />)
                                         :
-                                        (<button type='button' onClick={() => triggerImageInput('background_image')} className='w-full h-full' >150x150</button>)
+                                        (<button type='button' onClick={triggerImageInput} className='w-full h-full' >150x150</button>)
                                     }
                                 </div>
-                                <button type='button' onClick={() => triggerImageInput('background_image')}>
+                                <button type='button' onClick={triggerImageInput}>
                                     <span className='flex justify-center px-2 py-0.5'><FaDownload className='size-6' /></span>
                                     <span className='text-base flex justify-center px-2 py-0.5'>Adicionar imagem</span>
                                 </button>
                                 <input type="file" name="background_image" id="background_image" accept='image/*' className='hidden'
-                                    onChange={((ev) => setProjectImage(handleImageInput(ev)))} />
+                                    onChange={handleImageInput} />
                             </div>
                             
                         </div>
