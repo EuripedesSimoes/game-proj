@@ -22,6 +22,9 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
 import { FaBorderStyle } from 'react-icons/fa'
 
+import Dana from './assets/Ys-Dana-Wallpaper-1080x1920.51e513139f4fdbbbd3c0.jpg'
+import Valstrax from './assets/valstrax wpp.jpg'
+
 type CardSize = 'grande' | 'médio' | 'pequeno' | 'steam';
 
 export default function App() {
@@ -210,7 +213,7 @@ export default function App() {
 
 
   return (
-    <main className='flex flex-col w-full pt-4 min-h-screen items-center bg-gray-800'>
+    <main className='flex flex-col w-full pt-4 min-h-screen items-center bg-gray-700/40'>
 
       {/* <h3 className='text-4xl p-4 text-white font-bold'>Welcome to <span className='font-bold text-4xl text-red-400'>Gamify</span></h3> */}
 
@@ -240,11 +243,11 @@ export default function App() {
           <div key={cardsKey} className={` flex flex-col  
           ${steamCard === 'pequeno' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 min-[112rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
               : steamCard === 'médio' ? ' min-[520px]:grid min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 min-[112rem]:grid-cols-4 '
-                : steamCard === 'grande' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
-                  : steamCard === 'steam' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
+                : steamCard === 'grande' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-6 min-[136rem]:grid-cols-7 '
+                  : steamCard === 'steam' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-6 min-[136rem]:grid-cols-7 '
                     : ''
             }
-             gap-8 py-6 px-4 w-11/12 min-h-screen`}>
+             gap-8 py-6 px-4 w-11/12 `}>
             {sortedGames.map((game: myGamesApiInterface) => (
               <div key={game.id}>
                 {steamCard === 'steam' ? (
@@ -261,7 +264,7 @@ export default function App() {
                     release_year: game.release_year,
                     year_started: game.year_started,
                     year_finished: game.year_finished,
-                    background_image: game.background_image,
+                    background_image: game.background_image ? game.background_image : Dana, // Use a imagem padrão se não houver
                   }} deletajooj={fbDeletajooj} uidValidator={user?.uid!} />
                 ) : (
                   <CardComponent
@@ -277,7 +280,7 @@ export default function App() {
                     release_year={game.release_year}
                     year_started={game.year_started !== '' ? game.year_started : '0'}
                     year_finished={game.year_finished !== '' ? game.year_finished : '0'}
-                    background_image={game.background_image}
+                    background_image={game.background_image ? game.background_image : Valstrax}
                     deletajooj={fbDeletajooj}
                     steamCard={steamCard}
                     uidValidator={user?.uid!}
