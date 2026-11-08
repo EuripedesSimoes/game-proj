@@ -25,7 +25,8 @@ import { FaBorderStyle } from 'react-icons/fa'
 import Dana from './assets/Ys-Dana-Wallpaper-1080x1920.51e513139f4fdbbbd3c0.jpg'
 import Valstrax from './assets/valstrax wpp.jpg'
 
-type CardSize = 'grande' | 'médio' | 'pequeno' | 'steam';
+// type CardSize = 'grande' | 'médio' | 'pequeno' | 'steam';
+type CardSize = 'grande' | 'médio' | 'steam';
 
 export default function App() {
 
@@ -42,7 +43,8 @@ export default function App() {
       // Verificamos se o valor existe e se é uma das opções válidas
       if (stored) {
         const parsed = JSON.parse(stored) as CardSize;
-        const validSizes: CardSize[] = ['grande', 'médio', 'pequeno', 'steam'];
+        // const validSizes: CardSize[] = ['grande', 'médio', 'pequeno', 'steam'];
+        const validSizes: CardSize[] = ['grande', 'médio', 'steam'];
 
         return validSizes.includes(parsed) ? parsed : 'médio';
       }
@@ -64,10 +66,11 @@ export default function App() {
   const alterarTamanhoCard = () => {
     // Mapeamos: "se for atual, o próximo é X"
     const proximos: Record<CardSize, CardSize> = {
-      pequeno: 'médio',
+      // pequeno: 'médio',
       médio: 'grande',
       grande: 'steam',
-      steam: 'pequeno'
+      // steam: 'pequeno'
+      steam: 'médio'
     };
 
     // Pegamos o próximo baseado no valor atual
@@ -240,16 +243,17 @@ export default function App() {
         <>
           {/* <div className='flex flex-col justify-start min-h-screen w-full'> */}
 
-          <div key={cardsKey} className={` flex flex-col  
-          ${steamCard === 'pequeno' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 min-[112rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
-              : steamCard === 'médio' ? ' min-[520px]:grid min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 min-[112rem]:grid-cols-4 '
-                : steamCard === 'grande' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-6 min-[136rem]:grid-cols-7 '
-                  : steamCard === 'steam' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-6 min-[136rem]:grid-cols-7 '
-                    : ''
-            }
-             gap-8 py-6 px-4 w-11/12 `}>
+          <div key={cardsKey} className={`
+          ${
+            // steamCard === 'pequeno' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 min-[112rem]:grid-cols-5 min-[136rem]:grid-cols-6 ' :
+            steamCard === 'médio' ? ' min-[520px]:grid min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 min-[112rem]:grid-cols-4 '
+              : steamCard === 'grande' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
+                : steamCard === 'steam' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-6 min-[136rem]:grid-cols-7 '
+                  : ''
+            } gap-8 py-6 px-4 w-11/12 content-start`
+          }>
             {sortedGames.map((game: myGamesApiInterface) => (
-              <div key={game.id}>
+              <div key={game.id} className='mt-2 mb-2'>
                 {steamCard === 'steam' ? (
                   <SteamHoverCard game={{
                     id: game.id,

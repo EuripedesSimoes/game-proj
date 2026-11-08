@@ -18,6 +18,7 @@ export default function SteamHoverCard({ game, deletajooj, uidValidator }: Props
   const imageUrl = typeof game.background_image === 'string'
     ? game.background_image.trim()
     : '';
+  const hoursPlayed = Number(game.hours_played ?? 0);
 
   const isOpen = hovered || selected;
   // console.log(hovered, selected)
@@ -134,20 +135,21 @@ export default function SteamHoverCard({ game, deletajooj, uidValidator }: Props
                 `
                 }
               >
-                <div className="flex justify-between items-center">
-                  <p className=" text-white/85">{game.platform}</p>
 
-                  <div className={`${uidValidator === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? 'hidden' : 'flex'} gap-2`}> 
-                    {deletajooj && (
-                      <Button className='bg-white/60' onClick={() => deletajooj(game.id, imageUrl)}>
-                        <FaEraser className="h-5 w-5 text-red-600/80" />
-                      </Button>
-                    )}
-                    <AttGameModal gameId={game.id} data={game} />
-                  </div>
+                <div className={`${uidValidator === 'LmUiBeD97qW9Ft2FzJfnEMHKzXK2' ? 'hidden justify-between items-center' : 'flex justify-between items-center'} gap-2`}>
+                  {deletajooj && (
+                    <Button className='bg-white/60' onClick={() => deletajooj(game.id, imageUrl)}>
+                      <FaEraser className="h-5 w-5 text-red-600/80" />
+                    </Button>
+                  )}
+                  <AttGameModal gameId={game.id} data={game} />
                 </div>
 
-                <p className=" text-white/85">{String(game.hours_played ?? '0')} horas</p>
+                <p className=" text-white/85">{game.platform}</p>
+
+                <p className="text-white/85">
+                  {hoursPlayed} {hoursPlayed === 1 ? 'hora jogada' : 'horas jogadas'}
+                </p>
 
                 <p className=" text-white/85">{String(game.hours_expected ?? '0')} horas esperadas</p>
 

@@ -17,7 +17,8 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { getStorage, ref, deleteObject } from 'firebase/storage';
 import { FaBorderStyle } from 'react-icons/fa';
 
-type CardSize = 'grande' | 'médio' | 'pequeno' | 'steam';
+// type CardSize = 'grande' | 'médio' | 'pequeno' | 'steam';
+type CardSize = 'grande' | 'médio' | 'steam';
 
 export default function AppParaJogar() {
 
@@ -28,7 +29,8 @@ export default function AppParaJogar() {
             // Verificamos se o valor existe e se é uma das opções válidas
             if (stored) {
                 const parsed = JSON.parse(stored) as CardSize;
-                const validSizes: CardSize[] = ['grande', 'médio', 'pequeno', 'steam'];
+                // const validSizes: CardSize[] = ['grande', 'médio', 'pequeno', 'steam'];
+                const validSizes: CardSize[] = ['grande', 'médio', 'steam'];
 
                 return validSizes.includes(parsed) ? parsed : 'médio';
             }
@@ -50,10 +52,11 @@ export default function AppParaJogar() {
     const alterarTamanhoCard = () => {
         // Mapeamos: "se for atual, o próximo é X"
         const proximos: Record<CardSize, CardSize> = {
-            pequeno: 'médio',
+            // pequeno: 'médio',
             médio: 'grande',
             grande: 'steam',
-            steam: 'pequeno'
+            // steam: 'pequeno'
+            steam: 'médio'
         };
 
         // Pegamos o próximo baseado no valor atual
@@ -209,15 +212,17 @@ export default function AppParaJogar() {
                 ) :
                     (
                         <div key={cardsKey} className={` flex flex-col
-                            ${steamCardPJ === 'pequeno' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 min-[112rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
-                                    : steamCardPJ === 'médio' ? ' min-[520px]:grid min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 min-[112rem]:grid-cols-4 '
-                                        : steamCardPJ === 'grande' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
-                                            : steamCardPJ === 'steam' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
-                                                : ''
-                            } gap-8 py-6 px-4 w-11/12 min-h-screen`}>
+                            ${
+                                // steamCardPJ === 'pequeno' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 min-[112rem]:grid-cols-5 min-[136rem]:grid-cols-6 ' :
+                                steamCardPJ === 'médio' ? ' min-[520px]:grid min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 min-[112rem]:grid-cols-4 '
+                                    : steamCardPJ === 'grande' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
+                                        : steamCardPJ === 'steam' ? ' min-[520px]:grid grid-cols-1 min-[520px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4  min-[116rem]:grid-cols-5 min-[136rem]:grid-cols-6 '
+                                            : ''
+                            } gap-8 py-6 px-4 w-11/12 content-start`
+                            }>
                             {sortedGames.map((game: myGamesApiInterface) => {
                                 return (
-                                    <div key={game.id}>
+                                    <div key={game.id} className='mt-2 mb-2'>
                                         {steamCardPJ === 'steam' ? (
                                             <SteamHoverCard game={{
                                                 id: game.id,
